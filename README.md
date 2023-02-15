@@ -13,6 +13,15 @@ npm install --save @fyno/inapp
 ```
 
 ## Usage
+Before installing Inapp Notification Center make sure you have generated HMAC signature in the backend by following the below process
+```jsx
+import crypto from "crypto";
+const computedUserHmac = crypto
+  .createHmac("sha256", "WSID")
+  .update("USER_ID")
+  .digest("hex");
+
+```
 
 ```jsx
 import {FynoInappCenter} from '@fyno/inapp'
