@@ -1,0 +1,14 @@
+/* add css module styles here (optional) */
+
+::-webkit-scrollbar {
+  width: 8px; 
+}
+
+::-webkit-scrollbar-track {
+background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+background: #929292;
+border-radius: 3px;
+}
