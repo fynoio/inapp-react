@@ -11,6 +11,7 @@ export const NotificationsHomeContext = React.createContext()
 export const useNotificationsHomeContext = () => useContext(NotificationsHomeContext)
 
 export const NotificationsHomeProvider = ({ user, workspace, signature,logo, children }) => {
+  const [close, setClose] = useState(false)
   const [errMsg, setErrMsg] = useState('')
   const [list, setList] = useState([])
   const [unreadList, setUnreadList] = useState([])
@@ -87,15 +88,18 @@ export const NotificationsHomeProvider = ({ user, workspace, signature,logo, chi
       handleIncomingMessage(data)
     })
     socket.on('messages:state', data => {
-      setList(prev => prev.concat(data.messages))
-      setUnreadCount(data.unreadCount)
-      setCount(data.total)
+      data.filter === 'all' ? setList(prev => prev.concat(data.messages.messages)) : setUnreadList(prev => prev.concat(data.messages.messages))
+      setUnreadCount(data.messages.unread)
+      setCount(data.messages.total)
     })
     socket.on('statusUpdated', status => {
       handleChangeStatus(status)
     })
+    socket.on('lastSeenUpdated', (time) => {
+      localStorage.setItem('fynoinapp_ls', time)
+    })
     socket.on('disconnect', err => {
-      // console.log(socket.id)
+      setErrMsg(err.message)
     })
 
     return () => {
@@ -144,7 +148,8 @@ export const NotificationsHomeProvider = ({ user, workspace, signature,logo, chi
 
   const handleToast = (data,socket) => {
     toast(
-      t => <ToastStructure t={t} msg={data} socketInstance={socket} logo={logo}/>
+      t => <ToastStructure t={t} msg={data} socketInstance={socket} logo={logo} onMouseEnter={() => { setClose(true); }}
+      onMouseLeave={() => { setClose(false); }}/>
     )
   }
 
@@ -159,7 +164,9 @@ export const NotificationsHomeProvider = ({ user, workspace, signature,logo, chi
       list,
       unreadList,
       unreadCount,
-      count
+      count,
+      errMsg,
+      close
     },
     handlers: {
       handleClosePanel,
@@ -170,7 +177,8 @@ export const NotificationsHomeProvider = ({ user, workspace, signature,logo, chi
       handleIncomingMessage,
       handleMarkAsRead,
       handleDelete,
-      loadMoreNotifications
+      loadMoreNotifications,
+      setClose
     }
   }
 
