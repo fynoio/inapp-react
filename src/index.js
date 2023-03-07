@@ -3,6 +3,7 @@ import NotificationHomeWrapper from './notifications/components/notificationsHom
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import React from 'react';
 import './styles.module.css';
+import { useNotificationsHomeContext } from './notifications/context';
 
 export const FynoInappCenter = ({mode, user, workspace, signature, themeConfig, notificationSettings}) => {
   const lightColor = '58, 53, 65'
@@ -54,6 +55,7 @@ export const FynoInappCenter = ({mode, user, workspace, signature, themeConfig, 
   });
   return (
     <ThemeProvider theme={theme}>
+        <div>{close}</div>
         <NotificationHomeWrapper user={user} workspace={workspace} signature={signature} logo={themeConfig?.logo}/>
         <Toaster position={notificationSettings?.toastPosition || "top-right"} toastOptions={{
           duration: notificationSettings?.duration || 5000,

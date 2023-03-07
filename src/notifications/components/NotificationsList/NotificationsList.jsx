@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
+import parse from 'html-react-parser'
 import { useInView } from 'react-intersection-observer'
-import PerfectScrollbarComponent from 'react-perfect-scrollbar'
 
 import { DeleteOutline, DoneAll, HourglassEmpty, LibraryBooks, MoreHoriz } from '@mui/icons-material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
@@ -94,8 +94,88 @@ const AttachmentComponent = ({ type, attachmentsObject, showBlur }) => {
   }
 }
 
+const preview = (value, list) => {
+  if (value) {
+    var preview_val = value
+    for (const key in list) {
+      let regex = new RegExp(key, list[key]['scope'])
+      preview_val =
+        typeof preview_val === 'string'
+          ? preview_val?.replace(regex, list[key]['with'])
+          : preview_val?.map(item => {
+              return item?.replace(regex, list[key]['with'])
+            })
+    }
+
+    const tt_regex =
+      /(<tt style=\"word-wrap: break-word; white-space: pre-wrap; word-break: break-word;\">(?:\n|.)+?<\/tt>)/gm
+
+    let m,
+      replace = [],
+      replace_with = []
+
+    while ((m = tt_regex.exec(preview_val)) !== null) {
+      // This is necessary to avoid infinite loops with zero-width matches
+      if (m.index === tt_regex.lastIndex) {
+        tt_regex.lastIndex++
+      }
+
+      let replace_with_temp = m[0]
+        .replace(/<i>|<\/i>?/gm, '_')
+        .replace(/<b>|<\/b>?/gm, '*')
+        .replace(/<s>|<\/s>?/gm, '~')
+
+      if (m[0] != replace_with_temp) {
+        replace.push(m[0])
+        replace_with.push(replace_with_temp)
+      }
+    }
+    for (let i = 0; i < replace?.length; i++) {
+      preview_val = preview_val.replace(replace[i], replace_with[i])
+    }
+    return preview_val
+  } else {
+    return ''
+  }
+}
+
 const MainBody = ({ body, title }) => {
   const theme = useTheme();
+  const list = {
+    '&': {
+      scope: 'g',
+      with: '&amp;'
+    },
+    '<': {
+      scope: 'g',
+      with: '&lt;'
+    },
+    '>': {
+      scope: 'g',
+      with: '&gt;'
+    },
+    '"': {
+      scope: 'g',
+      with: '&quot;'
+    },
+    '\\*(\\S(?:.*?)\\S|\\S)\\*': {
+      scope: 'g',
+      with: '<b>$1</b>'
+    },
+    '\\b_(\\S(?:.*?)\\S|\\S)_\\b': {
+      scope: 'g',
+      with: '<i>$1</i>'
+    },
+    '~(\\S(?:.*?)\\S|\\S)~': {
+      scope: 'g',
+      with: '<s>$1</s>'
+    },
+    '```((?:\\n|.)*?)```': {
+      scope: 'gm',
+      with: '<tt style="word-wrap: break-word; white-space: pre-wrap; word-break: break-word;">$1</tt>'
+    }
+  }
+  const renderBody = preview(body, list)
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <Box>
@@ -103,7 +183,7 @@ const MainBody = ({ body, title }) => {
           {title}
         </Typography>
         <Typography fontSize={'0.8rem'} fontWeight={200} color={theme.palette.text.primary}>
-          {body}
+          {parse(renderBody)}
         </Typography>
       </Box>
     </Box>
@@ -154,8 +234,8 @@ const NotificationFooter = ({ createdAt, msg }) => {
               onClick={e => {
                 e.preventDefault()
                 e.stopPropagation()
-                setOpenMenu(false)
                 handleMarkAsRead(msg)
+                setOpenMenu(false)
               }}
             >
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -182,7 +262,7 @@ const NotificationFooter = ({ createdAt, msg }) => {
   )
 }
 
-const LinkWrapper = ({ children, link, hover = false, newTab = true, item }) => {
+const LinkWrapper = ({ children, link, hover = false, sameTab = "false", item }) => {
   const theme = useTheme()
   const hasAttachment = link?.length > 0 && hover
 
@@ -205,8 +285,10 @@ const LinkWrapper = ({ children, link, hover = false, newTab = true, item }) => 
     position: 'absolute'
   }
   return (
-    <Link target={!newTab ? '_self' : '_blank'} href={`${link}`} style={{textDecoration:'none'}}>
-      <Box onClick={() => handleMarkAsRead(item)} sx={{ position: 'relative' }}>
+    <Link target={sameTab === "true" ? '_self' : '_blank'} href={`${link}`} style={{textDecoration:'none'}}>
+      <Box onClick={(e) => {
+        handleMarkAsRead(item);
+        }} sx={{ position: 'relative' }}>
         {hasAttachment && (
           <Box
             sx={{ ...HoverBoxStyles }}
@@ -239,18 +321,18 @@ const ActionsComponent = ({ item }) => {
     return (
       <Grid container flexDirection='row-reverse' justifyContent='flex-end' sx={{ gap: 1, mt: 1 }}>
         {buttons.map((item, index) => {
-          const newTab = item?.isNewTab || true;
-          if (Boolean(item?.primary) === false || item?.primary === undefined) {
+          const sameTab = item?.sameTab || "false";
+          if (item?.primary === "false" || item?.primary === undefined) {
             return (
-              <a key={item + index} target={newTab ? '_blank' : '_self'} href={`${item?.action}`} style={{textDecoration:'none'}}>
+              <a key={item + index} target={sameTab === "false" ? '_blank' : '_self'} href={`${item?.action}`} style={{textDecoration:'none'}}>
                 <Button disableElevation variant={'outlined'} size='small' sx={{ fontSize: '0.6rem' }}>
                   {item?.label}
                 </Button>
               </a>
             )
-          } else if (Boolean(item?.primary) === true) {
+          } else if (item?.primary === "true") {
             return (
-              <a key={item + index} target={newTab ? '_blank' : '_self'} href={`${item?.action}`} style={{textDecoration: 'none'}}>
+              <a key={item + index} target={sameTab === "false" ? '_blank' : '_self'} href={`${item?.action}`} style={{textDecoration: 'none'}}>
                 <Button disableElevation variant={'contained'} size='small' sx={{ fontSize: '0.6rem' }}>
                   {item?.label}
                 </Button>
@@ -267,12 +349,21 @@ const NotificationItem = ({ item }) => {
   const theme = useTheme()
   const type = item?.notification_content?.attachments?.type
   const read = item?.isRead
-  const mainLink = item?.notification_content?.action?.href
-  const newTab = item?.notification_content?.action?.isNewTab
+  let mainLink = item?.notification_content?.action?.href
+  if(mainLink && mainLink[0] !== '/' ){
+    if(!(/^https:/.test(mainLink) || /^http:/.test(mainLink))){
+      if(/[a-zA-Z]\.[a-zA-Z]/.test(mainLink)){
+        mainLink = "https://"+ mainLink
+      } else {
+        mainLink = "/"+ mainLink
+      }
+    }
+  }
+  const sameTab = item?.notification_content?.action?.sameTab
 
   const {
     data: { brandLogo },
-    handlers: { handleClick }
+    handlers: { handleMarkAsRead }
   } = useNotificationsHomeContext()
 
   const createdAt = item?.createdAt
@@ -288,7 +379,7 @@ const NotificationItem = ({ item }) => {
     pt: 2,
     pb: 0,
     px: 3,
-    background: read ? '' : theme.palette.mode === 'dark' ? 'rgba(145, 85, 253, 0.08)' : 'rgba(145, 85, 253, 0.059)',
+    background: read ? '' : theme.palette.primary.main+"1A",
     cursor: 'pointer',
     ':hover': { translate: '0 -2px' },
     transition: '0.3s translate ease-in-out',
@@ -297,12 +388,13 @@ const NotificationItem = ({ item }) => {
   }
 
   return (
-    <LinkWrapper link={mainLink} newTab={newTab} item={item}>
+    <LinkWrapper link={mainLink} sameTab={sameTab} item={item}>
       <Grid
         container
         sx={{ ...styles }}
-        onClick={() => {
-          handleClick()
+        onClick={(e) => {
+          e.stopPropagation()
+          handleMarkAsRead(item)
         }}
       >
         <Grid item xs={1.3}>
@@ -316,7 +408,7 @@ const NotificationItem = ({ item }) => {
           <Box
             sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between' }}
           >
-            <LinkWrapper item={item} link={attachmentLink} hover={true} newTab={true}>
+            <LinkWrapper item={item} link={attachmentLink} hover={true} sameTab={"false"}>
               <AttachmentComponent type={type} attachmentsObject={attachmentsObject} />
             </LinkWrapper>
           </Box>
@@ -340,14 +432,14 @@ const EmptyList = () => {
   return (
     <Box
       sx={{
-        height: xs ? 400 : '79vh',
+        height: xs ? '53vh' : "70vh",
         width: '100%',
         color: theme.palette.secondary.main,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'flex-start',
-        pt: 10,
+        pt: '20vh',
         textAlign: 'center'
       }}
     >
@@ -373,7 +465,7 @@ export const NotificationsList = ({ filter }) => {
   const xs = useMediaQuery(theme.breakpoints.up('sm'))
 
   const styles = {
-    height: xs ? 400 : '79vh',
+    height: xs ? 400 : '100%',
     width: '100%',
     '& .MuiMenuItem-root:last-of-type': {
       border: 0
@@ -381,13 +473,13 @@ export const NotificationsList = ({ filter }) => {
   }
 
   // ** Styled PerfectScrollbar component
-  const PerfectScrollbar = styled(PerfectScrollbarComponent)({
-    ...styles
-  })
+  // const PerfectScrollbar = styled(PerfectScrollbarComponent)({
+  //   ...styles
+  // })
 
-  const ScrollWrapper = ({ children }) => {
-    return <PerfectScrollbar options={{ wheelPropagation: false, suppressScrollX: true }}>{children}</PerfectScrollbar>
-  }
+  // const ScrollWrapper = ({ children }) => {
+  //   return <PerfectScrollbar options={{ wheelPropagation: false, suppressScrollX: true }}>{children}</PerfectScrollbar>
+  // }
 
   const page = Math.ceil(mapperList?.length / 20)
 
@@ -399,7 +491,7 @@ export const NotificationsList = ({ filter }) => {
 
   if (mapperList?.length > 0) {
     return (
-        <Grid container sx={{ height: '42vh', overflowY: 'auto' }} style={{alignContent: 'flex-start'}}>
+        <Grid container sx={{ height: xs? "53vh":'70vh', overflowY: 'auto', overflowX: 'hidden' }} style={{alignContent: 'flex-start'}}>
         {/* <ScrollWrapper> */}
         {mapperList.map((item, index) => {
           return (

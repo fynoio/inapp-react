@@ -5,18 +5,14 @@ import { FynoInappCenter } from '@fyno/inapp'
 const App = () => {
   const config = {
   mode: 'light',
-  user: 'vinod',
-  workspace: '1234',
-  signature: 'ee6901d581bb7c0a787806d7f726c45852de9b0a1700e82a6f6e476ded4de07c',
+  user: '<username>',
+  workspace: '<wsid from fyno>',
+  signature: '<signature generated on backend following inapp docs>',
   themeConfig: {
-    logo: 'https://logo.clearbit.com/yahoo.com',
-    // darkBackground: '#13005A',
-    // lightBackground:"#F1F6F5",
-    // primary:"#4B56D2"
-  },
-  toastConfig: {
-    position: 'top-left',
-    duration: 1000
+    logo: 'https://app.dev.fyno.io/images/fyno-logo.svg',
+    darkBackground: '#13005A',
+    lightBackground:"#F1F6F5",
+    primary:"#4B56D2"
   },
   notificationSettings: {
     position: 'top-left',
