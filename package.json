@@ -63,6 +63,7 @@
     "url": "https://github.com/fynoio/inapp-react.git"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org"
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
   }
 }
