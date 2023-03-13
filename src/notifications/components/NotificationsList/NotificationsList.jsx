@@ -13,7 +13,6 @@ import {
   Menu,
   MenuItem,
   Typography,
-  styled,
   useMediaQuery,
   useTheme
 } from '@mui/material'
@@ -262,7 +261,7 @@ const NotificationFooter = ({ createdAt, msg }) => {
   )
 }
 
-const LinkWrapper = ({ children, link, hover = false, sameTab = "false", item }) => {
+export const LinkWrapper = ({ children, link, hover = false, sameTab = "false", item }) => {
   const theme = useTheme()
   const hasAttachment = link?.length > 0 && hover
 

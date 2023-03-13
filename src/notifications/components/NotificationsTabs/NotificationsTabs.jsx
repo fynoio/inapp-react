@@ -9,7 +9,7 @@ import { Box, Button, Divider, Grid, Tab, Typography, useTheme,IconButton } from
 import { Close } from '@mui/icons-material'
 import { useNotificationsHomeContext } from '../../context'
 
-import NotificationsList from '../NotificationsList'
+import NotificationsList, { LinkWrapper } from '../NotificationsList'
 
 const DocumentComponent = ({ docType = 'txt' }) => {
   const theme = useTheme()
@@ -240,8 +240,7 @@ const MainBody = ({ body, title }) => {
   )
 }
 
-export const ToastStructure = ({ msg, t, socketInstance,logo }) => {
-  const {data: {close}} = useNotificationsHomeContext();
+export const ToastStructure = ({ msg, t, socketInstance,logo,close }) => {
   const title = msg?.notification_content?.title
   const body = msg?.notification_content?.body
   const type = msg?.notification_content?.attachments?.type
@@ -272,7 +271,9 @@ export const ToastStructure = ({ msg, t, socketInstance,logo }) => {
           <Box
             sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between' }}
           >
-            <AttachmentComponent type={type} attachmentsObject={attachmentsObject} />
+            <LinkWrapper item={message} link={attachmentsObject.attachment} hover={true} sameTab={"false"}>
+              <AttachmentComponent type={type} attachmentsObject={attachmentsObject} />
+            </LinkWrapper>
           </Box>
         </Grid>
         <ActionsComponent item={msg} t={t} socketInstance={socketInstance} />

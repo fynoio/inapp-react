@@ -1,15 +1,15 @@
-# @fyno/inapp
+# @fyno/inapp-react
 
 > React SDK for Fyno's inapp notification center
 
-[![NPM](https://img.shields.io/npm/v/@fyno/inapp.svg)](https://www.npmjs.com/package/@fyno/inapp) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+[![NPM](https://img.shields.io/npm/v/@fyno/inapp-react.svg)](https://www.npmjs.com/package/@fyno/inapp-react) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 ![Fyno: Fire your notifications](https://fynodev.s3.ap-south-1.amazonaws.com/others/Fyno_Banner.jpeg)
 
 ## Install
 
 ```bash
-npm install --save @fyno/inapp
+npm install --save @fyno/inapp-react
 ```
 
 ## Usage
@@ -17,14 +17,14 @@ Before installing Inapp Notification Center make sure you have generated HMAC si
 ```jsx
 import crypto from "crypto";
 const computedUserHmac = crypto
-  .createHmac("sha256", "WSID"+"token")
+  .createHmac("sha256", "WSID"+"Integration Token")
   .update("USER_ID")
   .digest("hex");
 
 ```
 
 ```jsx
-import {FynoInappCenter} from '@fyno/inapp'
+import {FynoInappCenter} from '@fyno/inapp-react'
 
 class Example extends Component {
   const config = {
@@ -46,7 +46,7 @@ class Example extends Component {
 OR
 
 ```jsx
-import {FynoInApp} from '@fyno/inapp'
+import {FynoInApp} from '@fyno/inapp-react'
 
 class Example extends Component {
   const themeConfig: {
