@@ -148,7 +148,7 @@ export const NotificationsHomeProvider = ({ user, workspace, signature,logo, chi
 
   const handleToast = (data,socket) => {
     toast(
-      t => <ToastStructure t={t} msg={data} socketInstance={socket} logo={logo} onMouseEnter={() => { setClose(true); }}
+      t => <ToastStructure t={t} msg={data} socketInstance={socket} logo={logo} close={close} onMouseEnter={() => { setClose(true); }}
       onMouseLeave={() => { setClose(false); }}/>
     )
   }
