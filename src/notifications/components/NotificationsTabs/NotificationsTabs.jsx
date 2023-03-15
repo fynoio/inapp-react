@@ -245,8 +245,20 @@ export const ToastStructure = ({ msg, t, socketInstance,logo,close }) => {
   const body = msg?.notification_content?.body
   const type = msg?.notification_content?.attachments?.type
   const attachmentsObject = msg?.notification_content?.attachments
+  const attachmentLink = attachmentsObject?.attachment || "javascript:void(0);"
   const icon = msg?.notification_content?.icon || logo
-  const link = msg?.notification_content?.action?.href || "#"
+  let link = msg?.notification_content?.action?.href || 'javascript:void(0);'
+  if(link && link[0] !== '/' ){
+    if(!(/^https:/.test(link) || /^http:/.test(link))){
+      if(/[a-zA-Z]\.[a-zA-Z]/.test(link)){
+        link = "https://"+ link
+      } else if(link !== "#"){
+        link = "/"+ link
+      } else{
+        link = "javascript:void(0);"
+      }
+    }
+  }
   const sameTab = msg?.notification_content?.action?.sameTab || "false"
 
   return (
@@ -271,9 +283,9 @@ export const ToastStructure = ({ msg, t, socketInstance,logo,close }) => {
           <Box
             sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between' }}
           >
-            <LinkWrapper item={message} link={attachmentsObject.attachment} hover={true} sameTab={"false"}>
+            <a href={attachmentLink} target="_blank" style={{textDecoration: 'none'}}>
               <AttachmentComponent type={type} attachmentsObject={attachmentsObject} />
-            </LinkWrapper>
+            </a>
           </Box>
         </Grid>
         <ActionsComponent item={msg} t={t} socketInstance={socketInstance} />

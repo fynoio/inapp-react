@@ -348,13 +348,15 @@ const NotificationItem = ({ item }) => {
   const theme = useTheme()
   const type = item?.notification_content?.attachments?.type
   const read = item?.isRead
-  let mainLink = item?.notification_content?.action?.href
+  let mainLink = item?.notification_content?.action?.href || 'javascript:void(0);'
   if(mainLink && mainLink[0] !== '/' ){
     if(!(/^https:/.test(mainLink) || /^http:/.test(mainLink))){
       if(/[a-zA-Z]\.[a-zA-Z]/.test(mainLink)){
         mainLink = "https://"+ mainLink
-      } else {
+      } else if(mainLink !== "#"){
         mainLink = "/"+ mainLink
+      } else{
+        mainLink = "javascript:void(0);"
       }
     }
   }
