@@ -1,5 +1,5 @@
 import { Toaster } from 'react-hot-toast';
-import NotificationHomeWrapper from './notifications/components/notificationsHomeWrapper'
+import NotificationHomeWrapper from './notifications/components/NotificationsHomeWrapper'
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import React from 'react';
 import './styles.module.css';
