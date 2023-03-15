@@ -5,12 +5,13 @@ import socketIO from 'socket.io-client'
 
 import { ToastStructure } from '../components/NotificationsTabs'
 import { useTheme } from '@mui/material'
+import useSound from 'use-sound'
 
 export const NotificationsHomeContext = React.createContext()
 
 export const useNotificationsHomeContext = () => useContext(NotificationsHomeContext)
 
-export const NotificationsHomeProvider = ({ user, workspace, signature,logo, children }) => {
+export const NotificationsHomeProvider = ({ user, workspace, signature, logo, sound, children }) => {
   const [close, setClose] = useState(false)
   const [errMsg, setErrMsg] = useState('')
   const [list, setList] = useState([])
@@ -24,6 +25,7 @@ export const NotificationsHomeProvider = ({ user, workspace, signature,logo, chi
   const theme = useTheme()
   const [toastData, setToastData] = useState({})
   const brandLogo = logo
+  const [ play ] = useSound(sound)
 
   const handleChangeStatus = status => {
     if (status.status === 'DELETED') {
@@ -147,6 +149,9 @@ export const NotificationsHomeProvider = ({ user, workspace, signature,logo, chi
   }
 
   const handleToast = (data,socket) => {
+    if(sound){
+      play()
+    }
     toast(
       t => <ToastStructure t={t} msg={data} socketInstance={socket} logo={logo} close={close} onMouseEnter={() => { setClose(true); }}
       onMouseLeave={() => { setClose(false); }}/>
