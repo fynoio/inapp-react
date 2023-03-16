@@ -247,7 +247,9 @@ export const ToastStructure = ({ msg, t, socketInstance,logo,close }) => {
   const attachmentsObject = msg?.notification_content?.attachments
   const attachmentLink = attachmentsObject?.attachment || "javascript:void(0);"
   const icon = msg?.notification_content?.icon || logo
-  let link = msg?.notification_content?.action?.href || 'javascript:void(0);'
+  let link = msg?.notification_content?.action?.href;
+  let sameTab = msg?.notification_content?.action?.sameTab || "false"
+
   if(link && link[0] !== '/' ){
     if(!(/^https:/.test(link) || /^http:/.test(link))){
       if(/[a-zA-Z]\.[a-zA-Z]/.test(link)){
@@ -256,10 +258,13 @@ export const ToastStructure = ({ msg, t, socketInstance,logo,close }) => {
         link = "/"+ link
       } else{
         link = "javascript:void(0);"
+        sameTab = "true"
       }
     }
+  } else {
+    link = "javascript:void(0);"
+    sameTab = "true"
   }
-  const sameTab = msg?.notification_content?.action?.sameTab || "false"
 
   return (
     <a

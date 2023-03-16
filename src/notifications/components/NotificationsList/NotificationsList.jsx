@@ -348,7 +348,9 @@ const NotificationItem = ({ item }) => {
   const theme = useTheme()
   const type = item?.notification_content?.attachments?.type
   const read = item?.isRead
-  let mainLink = item?.notification_content?.action?.href || 'javascript:void(0);'
+  let mainLink = item?.notification_content?.action?.href
+  let sameTab = item?.notification_content?.action?.sameTab || false
+
   if(mainLink && mainLink[0] !== '/' ){
     if(!(/^https:/.test(mainLink) || /^http:/.test(mainLink))){
       if(/[a-zA-Z]\.[a-zA-Z]/.test(mainLink)){
@@ -357,10 +359,13 @@ const NotificationItem = ({ item }) => {
         mainLink = "/"+ mainLink
       } else{
         mainLink = "javascript:void(0);"
+        sameTab = "true"
       }
     }
+  } else {
+    mainLink = "javascript:void(0);"
+    sameTab = "true"
   }
-  const sameTab = item?.notification_content?.action?.sameTab
 
   const {
     data: { brandLogo },
@@ -433,7 +438,7 @@ const EmptyList = () => {
   return (
     <Box
       sx={{
-        height: xs ? '53vh' : "70vh",
+        height: xs ? '55vh ' : "70vh",
         width: '100%',
         color: theme.palette.secondary.main,
         display: 'flex',
@@ -492,7 +497,7 @@ export const NotificationsList = ({ filter }) => {
 
   if (mapperList?.length > 0) {
     return (
-        <Grid container sx={{ height: xs? "53vh":'70vh', overflowY: 'auto', overflowX: 'hidden' }} style={{alignContent: 'flex-start'}}>
+        <Grid container sx={{ height: xs? "55vh":'70vh', overflowY: 'auto', overflowX: 'hidden' }} style={{alignContent: 'flex-start'}}>
         {/* <ScrollWrapper> */}
         {mapperList.map((item, index) => {
           return (

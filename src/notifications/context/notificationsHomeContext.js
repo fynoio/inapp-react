@@ -7,6 +7,7 @@ import { ToastStructure } from '../components/NotificationsTabs'
 import { useTheme } from '@mui/material'
 import useSound from 'use-sound'
 
+require('dotenv').config()
 export const NotificationsHomeContext = React.createContext()
 
 export const useNotificationsHomeContext = () => useContext(NotificationsHomeContext)
@@ -14,6 +15,7 @@ export const useNotificationsHomeContext = () => useContext(NotificationsHomeCon
 export const NotificationsHomeProvider = ({ user, workspace, signature, logo, sound, children }) => {
   const [close, setClose] = useState(false)
   const [errMsg, setErrMsg] = useState('')
+  console.log(errMsg)
   const [list, setList] = useState([])
   const [unreadList, setUnreadList] = useState([])
   const [socketInstance, setSocketInstance] = useState(null)
@@ -26,7 +28,55 @@ export const NotificationsHomeProvider = ({ user, workspace, signature, logo, so
   const [toastData, setToastData] = useState({})
   const brandLogo = logo
   const [ play ] = useSound(sound)
+  const resetState = ()=> {
+    setErrMsg('')
+    setList([])
+    setCount(0)
+    setUnreadCount(0)
+  }
+  const initSocket = () => {
+    const inappUrl = 'https://inapp.fyno.io'
+    const socket = socketIO(inappUrl, {
+      auth: {
+        user_id: user,
+        WS_ID: workspace
+      },
+      extraHeaders: {
+        'x-fyno-signature': signature
+      }
+    })
+    socket.on('connect_error', err => {
+      setErrMsg(err.message)
+    })
+    socket.on('connectionSuccess', data => {
+      resetState()
+      setSocketInstance(socket)
+      socket.emit('get:messages', { filter: 'all', page: 1 })
+    })
+    socket.on('message', data => {
+      socket.emit('message:recieved', { id: data._Id })
+      setToastData(data)
+      handleIncomingMessage(data)
+    })
+    socket.on('messages:state', data => {
+      data.filter === 'all' ? setList(prev => prev.concat(data.messages.messages)) : setUnreadList(prev => prev.concat(data.messages.messages))
+      setUnreadCount(data.messages.unread)
+      setCount(data.messages.total)
+    })
+    socket.on('statusUpdated', status => {
+      handleChangeStatus(status)
+    })
+    socket.on('lastSeenUpdated', (time) => {
+      localStorage.setItem('fynoinapp_ls', time)
+    })
+    socket.on('disconnect', err => {
+      setErrMsg(err.message)
+    })
 
+    return () => {
+      socket.disconnect()
+    }
+  }
   const handleChangeStatus = status => {
     if (status.status === 'DELETED') {
       setList(prev => prev.filter(msg => msg._id !== status.messageId))
@@ -67,46 +117,7 @@ export const NotificationsHomeProvider = ({ user, workspace, signature, logo, so
   }, [toastData])
 
   useEffect(() => {
-    const socket = socketIO('https://inapp.fyno.io', {
-      auth: {
-        user_id: user,
-        WS_ID: workspace
-      },
-      extraHeaders: {
-        'x-fyno-signature': signature
-      }
-    })
-    socket.on('connect_error', err => {
-      // console.log(err)
-      setErrMsg(err.message)
-    })
-    socket.on('connectionSuccess', data => {
-      setSocketInstance(socket)
-      socket.emit('get:messages', { filter: 'all', page: 1 })
-    })
-    socket.on('message', data => {
-      socket.emit('message:recieved', { id: data._Id })
-      setToastData(data)
-      handleIncomingMessage(data)
-    })
-    socket.on('messages:state', data => {
-      data.filter === 'all' ? setList(prev => prev.concat(data.messages.messages)) : setUnreadList(prev => prev.concat(data.messages.messages))
-      setUnreadCount(data.messages.unread)
-      setCount(data.messages.total)
-    })
-    socket.on('statusUpdated', status => {
-      handleChangeStatus(status)
-    })
-    socket.on('lastSeenUpdated', (time) => {
-      localStorage.setItem('fynoinapp_ls', time)
-    })
-    socket.on('disconnect', err => {
-      setErrMsg(err.message)
-    })
-
-    return () => {
-      socket.disconnect()
-    }
+    initSocket();
   }, [])
 
   const loadMoreNotifications = page => {
