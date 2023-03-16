@@ -1,9 +1,8 @@
 import React from 'react'
 
 import { Close, LinkOffOutlined } from '@mui/icons-material'
-import { Box, IconButton, Menu, Chip, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { Box, IconButton, Menu, Chip, Typography, useMediaQuery, useTheme, Tooltip, Icon } from '@mui/material'
 import { useNotificationsHomeContext } from '../../context'
-
 import ConfigPanel from '../ConfigPanel'
 import NotificationsTabs from '../NotificationsTabs'
 
@@ -27,7 +26,7 @@ const CloseButton = () => {
 const PanelHeader = () => {
   const theme = useTheme()
   const {
-    data: { unreadCount }
+    data: { unreadCount, errMsg }
   } = useNotificationsHomeContext()
 
   return (
@@ -44,11 +43,14 @@ const PanelHeader = () => {
       }}
     >
       <Typography variant='h5'>Notifications</Typography>
-      <Box>
+      <Box sx={{display: "inline-flex"}}>
         {/* <IconButton onClick={handleOpenConfig}>
         <Settings />
       </IconButton> */}
         {unreadCount > 0 ? <Chip varient="filled"  size='small' skin='light' label={`${unreadCount} Unread`} color="primary" sx={{color: theme.palette.primary.main, backgroundColor: theme.palette.chip.background}}></Chip>:''}
+        {errMsg === "xhr poll error" ? (<Tooltip title="You are offline now, please check your internet">
+        <Typography color={theme.palette.error.main}>•</Typography>
+       </Tooltip>) : null}
         <CloseButton />
       </Box>
     </Box>
@@ -142,7 +144,7 @@ export const NotificationsHomeBody = () => {
     >
       <Box sx={{ width: xs ? '24vw' : md ? '64vw': '90vw', height: xs ? '70vh' : '100%', background: theme.palette.background.paper }}>
         <PanelHeader />
-        {errMsg === '' ? <PanelBody /> : <Error />}
+        {errMsg === undefined || errMsg === '' || errMsg === 'xhr poll error' ? <PanelBody /> : <Error />}
         <PanelFooter />
       </Box>
     </Menu>
