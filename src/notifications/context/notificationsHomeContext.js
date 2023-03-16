@@ -35,7 +35,7 @@ export const NotificationsHomeProvider = ({ user, workspace, signature, logo, so
     setUnreadCount(0)
   }
   const initSocket = () => {
-    const inappUrl = process.env.INAPP_ENV === 'dev' ? 'https://inapp.dev.fyno.io' : 'https://inapp.fyno.io'
+    const inappUrl = 'https://inapp.fyno.io'
     const socket = socketIO(inappUrl, {
       auth: {
         user_id: user,
