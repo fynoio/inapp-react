@@ -12,7 +12,7 @@ export const NotificationsHomeContext = React.createContext()
 
 export const useNotificationsHomeContext = () => useContext(NotificationsHomeContext)
 
-export const NotificationsHomeProvider = ({ user, workspace, signature, logo, sound, children }) => {
+export const NotificationsHomeProvider = ({ user, workspace, signature, logo, sound, overrideInappUrl, children }) => {
   const [close, setClose] = useState(false)
   const [errMsg, setErrMsg] = useState('')
   console.log(errMsg)
@@ -35,7 +35,7 @@ export const NotificationsHomeProvider = ({ user, workspace, signature, logo, so
     setUnreadCount(0)
   }
   const initSocket = () => {
-    const inappUrl = 'https://inapp.fyno.io'
+    const inappUrl = overrideInappUrl ? overrideInappUrl : 'https://inapp.fyno.io'
     const socket = socketIO(inappUrl, {
       auth: {
         user_id: user,

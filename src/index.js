@@ -4,7 +4,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import React from 'react';
 import './styles.module.css';
 
-export const FynoInappCenter = ({mode, user, workspace, signature, themeConfig, notificationSettings}) => {
+export const FynoInappCenter = ({mode, user, workspace, signature, themeConfig, notificationSettings, overrideInappUrl=""}) => {
   const lightColor = '58, 53, 65'
   const darkColor = '231, 227, 252'
   const mainColor = mode === 'light' ? themeConfig?.lightColor || lightColor : themeConfig?.darkColor || darkColor
@@ -54,7 +54,7 @@ export const FynoInappCenter = ({mode, user, workspace, signature, themeConfig, 
   });
   return (
     <ThemeProvider theme={theme}>
-        <NotificationHomeWrapper user={user} workspace={workspace} signature={signature} logo={themeConfig?.logo} sound={notificationSettings?.sound}/>
+        <NotificationHomeWrapper user={user} workspace={workspace} signature={signature} logo={themeConfig?.logo} sound={notificationSettings?.sound} overrideInappUrl={overrideInappUrl}/>
         <Toaster position={notificationSettings?.toastPosition || "top-right"} toastOptions={{
           duration: notificationSettings?.duration || 5000,
           style: { width:"100%", background: theme.palette.background.paper }
