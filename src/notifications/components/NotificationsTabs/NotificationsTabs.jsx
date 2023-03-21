@@ -288,7 +288,7 @@ export const ToastStructure = ({ msg, t, socketInstance,logo,close }) => {
           <Box
             sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between' }}
           >
-            <a href={attachmentLink} target="_blank" style={{textDecoration: 'none'}}>
+            <a href={attachmentLink} target="_blank" style={{textDecoration: 'none'}} rel="noopener noreferrer">
               <AttachmentComponent type={type} attachmentsObject={attachmentsObject} />
             </a>
           </Box>
