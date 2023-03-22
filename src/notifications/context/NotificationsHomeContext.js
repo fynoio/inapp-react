@@ -34,7 +34,46 @@ export const NotificationsHomeProvider = ({ user, workspace, signature, logo, so
     setCount(0)
     setUnreadCount(0)
   }
-  const initSocket = () => {
+  const handleChangeStatus = status => {
+    if (status.status === 'DELETED') {
+      setList(prev => prev.filter(msg => msg._id !== status.messageId))
+      setCount(prev => prev - 1)
+      if (!status?.isRead) {
+        setUnreadCount(prev => prev - 1)
+      }
+    } else if (status.status === 'READ') {
+      setList(prev => {
+        const message = prev.find(msg => msg._id === status.messageId)
+        if (message) {
+          message?.status.push(status)
+          message.isRead = true
+        }
+
+        return prev
+      })
+      setUnreadList(prev => prev.filter(msg => msg._id !== status.messageId))
+      setUnreadCount(prev => prev - 1)
+    } else {
+      setList(prev => {
+        prev.find(msg => msg._id === status.messageId).status.push(status)
+
+        return prev
+      })
+    }
+  }
+
+  useEffect(() => {
+    setUnreadList(list.filter(msg => !msg.isRead))
+  }, [list])
+
+  useEffect(() => {
+    if (anchorEl === null && JSON.stringify(toastData) !== '{}') {
+      handleToast(toastData, socketInstance)
+      setToastData({})
+    }
+  }, [toastData])
+
+  useEffect(() => {
     const inappUrl = overrideInappUrl ? overrideInappUrl : 'https://inapp.fyno.io'
     const socket = socketIO(inappUrl, {
       auth: {
@@ -76,48 +115,6 @@ export const NotificationsHomeProvider = ({ user, workspace, signature, logo, so
     return () => {
       socket.disconnect()
     }
-  }
-  const handleChangeStatus = status => {
-    if (status.status === 'DELETED') {
-      setList(prev => prev.filter(msg => msg._id !== status.messageId))
-      setCount(prev => prev - 1)
-      if (!status?.isRead) {
-        setUnreadCount(prev => prev - 1)
-      }
-    } else if (status.status === 'READ') {
-      setList(prev => {
-        const message = prev.find(msg => msg._id === status.messageId)
-        if (message) {
-          message?.status.push(status)
-          message.isRead = true
-        }
-
-        return prev
-      })
-      setUnreadList(prev => prev.filter(msg => msg._id !== status.messageId))
-      setUnreadCount(prev => prev - 1)
-    } else {
-      setList(prev => {
-        prev.find(msg => msg._id === status.messageId).status.push(status)
-
-        return prev
-      })
-    }
-  }
-
-  useEffect(() => {
-    setUnreadList(list.filter(msg => !msg.isRead))
-  }, [list])
-
-  useEffect(() => {
-    if (anchorEl === null && JSON.stringify(toastData) !== '{}') {
-      handleToast(toastData, socketInstance)
-      setToastData({})
-    }
-  }, [toastData])
-
-  useEffect(() => {
-    initSocket();
   }, [])
 
   const loadMoreNotifications = page => {
