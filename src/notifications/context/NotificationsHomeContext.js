@@ -7,7 +7,6 @@ import { ToastStructure } from '../components/NotificationsTabs'
 import { useTheme } from '@mui/material'
 import useSound from 'use-sound'
 
-require('dotenv').config()
 export const NotificationsHomeContext = React.createContext()
 
 export const useNotificationsHomeContext = () => useContext(NotificationsHomeContext)
