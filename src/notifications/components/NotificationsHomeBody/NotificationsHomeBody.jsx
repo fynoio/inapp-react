@@ -20,7 +20,8 @@ const CloseButton = () => {
         <Close />
       </IconButton>
     )
-  }
+  } else
+  return null
 }
 
 const PanelHeader = () => {
@@ -72,17 +73,25 @@ const PanelBody = () => {
 const PanelFooter = () => {
   return (
     <div style={{
-      display: "flex",
-    height: "4vh",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "2.5px",
-    filter: "opacity(.5)",
+      position: "absolute",
+      bottom: "2px",
+      width: "100%",
+      height: "3vh",
+      background: "#fff"
     }}>
-      <span style={{
-        fontSize: "10px",
-        marginTop: "2px"
-      }}>Powered By</span><img src="https://uploads-ssl.webflow.com/63735bad18c742035738e107/6399dab9fdfc2105b70def91_Fyno_logo_lettered.png" alt="Fyno" width={'45px'} height={'auto'} className={'poweredLogo'} />
+      <div style={{
+        display: "flex",
+        height: "4vh",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "2.5px",
+        filter: "opacity(.5)"
+      }}>
+        <span style={{
+          fontSize: "10px",
+          marginTop: "2px"
+        }}>Powered By</span><img src="https://uploads-ssl.webflow.com/63735bad18c742035738e107/6399dab9fdfc2105b70def91_Fyno_logo_lettered.png" alt="Fyno" width={'45px'} height={'auto'} className={'poweredLogo'} />
+      </div>
     </div>
   )
 }

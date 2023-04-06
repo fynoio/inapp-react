@@ -157,6 +157,10 @@ const MainBody = ({ body, title }) => {
       scope: 'g',
       with: '&quot;'
     },
+    '\n': {
+      scope: 'g',
+      with: '<br/>'
+    },
     '\\*(\\S(?:.*?)\\S|\\S)\\*': {
       scope: 'g',
       with: '<b>$1</b>'
@@ -404,7 +408,7 @@ const NotificationItem = ({ item }) => {
         }}
       >
         <Grid item xs={1.3}>
-          <img src={logo} width='30px' height='30px' style={{borderRadius: '4px'}} />
+        <img src={logo} width='30px' height='30px' style={{borderRadius: '4px', objectFit: 'contain'}}/>
         </Grid>
         <Grid item xs={8.7}>
           <MainBody title={title} body={body} />
@@ -438,6 +442,7 @@ const EmptyList = () => {
   return (
     <Box
       sx={{
+        position: "absolute",
         height: xs ? '55vh ' : "70vh",
         width: '100%',
         color: theme.palette.secondary.main,

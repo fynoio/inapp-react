@@ -28,6 +28,7 @@ import {FynoInappCenter} from '@fyno/inapp-react'
 
 class Example extends Component {
   const config = {
+    mode: "THEME_MODE",//<light|dark>
     userId: 'USER_ID',
     workspaceId: 'WSID',
     signature: 'computedUserHmac'
@@ -49,7 +50,7 @@ class Example extends Component {
 OR
 
 ```jsx
-import {FynoInApp} from '@fyno/inapp-react'
+import {FynoInappCenter} from '@fyno/inapp-react'
 
 class Example extends Component {
 
@@ -63,7 +64,7 @@ class Example extends Component {
     sound: 'LINK_TO_NOTIFICATION_SOUND'
   }
   render() {  
-    return <FynoInappCenter user="{userid}" workspace="{workspace_id}" signature="{signature generated from backend}" themeConfig={themeConfig} notificationSettings={notificationSettings}/>
+    return <FynoInappCenter theme="light" user="{userid}" workspace="{workspace_id}" signature="{signature generated from backend}" themeConfig={themeConfig} notificationSettings={notificationSettings}/>
   }
 }
 ```
