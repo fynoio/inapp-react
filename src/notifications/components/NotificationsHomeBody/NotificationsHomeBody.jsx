@@ -81,7 +81,7 @@ const PanelFooter = () => {
     }}>
       <div style={{
         display: "flex",
-        height: "4vh",
+        height: "3vh",
         alignItems: "center",
         justifyContent: "center",
         gap: "2.5px",
