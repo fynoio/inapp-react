@@ -207,6 +207,10 @@ const MainBody = ({ body, title }) => {
       scope: 'g',
       with: '&quot;'
     },
+    '\n': {
+      scope: 'g',
+      with: '<br/>'
+    },
     '\\*(\\S(?:.*?)\\S|\\S)\\*': {
       scope: 'g',
       with: '<b>$1</b>'
@@ -227,7 +231,7 @@ const MainBody = ({ body, title }) => {
   const theme = useTheme()
   const renderBody = preview(body, list)
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, textAlign: 'justify'}}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, textAlign: 'left'}}>
       <Box>
         <Typography fontSize={'0.85rem'} fontWeight={600} color={theme.palette.text.primary}>
           {title}
@@ -279,7 +283,7 @@ export const ToastStructure = ({ msg, t, socketInstance,logo,close }) => {
     >
       <Grid container spacing={0} alignItems='center'>
         <Grid item xs={1.5} justifyContent='center' alignItems={'center'}>
-          <img src={icon} width='30px' height='30px' style={{borderRadius: '4px'}}/>
+        <img src={logo} width='30px' height='30px' style={{borderRadius: '4px', objectFit: 'contain'}}/>
         </Grid>
         <Grid item xs={8}>
           <MainBody title={title} body={body} />
