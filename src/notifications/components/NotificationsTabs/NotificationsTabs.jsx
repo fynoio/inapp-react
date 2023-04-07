@@ -231,7 +231,7 @@ const MainBody = ({ body, title }) => {
   const theme = useTheme()
   const renderBody = preview(body, list)
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, textAlign: 'left'}}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, textAlign: 'left', wordWrap: 'break-word'}}>
       <Box>
         <Typography fontSize={'0.85rem'} fontWeight={600} color={theme.palette.text.primary}>
           {title}

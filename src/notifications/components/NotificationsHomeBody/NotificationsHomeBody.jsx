@@ -71,17 +71,18 @@ const PanelBody = () => {
 }
 
 const PanelFooter = () => {
+  const theme = useTheme();
   return (
     <div style={{
       position: "absolute",
       bottom: "2px",
       width: "100%",
       height: "3vh",
-      background: "#fff"
+      background: theme.palette.background.paper
     }}>
       <div style={{
         display: "flex",
-        height: "4vh",
+        height: "3vh",
         alignItems: "center",
         justifyContent: "center",
         gap: "2.5px",
