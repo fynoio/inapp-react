@@ -13,14 +13,15 @@ npm install --save @fyno/inapp-react
 ```
 
 ## Usage
-Before installing Inapp Notification Center make sure you have generated HMAC signature in the backend by following the below process
-```jsx
-import crypto from "crypto";
-const computedUserHmac = crypto
-  .createHmac("sha256", "WSID"+"INTEGRATION_TOKEN")
-  .update("USER_ID")
-  .digest("hex");
 
+Before installing Inapp Notification Center make sure you have generated HMAC signature in the backend by following the below process
+
+```jsx
+import crypto from 'crypto'
+const signature = crypto
+  .createHmac('sha256', 'WSID' + 'INTEGRATION_TOKEN')
+  .update('USER_ID')
+  .digest('hex')
 ```
 
 ```jsx
@@ -28,10 +29,11 @@ import {FynoInappCenter} from '@fyno/inapp-react'
 
 class Example extends Component {
   const config = {
-    mode: "THEME_MODE",//<light|dark>
+    mode: 'THEME_MODE',//<light|dark>
     userId: 'USER_ID',
     workspaceId: 'WSID',
-    signature: 'computedUserHmac'
+    integration: 'INTRGRATION_ID',
+    signature: 'signature'
     themeConfig: {
       logo: 'LINK_TO_BRAND_LOGO',
       primary: 'PRIMARY_COLOR',
@@ -47,6 +49,7 @@ class Example extends Component {
   }
 }
 ```
+
 OR
 
 ```jsx
@@ -63,8 +66,8 @@ class Example extends Component {
   const notificationSettings = {
     sound: 'LINK_TO_NOTIFICATION_SOUND'
   }
-  render() {  
-    return <FynoInappCenter theme="light" user="{userid}" workspace="{workspace_id}" signature="{signature generated from backend}" themeConfig={themeConfig} notificationSettings={notificationSettings}/>
+  render() {
+    return <FynoInappCenter theme="light" user="{userid}" workspace="{workspace_id}" integration="{integration_id}" signature="{signature generated from backend}" themeConfig={themeConfig} notificationSettings={notificationSettings}/>
   }
 }
 ```

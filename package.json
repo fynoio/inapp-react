@@ -1,6 +1,6 @@
 {
   "name": "@fyno/inapp-react",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "React SDK for invoking Fyno inapp notifications center",
   "author": "Fyno",
   "license": "MIT",
@@ -28,8 +28,7 @@
     "test:unit": "cross-env CI=1 react-scripts test --env=jsdom",
     "test:watch": "react-scripts test --env=jsdom",
     "predeploy": "cd example && yarn install && yarn run build",
-    "deploy": "gh-pages -d example/build",
-    "publish": "npm run build && npm publish"
+    "deploy": "gh-pages -d example/build"
   },
   "peerDependencies": {
     "react": ">= 16.8.0"
