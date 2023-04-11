@@ -9,12 +9,21 @@ import useSound from 'use-sound'
 
 export const NotificationsHomeContext = React.createContext()
 
-export const useNotificationsHomeContext = () => useContext(NotificationsHomeContext)
+export const useNotificationsHomeContext = () =>
+  useContext(NotificationsHomeContext)
 
-export const NotificationsHomeProvider = ({ user, workspace, signature, logo, sound, overrideInappUrl, children }) => {
+export const NotificationsHomeProvider = ({
+  user,
+  workspace,
+  integration,
+  signature,
+  logo,
+  sound,
+  overrideInappUrl,
+  children
+}) => {
   const [close, setClose] = useState(false)
   const [errMsg, setErrMsg] = useState('')
-  console.log(errMsg)
   const [list, setList] = useState([])
   const [unreadList, setUnreadList] = useState([])
   const [socketInstance, setSocketInstance] = useState(null)
@@ -26,23 +35,23 @@ export const NotificationsHomeProvider = ({ user, workspace, signature, logo, so
   const theme = useTheme()
   const [toastData, setToastData] = useState({})
   const brandLogo = logo
-  const [ play ] = useSound(sound)
-  const resetState = ()=> {
+  const [play] = useSound(sound)
+  const resetState = () => {
     setErrMsg('')
     setList([])
     setCount(0)
     setUnreadCount(0)
   }
-  const handleChangeStatus = status => {
+  const handleChangeStatus = (status) => {
     if (status.status === 'DELETED') {
-      setList(prev => prev.filter(msg => msg._id !== status.messageId))
-      setCount(prev => prev - 1)
+      setList((prev) => prev.filter((msg) => msg._id !== status.messageId))
+      setCount((prev) => prev - 1)
       if (!status?.isRead) {
-        setUnreadCount(prev => prev - 1)
+        setUnreadCount((prev) => prev - 1)
       }
     } else if (status.status === 'READ') {
-      setList(prev => {
-        const message = prev.find(msg => msg._id === status.messageId)
+      setList((prev) => {
+        const message = prev.find((msg) => msg._id === status.messageId)
         if (message) {
           message?.status.push(status)
           message.isRead = true
@@ -50,20 +59,18 @@ export const NotificationsHomeProvider = ({ user, workspace, signature, logo, so
 
         return prev
       })
-      setUnreadList(prev => prev.filter(msg => msg._id !== status.messageId))
-      setUnreadCount(prev => prev - 1)
+      setUnreadList((prev) =>
+        prev.filter((msg) => msg._id !== status.messageId)
+      )
+      setUnreadCount((prev) => prev - 1)
     } else {
-      setList(prev => {
-        prev.find(msg => msg._id === status.messageId).status.push(status)
+      setList((prev) => {
+        prev.find((msg) => msg._id === status.messageId).status.push(status)
 
         return prev
       })
     }
   }
-
-  useEffect(() => {
-    setUnreadList(list.filter(msg => !msg.isRead))
-  }, [list])
 
   useEffect(() => {
     if (anchorEl === null && JSON.stringify(toastData) !== '{}') {
@@ -73,41 +80,46 @@ export const NotificationsHomeProvider = ({ user, workspace, signature, logo, so
   }, [toastData])
 
   useEffect(() => {
-    const inappUrl = overrideInappUrl ? overrideInappUrl : 'https://inapp.fyno.io'
+    const inappUrl = overrideInappUrl
+      ? overrideInappUrl
+      : 'https://inapp.fyno.io'
     const socket = socketIO(inappUrl, {
       auth: {
         user_id: user,
-        WS_ID: workspace
+        WS_ID: workspace,
+        Integration_ID: integration
       },
       extraHeaders: {
         'x-fyno-signature': signature
       }
     })
-    socket.on('connect_error', err => {
+    socket.on('connect_error', (err) => {
       setErrMsg(err.message)
     })
-    socket.on('connectionSuccess', data => {
+    socket.on('connectionSuccess', (data) => {
       resetState()
       setSocketInstance(socket)
       socket.emit('get:messages', { filter: 'all', page: 1 })
     })
-    socket.on('message', data => {
+    socket.on('message', (data) => {
       socket.emit('message:recieved', { id: data._Id })
       setToastData(data)
       handleIncomingMessage(data)
     })
-    socket.on('messages:state', data => {
-      data.filter === 'all' ? setList(prev => prev.concat(data.messages.messages)) : setUnreadList(prev => prev.concat(data.messages.messages))
+    socket.on('messages:state', (data) => {
+      data.filter === 'all'
+        ? setList((prev) => prev.concat(data.messages.messages))
+        : setUnreadList((prev) => prev.concat(data.messages.messages))
       setUnreadCount(data.messages.unread)
       setCount(data.messages.total)
     })
-    socket.on('statusUpdated', status => {
+    socket.on('statusUpdated', (status) => {
       handleChangeStatus(status)
     })
     socket.on('lastSeenUpdated', (time) => {
       localStorage.setItem('fynoinapp_ls', time)
     })
-    socket.on('disconnect', err => {
+    socket.on('disconnect', (err) => {
       setErrMsg(err.message)
     })
 
@@ -116,7 +128,7 @@ export const NotificationsHomeProvider = ({ user, workspace, signature, logo, so
     }
   }, [])
 
-  const loadMoreNotifications = page => {
+  const loadMoreNotifications = (page) => {
     socketInstance.emit('get:messages', { filter: 'all', page: page })
   }
 
@@ -128,7 +140,7 @@ export const NotificationsHomeProvider = ({ user, workspace, signature, logo, so
     setAnchorEl(null)
   }
 
-  const handleOpenPanel = event => {
+  const handleOpenPanel = (event) => {
     setAnchorEl(event.currentTarget)
   }
 
@@ -138,31 +150,42 @@ export const NotificationsHomeProvider = ({ user, workspace, signature, logo, so
 
   const handleClick = () => {}
 
-  const handleIncomingMessage = message => {
+  const handleIncomingMessage = (message) => {
     message.isRead = false
-    setList(prev => {
+    setList((prev) => {
       return [message, ...prev]
     })
-    setCount(prev => prev + 1)
-    setUnreadCount(prev => prev + 1)
+    setCount((prev) => prev + 1)
+    setUnreadCount((prev) => prev + 1)
   }
 
-  const handleDelete = msg => {
+  const handleDelete = (msg) => {
     socketInstance.emit('message:deleted', msg)
   }
 
-  const handleMarkAsRead = msg => {
+  const handleMarkAsRead = (msg) => {
     socketInstance.emit('message:read', msg)
   }
 
-  const handleToast = (data,socket) => {
-    if(sound){
+  const handleToast = (data, socket) => {
+    if (sound) {
       play()
     }
-    toast(
-      t => <ToastStructure t={t} msg={data} socketInstance={socket} logo={logo} close={close} onMouseEnter={() => { setClose(true); }}
-      onMouseLeave={() => { setClose(false); }}/>
-    )
+    toast((t) => (
+      <ToastStructure
+        t={t}
+        msg={data}
+        socketInstance={socket}
+        logo={logo}
+        close={close}
+        onMouseEnter={() => {
+          setClose(true)
+        }}
+        onMouseLeave={() => {
+          setClose(false)
+        }}
+      />
+    ))
   }
 
   const contextValue = {
@@ -194,5 +217,9 @@ export const NotificationsHomeProvider = ({ user, workspace, signature, logo, so
     }
   }
 
-  return <NotificationsHomeContext.Provider value={contextValue}>{children}</NotificationsHomeContext.Provider>
+  return (
+    <NotificationsHomeContext.Provider value={contextValue}>
+      {children}
+    </NotificationsHomeContext.Provider>
+  )
 }

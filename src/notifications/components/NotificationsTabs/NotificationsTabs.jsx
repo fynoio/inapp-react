@@ -2,10 +2,18 @@ import React, { useState } from 'react'
 import toast from 'react-hot-toast'
 import parse from 'html-react-parser'
 
-
 import { LibraryBooks } from '@mui/icons-material'
 import { TabContext, TabList, TabPanel } from '@mui/lab'
-import { Box, Button, Divider, Grid, Tab, Typography, useTheme,IconButton } from '@mui/material'
+import {
+  Box,
+  Button,
+  Divider,
+  Grid,
+  Tab,
+  Typography,
+  useTheme,
+  IconButton
+} from '@mui/material'
 import { Close } from '@mui/icons-material'
 import { useNotificationsHomeContext } from '../../context'
 
@@ -18,32 +26,48 @@ const DocumentComponent = ({ docType = 'txt' }) => {
   const temp = {
     pdf: {
       iconColor: isDarkMode ? 'rgba(172, 82, 82, 1)' : 'rgba(212, 121, 121, 1)',
-      background: isDarkMode ? 'rgba(172, 82, 82, 0.2)' : 'rgba(218, 118, 118, 0.15)',
+      background: isDarkMode
+        ? 'rgba(172, 82, 82, 0.2)'
+        : 'rgba(218, 118, 118, 0.15)',
       title: 'PDF'
     },
     xlsx: {
       iconColor: isDarkMode ? 'rgba(51, 143, 104, 1)' : 'rgba(85 ,149 ,121,1)',
-      background: isDarkMode ? 'rgba(51, 143, 104, 0.2)' : 'rgba(69, 125, 101, 0.15)',
+      background: isDarkMode
+        ? 'rgba(51, 143, 104, 0.2)'
+        : 'rgba(69, 125, 101, 0.15)',
       title: 'XLSX'
     },
     xls: {
       iconColor: isDarkMode ? 'rgba(51, 143, 104, 1)' : 'rgba(85, 149, 121, 1)',
-      background: isDarkMode ? 'rgba(51, 143, 104, 0.2)' : 'rgba(69, 125, 101, 0.15)',
+      background: isDarkMode
+        ? 'rgba(51, 143, 104, 0.2)'
+        : 'rgba(69, 125, 101, 0.15)',
       title: 'XLS'
     },
     docx: {
-      iconColor: isDarkMode ? 'rgba(106, 159, 205, 1)' : 'rgba(101, 162, 219, 1)',
-      background: isDarkMode ? 'rgba(106, 159, 205, 0.2)' : 'rgba(123, 175, 225, 0.15)',
+      iconColor: isDarkMode
+        ? 'rgba(106, 159, 205, 1)'
+        : 'rgba(101, 162, 219, 1)',
+      background: isDarkMode
+        ? 'rgba(106, 159, 205, 0.2)'
+        : 'rgba(123, 175, 225, 0.15)',
       title: 'DOCX'
     },
     doc: {
-      iconColor: isDarkMode ? 'rgba(106, 159, 205, 1)' : 'rgba(101, 162, 219, 1)',
-      background: isDarkMode ? 'rgba(106, 159, 205, 0.2)' : 'rgba(123, 175, 225, 0.15)',
+      iconColor: isDarkMode
+        ? 'rgba(106, 159, 205, 1)'
+        : 'rgba(101, 162, 219, 1)',
+      background: isDarkMode
+        ? 'rgba(106, 159, 205, 0.2)'
+        : 'rgba(123, 175, 225, 0.15)',
       title: 'DOC'
     },
     txt: {
       iconColor: isDarkMode ? 'rgba(185, 168, 75, 1)' : 'rgba(201, 184, 91, 1)',
-      background: isDarkMode ? 'rgba(185, 168, 75, 0.2)' : 'rgba(206, 192, 116, 0.15)',
+      background: isDarkMode
+        ? 'rgba(185, 168, 75, 0.2)'
+        : 'rgba(206, 192, 116, 0.15)',
       title: 'TXT'
     }
   }
@@ -63,7 +87,9 @@ const DocumentComponent = ({ docType = 'txt' }) => {
   return (
     <Box sx={{ ...boxStyles }}>
       <LibraryBooks fontSize='small' />
-      <Typography sx={{ fontSize: '0.6rem' }}>{temp[docType]?.title || docType.toUpperCase()}</Typography>
+      <Typography sx={{ fontSize: '0.6rem' }}>
+        {temp[docType]?.title || docType.toUpperCase()}
+      </Typography>
     </Box>
   )
 }
@@ -74,10 +100,15 @@ const ActionsComponent = ({ item, t, socketInstance }) => {
 
   if (buttons?.length > 0) {
     return (
-      <Grid container flexDirection='row-reverse' justifyContent='flex-end' sx={{ gap: 1, mt: 1, ml: 5 }}>
+      <Grid
+        container
+        flexDirection='row-reverse'
+        justifyContent='flex-end'
+        sx={{ gap: 1, mt: 1, ml: 5 }}
+      >
         {buttons.map((item, index) => {
-          const sameTab = item?.sameTab || "true"
-          if (item?.primary === "false" || item?.primary === undefined) {
+          const sameTab = item?.sameTab || 'true'
+          if (item?.primary === 'false' || item?.primary === undefined) {
             return (
               <a
                 key={item + index}
@@ -85,10 +116,10 @@ const ActionsComponent = ({ item, t, socketInstance }) => {
                   toast.dismiss(t.id)
                   socketInstance.emit('message:read', data)
                 }}
-                target={sameTab === "false" ? '_self' : '_blank'}
+                target={sameTab === 'false' ? '_self' : '_blank'}
                 href={`${item?.action}`}
                 rel='noopener noreferrer'
-                style={{textDecoration: 'none'}}
+                style={{ textDecoration: 'none' }}
               >
                 <Button
                   disableElevation
@@ -101,14 +132,14 @@ const ActionsComponent = ({ item, t, socketInstance }) => {
                 </Button>
               </a>
             )
-          } else if (item?.primary === "true") {
+          } else if (item?.primary === 'true') {
             return (
               <a
                 key={item + index}
                 target={!sameTab ? '_self' : '_blank'}
                 href={`${item?.action}`}
                 rel='noopener noreferrer'
-                style={{textDecoration: 'none'}}
+                style={{ textDecoration: 'none' }}
               >
                 <Button
                   disableElevation
@@ -131,13 +162,30 @@ const ActionsComponent = ({ item, t, socketInstance }) => {
 const AttachmentComponent = ({ type, attachmentsObject, showBlur }) => {
   const attachment = attachmentsObject?.attachment || ''
   const isDocument = attachmentsObject?.type === 'Document' || false
-  const docType = isDocument ? attachment?.substring(attachment.lastIndexOf('.') + 1) : null
+  const docType = isDocument
+    ? attachment?.substring(attachment.lastIndexOf('.') + 1)
+    : null
 
   switch (type) {
     case 'Image':
-      return <img alt='image' src={attachment} width='50rem' height='50rem' style={{ borderRadius: 5 }} />
+      return (
+        <img
+          alt='image'
+          src={attachment}
+          width='50rem'
+          height='50rem'
+          style={{ borderRadius: 5 }}
+        />
+      )
     case 'Video':
-      return <video src={attachment} width='50rem' height='50rem' style={{ borderRadius: 5 }} />
+      return (
+        <video
+          src={attachment}
+          width='50rem'
+          height='50rem'
+          style={{ borderRadius: 5 }}
+        />
+      )
     case 'Document':
       return <DocumentComponent docType={docType} showBlur={showBlur} />
     default:
@@ -152,7 +200,7 @@ const preview = (value, list) => {
       preview_val =
         typeof preview_val === 'string'
           ? preview_val?.replace(regex, list[key]['with'])
-          : preview_val?.map(item => {
+          : preview_val?.map((item) => {
               return item?.replace(regex, list[key]['with'])
             })
     }
@@ -231,12 +279,28 @@ const MainBody = ({ body, title }) => {
   const theme = useTheme()
   const renderBody = preview(body, list)
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, textAlign: 'left', wordWrap: 'break-word'}}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2,
+        textAlign: 'left',
+        wordWrap: 'break-word'
+      }}
+    >
       <Box>
-        <Typography fontSize={'0.85rem'} fontWeight={600} color={theme.palette.text.primary}>
+        <Typography
+          fontSize={'0.85rem'}
+          fontWeight={600}
+          color={theme.palette.text.primary}
+        >
           {title}
         </Typography>
-        <Typography fontSize={'0.7rem'} fontWeight={200} color={theme.palette.text.primary}>
+        <Typography
+          fontSize={'0.7rem'}
+          fontWeight={200}
+          color={theme.palette.text.primary}
+        >
           {parse(renderBody)}
         </Typography>
       </Box>
@@ -244,63 +308,98 @@ const MainBody = ({ body, title }) => {
   )
 }
 
-export const ToastStructure = ({ msg, t, socketInstance,logo,close }) => {
+export const ToastStructure = ({ msg, t, socketInstance, logo, close }) => {
   const title = msg?.notification_content?.title
   const body = msg?.notification_content?.body
   const type = msg?.notification_content?.attachments?.type
   const attachmentsObject = msg?.notification_content?.attachments
-  const attachmentLink = attachmentsObject?.attachment || "javascript:void(0);"
+  const attachmentLink = attachmentsObject?.attachment || 'javascript:void(0);'
   const icon = msg?.notification_content?.icon || logo
-  let link = msg?.notification_content?.action?.href;
-  let sameTab = msg?.notification_content?.action?.sameTab || "false"
+  let link = msg?.notification_content?.action?.href
+  let sameTab = msg?.notification_content?.action?.sameTab || 'false'
 
-  if(link && link[0] !== '/' ){
-    if(!(/^https:/.test(link) || /^http:/.test(link))){
-      if(/[a-zA-Z]\.[a-zA-Z]/.test(link)){
-        link = "https://"+ link
-      } else if(link !== "#"){
-        link = "/"+ link
-      } else{
-        link = "javascript:void(0);"
-        sameTab = "true"
+  if (link && link[0] !== '/') {
+    if (!(/^https:/.test(link) || /^http:/.test(link))) {
+      if (/[a-zA-Z]\.[a-zA-Z]/.test(link)) {
+        link = 'https://' + link
+      } else if (link !== '#') {
+        link = '/' + link
+      } else {
+        link = 'javascript:void(0);'
+        sameTab = 'true'
       }
     }
   } else {
-    link = "javascript:void(0);"
-    sameTab = "true"
+    link = 'javascript:void(0);'
+    sameTab = 'true'
   }
 
   return (
     <a
-      target={sameTab === "false" ? '_blank' : '_self'}
+      target={sameTab === 'false' ? '_blank' : '_self'}
       onClick={() => {
         toast.dismiss(t.id)
         socketInstance.emit('message:read', msg)
       }}
       href={`${link}`}
       rel='noopener noreferrer'
-      style={{textDecoration: 'none', width: '100%'}}
+      style={{ textDecoration: 'none', width: '100%' }}
     >
       <Grid container spacing={0} alignItems='center'>
         <Grid item xs={1.5} justifyContent='center' alignItems={'center'}>
-        <img src={logo} width='30px' height='30px' style={{borderRadius: '4px', objectFit: 'contain'}}/>
+          <img
+            src={logo}
+            width='30px'
+            height='30px'
+            style={{ borderRadius: '4px', objectFit: 'contain' }}
+          />
         </Grid>
         <Grid item xs={8}>
           <MainBody title={title} body={body} />
         </Grid>
         <Grid item xs={2.5}>
           <Box
-            sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between' }}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              justifyContent: 'space-between'
+            }}
           >
-            <a href={attachmentLink} target="_blank" style={{textDecoration: 'none'}} rel="noopener noreferrer">
-              <AttachmentComponent type={type} attachmentsObject={attachmentsObject} />
+            <a
+              href={attachmentLink}
+              target='_blank'
+              style={{ textDecoration: 'none' }}
+              rel='noopener noreferrer'
+            >
+              <AttachmentComponent
+                type={type}
+                attachmentsObject={attachmentsObject}
+              />
             </a>
           </Box>
         </Grid>
         <ActionsComponent item={msg} t={t} socketInstance={socketInstance} />
-        {close ? (<IconButton onClick={(e)=>{e.preventDefault();e.stopPropagation();toast.dismiss(t.id)}} style={{position: 'absolute',top: '-13%',left: '-3%', backgroundColor: 'rgba(58, 53, 65, 0.04)'}} size="small">
-          <Close fontSize='small'/>
-        </IconButton>): ''}
+        {close ? (
+          <IconButton
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              toast.dismiss(t.id)
+            }}
+            style={{
+              position: 'absolute',
+              top: '-13%',
+              left: '-3%',
+              backgroundColor: 'rgba(58, 53, 65, 0.04)'
+            }}
+            size='small'
+          >
+            <Close fontSize='small' />
+          </IconButton>
+        ) : (
+          ''
+        )}
       </Grid>
     </a>
   )
@@ -314,7 +413,13 @@ export const NotificationsTabs = () => {
 
   return (
     <TabContext value={tabPanelValue}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}
+      >
         <TabList variant='standard' onChange={handleChangeTabs}>
           <Tab disableRipple={true} value='all' label='All' />
           <Tab disableRipple={true} value='unread' label='Unread' />

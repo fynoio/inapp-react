@@ -1,7 +1,17 @@
 import React from 'react'
 
 import { Close, LinkOffOutlined } from '@mui/icons-material'
-import { Box, IconButton, Menu, Chip, Typography, useMediaQuery, useTheme, Tooltip, Icon } from '@mui/material'
+import {
+  Box,
+  IconButton,
+  Menu,
+  Chip,
+  Typography,
+  useMediaQuery,
+  useTheme,
+  Tooltip,
+  Icon
+} from '@mui/material'
 import { useNotificationsHomeContext } from '../../context'
 import ConfigPanel from '../ConfigPanel'
 import NotificationsTabs from '../NotificationsTabs'
@@ -20,8 +30,7 @@ const CloseButton = () => {
         <Close />
       </IconButton>
     )
-  } else
-  return null
+  } else return null
 }
 
 const PanelHeader = () => {
@@ -44,14 +53,30 @@ const PanelHeader = () => {
       }}
     >
       <Typography variant='h5'>Notifications</Typography>
-      <Box sx={{display: "inline-flex"}}>
+      <Box sx={{ display: 'inline-flex' }}>
         {/* <IconButton onClick={handleOpenConfig}>
         <Settings />
       </IconButton> */}
-        {unreadCount > 0 ? <Chip varient="filled"  size='small' skin='light' label={`${unreadCount} Unread`} color="primary" sx={{color: theme.palette.primary.main, backgroundColor: theme.palette.chip.background}}></Chip>:''}
-        {errMsg === "xhr poll error" ? (<Tooltip title="You are offline now, please check your internet">
-        <Typography color={theme.palette.error.main}>•</Typography>
-       </Tooltip>) : null}
+        {unreadCount > 0 ? (
+          <Chip
+            varient='filled'
+            size='small'
+            skin='light'
+            label={`${unreadCount} Unread`}
+            color='primary'
+            sx={{
+              color: theme.palette.primary.main,
+              backgroundColor: theme.palette.chip.background
+            }}
+          ></Chip>
+        ) : (
+          ''
+        )}
+        {errMsg === 'xhr poll error' ? (
+          <Tooltip title='You are offline now, please check your internet'>
+            <Typography color={theme.palette.error.main}>•</Typography>
+          </Tooltip>
+        ) : null}
         <CloseButton />
       </Box>
     </Box>
@@ -71,27 +96,42 @@ const PanelBody = () => {
 }
 
 const PanelFooter = () => {
-  const theme = useTheme();
+  const theme = useTheme()
   return (
-    <div style={{
-      position: "absolute",
-      bottom: "2px",
-      width: "100%",
-      height: "3vh",
-      background: theme.palette.background.paper
-    }}>
-      <div style={{
-        display: "flex",
-        height: "3vh",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: "2.5px",
-        filter: "opacity(.5)"
-      }}>
-        <span style={{
-          fontSize: "10px",
-          marginTop: "2px"
-        }}>Powered By</span><img src="https://uploads-ssl.webflow.com/63735bad18c742035738e107/6399dab9fdfc2105b70def91_Fyno_logo_lettered.png" alt="Fyno" width={'45px'} height={'auto'} className={'poweredLogo'} />
+    <div
+      style={{
+        position: 'absolute',
+        bottom: '2px',
+        width: '100%',
+        height: '2.5vh',
+        background: theme.palette.background.paper
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          height: '3vh',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '2.5px',
+          filter: 'opacity(.5)'
+        }}
+      >
+        <span
+          style={{
+            fontSize: '10px',
+            marginTop: '2px'
+          }}
+        >
+          Powered By
+        </span>
+        <img
+          src='https://uploads-ssl.webflow.com/63735bad18c742035738e107/6399dab9fdfc2105b70def91_Fyno_logo_lettered.png'
+          alt='Fyno'
+          width={'45px'}
+          height={'auto'}
+          className={'poweredLogo'}
+        />
       </div>
     </div>
   )
@@ -107,7 +147,7 @@ const Error = () => {
   return (
     <Box
       sx={{
-        height: xs ? '39vh' : "58vh",
+        height: xs ? '39vh' : '58vh',
         width: '100%',
         color: theme.palette.secondary.main,
         display: 'flex',
@@ -144,7 +184,7 @@ export const NotificationsHomeBody = () => {
       open={Boolean(anchorEl)}
       sx={{ left: { sm: -50 } }}
       onClose={handleClosePanel}
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'right'}}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       MenuListProps={{
         sx: {
           overflowY: 'hidden',
@@ -152,9 +192,21 @@ export const NotificationsHomeBody = () => {
         }
       }}
     >
-      <Box sx={{ width: xs ? '24vw' : md ? '64vw': '90vw', height: xs ? '70vh' : '100%', background: theme.palette.background.paper }}>
+      <Box
+        sx={{
+          width: xs ? '24vw' : md ? '64vw' : '90vw',
+          height: xs ? '70vh' : '100%',
+          background: theme.palette.background.paper
+        }}
+      >
         <PanelHeader />
-        {errMsg === undefined || errMsg === '' || errMsg === 'xhr poll error' ? <PanelBody /> : <Error />}
+        {errMsg === undefined ||
+        errMsg === '' ||
+        errMsg === 'xhr poll error' ? (
+          <PanelBody />
+        ) : (
+          <Error />
+        )}
         <PanelFooter />
       </Box>
     </Menu>

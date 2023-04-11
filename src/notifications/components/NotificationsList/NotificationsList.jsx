@@ -130,7 +130,7 @@ const AttachmentComponent = ({ type, attachmentsObject, showBlur }) => {
     case 'Document':
       return <DocumentComponent docType={docType} showBlur={showBlur} />
     default:
-      return
+      return null
   }
 }
 
@@ -590,15 +590,13 @@ const EmptyList = () => {
   return (
     <Box
       sx={{
-        position: 'absolute',
-        height: xs ? '55vh ' : '70vh',
+        height: xs ? '56vh ' : '70vh',
         width: '100%',
         color: theme.palette.secondary.main,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'flex-start',
-        pt: '20vh',
+        justifyContent: 'center',
         textAlign: 'center'
       }}
     >
@@ -655,7 +653,7 @@ export const NotificationsList = ({ filter }) => {
       <Box
         ref={listRef}
         sx={{
-          height: xs ? '55vh' : '70vh'
+          height: xs ? '56vh' : '70vh'
           // overflowY: 'auto',
           // overflowX: 'hidden'
         }}
