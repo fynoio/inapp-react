@@ -1,16 +1,28 @@
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast'
 import NotificationHomeWrapper from './notifications/components/NotificationsHomeWrapper'
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import React from 'react';
-import './styles.module.css';
+import { ThemeProvider, createTheme } from '@mui/material/styles'
+import React from 'react'
+import './styles.module.css'
 
-export const FynoInappCenter = ({mode, user, workspace, signature, themeConfig, notificationSettings, overrideInappUrl=""}) => {
+export const FynoInappCenter = ({
+  mode,
+  user,
+  workspace,
+  integration,
+  signature,
+  themeConfig,
+  notificationSettings,
+  overrideInappUrl = ''
+}) => {
   const lightColor = '58, 53, 65'
   const darkColor = '231, 227, 252'
-  const mainColor = mode === 'light' ? themeConfig?.lightColor || lightColor : themeConfig?.darkColor || darkColor
+  const mainColor =
+    mode === 'light'
+      ? themeConfig?.lightColor || lightColor
+      : themeConfig?.darkColor || darkColor
 
   const defaultBgColor = () => {
-   if (mode === 'light') {
+    if (mode === 'light') {
       return '#F4F5FA'
     } else return '#231F37'
   }
@@ -37,7 +49,10 @@ export const FynoInappCenter = ({mode, user, workspace, signature, themeConfig, 
       },
       divider: `rgba(${mainColor}, 0.12)`,
       background: {
-        paper: mode === 'light' ? themeConfig?.lightBackground || '#FFF' : themeConfig?.darkBackground ||  '#3B345D',
+        paper:
+          mode === 'light'
+            ? themeConfig?.lightBackground || '#FFF'
+            : themeConfig?.darkBackground || '#3B345D',
         default: defaultBgColor()
       },
       action: {
@@ -48,19 +63,34 @@ export const FynoInappCenter = ({mode, user, workspace, signature, themeConfig, 
         focus: `rgba(${mainColor}, 0.12)`
       },
       chip: {
-        background: themeConfig?.primary ? `${themeConfig?.primary}2F` : '#9155FD2F'
+        background: themeConfig?.primary
+          ? `${themeConfig?.primary}2F`
+          : '#9155FD2F'
       }
     }
-  });
+  })
   return (
     <ThemeProvider theme={theme}>
-        <NotificationHomeWrapper user={user} workspace={workspace} signature={signature} logo={themeConfig?.logo} sound={notificationSettings?.sound} overrideInappUrl={overrideInappUrl}/>
-        <Toaster position={notificationSettings?.toastPosition || "top-right"} toastOptions={{
+      <NotificationHomeWrapper
+        user={user}
+        workspace={workspace}
+        integration={integration}
+        signature={signature}
+        logo={themeConfig?.logo}
+        sound={notificationSettings?.sound}
+        overrideInappUrl={overrideInappUrl}
+      />
+      <Toaster
+        position={notificationSettings?.toastPosition || 'top-right'}
+        toastOptions={{
           duration: notificationSettings?.duration || 5000,
-          style: { width:"100%", background: theme.palette.background.paper }
-        }}/>
+          style: { width: '100%', background: theme.palette.background.paper }
+        }}
+      />
     </ThemeProvider>
   )
 }
 
-export const FynoToast = (config) => (<Toaster {...config} reverseOrder={false} />)
+export const FynoToast = (config) => (
+  <Toaster {...config} reverseOrder={false} />
+)
