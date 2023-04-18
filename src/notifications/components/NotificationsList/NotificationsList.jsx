@@ -641,7 +641,7 @@ export const NotificationsList = ({ filter }) => {
 
   const {
     data: { list, unreadList, count, openDeleteDialog },
-    handlers: { loadMoreNotifications }
+    handlers: { loadMoreNotifications, deleteAllMessages, handleClickDelete }
   } = useNotificationsHomeContext()
 
   const mapperList = filter ? unreadList : list
@@ -686,45 +686,50 @@ export const NotificationsList = ({ filter }) => {
         // style={{ alignContent: 'flex-start' }}
       >
         <Collapse
-          sx={{ position: 'absolute', top: 0, width: '100%' }}
+          sx={{
+            position: 'absolute',
+            top: 0,
+            width: '100%',
+            zIndex: 5000
+          }}
           in={openDeleteDialog}
         >
-          <ClickAwayWrapper
+          {/* <ClickAwayWrapper
             open={openDeleteDialog}
             setAnchorElDelete={handleClickDelete}
+          > */}
+          <Paper
+            sx={{
+              p: 3,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+
+              borderTopLeftRadius: 0,
+              borderTopRightRadius: 0,
+              width: '100%'
+            }}
           >
-            <Paper
-              sx={{
-                p: 3,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-                borderTopLeftRadius: 0,
-                borderTopRightRadius: 0,
-                zIndex: 5000,
-                width: '100%'
-              }}
+            <Typography
+              sx={{ width: '80%', fontSize: '0.8rem' }}
+              textAlign='left'
             >
-              <Typography
-                sx={{ width: '80%', fontSize: '0.8rem' }}
-                textAlign='left'
+              Are you sure you want to delete all the notifications?
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <IconButton
+                variant='contained'
+                size='small'
+                onClick={deleteAllMessages}
               >
-                Are you sure you want to delete all the notifications?
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                <IconButton
-                  variant='contained'
-                  size='small'
-                  onClick={handleClickDelete}
-                >
-                  <Check />
-                </IconButton>
-                <IconButton size='small' onClick={handleClickDelete}>
-                  <Close />
-                </IconButton>
-              </Box>
-            </Paper>
-          </ClickAwayWrapper>
+                <Check />
+              </IconButton>
+              <IconButton size='small' onClick={handleClickDelete}>
+                <Close />
+              </IconButton>
+            </Box>
+          </Paper>
+          {/* </ClickAwayWrapper> */}
         </Collapse>
         <List
           height={600}

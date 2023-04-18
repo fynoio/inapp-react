@@ -52,7 +52,7 @@ const PanelHeader = () => {
         pl: 3,
         pr: 2,
         pt: 3,
-        gap: 4
+        gap: 2
       }}
     >
       <Typography variant='h5'>Notifications</Typography>

@@ -44,10 +44,6 @@ export const NotificationsHomeProvider = ({
   }
   const [anchorDeleteEl, setAnchorDeleteEl] = useState(false)
 
-  const handleClickDelete = (event) => {
-    setAnchorDeleteEl(!anchorDeleteEl)
-  }
-
   const openDeleteDialog = Boolean(anchorDeleteEl)
 
   const handleChangeStatus = (status) => {
@@ -116,8 +112,20 @@ export const NotificationsHomeProvider = ({
     })
     socket.on('messages:state', (data) => {
       data.filter === 'all'
-        ? setList((prev) => prev.concat(data.messages.messages))
-        : setUnreadList((prev) => prev.concat(data.messages.messages))
+        ? setList((prev) => {
+            if (data.messages.messages?.length > 0 && data?.page > 1) {
+              return prev.concat(data.messages.messages)
+            } else {
+              return data.messages.messages
+            }
+          })
+        : setUnreadList((prev) => {
+            if (data.messages.messages?.length > 0 && data?.page > 1) {
+              return prev.concat(data.messages.messages)
+            } else {
+              return data.messages.messages
+            }
+          })
       setUnreadCount(data.messages.unread)
       setCount(data.messages.total)
     })
@@ -136,13 +144,34 @@ export const NotificationsHomeProvider = ({
     }
   }, [])
 
+  useEffect(() => {
+    setUnreadList(list?.filter((msg) => !msg?.isRead))
+  }, [JSON.stringify(list)])
+
   const loadMoreNotifications = (page, type) => {
-    socketInstance.emit('get:messages', { filter: type, page: page })
+    if (socketInstance) {
+      socketInstance.emit('get:messages', { filter: type, page: page })
+    }
   }
 
   const handleChangeTabs = (event, value) => {
     setTabPanelValue(value)
-    loadMoreNotifications('1', value)
+    // loadMoreNotifications('1', value)
+  }
+
+  const handleClickDelete = (event) => {
+    setAnchorDeleteEl(!anchorDeleteEl)
+  }
+
+  const deleteAllMessages = () => {
+    socketInstance.emit('markAll:delete', signature)
+    setUnreadCount(0)
+    handleClickDelete()
+  }
+
+  const handleMarkAllAsRead = () => {
+    socketInstance.emit('markAll:read', signature)
+    setUnreadCount(0)
   }
 
   const handleClosePanel = () => {
@@ -224,7 +253,9 @@ export const NotificationsHomeProvider = ({
       handleDelete,
       loadMoreNotifications,
       setClose,
-      handleClickDelete
+      handleClickDelete,
+      deleteAllMessages,
+      handleMarkAllAsRead
     }
   }
 

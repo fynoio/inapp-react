@@ -419,7 +419,7 @@ export const ToastStructure = ({ msg, t, socketInstance, logo, close }) => {
 const Actions = () => {
   const {
     data: { tabPanelValue, list, unreadList },
-    handlers: { handleClickDelete }
+    handlers: { handleClickDelete, handleMarkAllAsRead }
   } = useNotificationsHomeContext()
 
   const mapperList = tabPanelValue === 'all' ? list : unreadList
@@ -434,7 +434,7 @@ const Actions = () => {
         </Tooltip>
         {tabPanelValue === 'unread' && (
           <Tooltip title='Mark all as read'>
-            <IconButton>
+            <IconButton onClick={(e) => handleMarkAllAsRead(e)}>
               <DoneAll />
             </IconButton>
           </Tooltip>
@@ -447,7 +447,7 @@ const Actions = () => {
 export const NotificationsTabs = () => {
   const {
     data: { tabPanelValue, unreadCount },
-    handlers: { handleChangeTabs, handleClickDelete }
+    handlers: { handleChangeTabs }
   } = useNotificationsHomeContext()
 
   const theme = useTheme()
