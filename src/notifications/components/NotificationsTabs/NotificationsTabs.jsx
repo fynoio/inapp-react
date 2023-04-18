@@ -2,7 +2,12 @@ import React, { useState } from 'react'
 import toast from 'react-hot-toast'
 import parse from 'html-react-parser'
 
-import { LibraryBooks } from '@mui/icons-material'
+import {
+  LibraryBooks,
+  Add,
+  DoneAll,
+  DeleteSweepOutlined
+} from '@mui/icons-material'
 import { TabContext, TabList, TabPanel } from '@mui/lab'
 import {
   Box,
@@ -12,12 +17,18 @@ import {
   Tab,
   Typography,
   useTheme,
-  IconButton
+  IconButton,
+  Chip,
+  ClickAwayListener,
+  Popper,
+  Paper,
+  Tooltip
 } from '@mui/material'
 import { Close } from '@mui/icons-material'
 import { useNotificationsHomeContext } from '../../context'
 
 import NotificationsList, { LinkWrapper } from '../NotificationsList'
+import { hexToRGBA } from '../../helpers/hextoRGBA'
 
 const DocumentComponent = ({ docType = 'txt' }) => {
   const theme = useTheme()
@@ -405,11 +416,41 @@ export const ToastStructure = ({ msg, t, socketInstance, logo, close }) => {
   )
 }
 
+const Actions = () => {
+  const {
+    data: { tabPanelValue, list, unreadList },
+    handlers: { handleClickDelete }
+  } = useNotificationsHomeContext()
+
+  const mapperList = tabPanelValue === 'all' ? list : unreadList
+
+  if (mapperList?.length > 0) {
+    return (
+      <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+        <Tooltip title='Delete all'>
+          <IconButton onClick={(e) => handleClickDelete(e)}>
+            <DeleteSweepOutlined />
+          </IconButton>
+        </Tooltip>
+        {tabPanelValue === 'unread' && (
+          <Tooltip title='Mark all as read'>
+            <IconButton>
+              <DoneAll />
+            </IconButton>
+          </Tooltip>
+        )}
+      </Box>
+    )
+  }
+}
+
 export const NotificationsTabs = () => {
   const {
-    data: { tabPanelValue },
-    handlers: { handleChangeTabs }
+    data: { tabPanelValue, unreadCount },
+    handlers: { handleChangeTabs, handleClickDelete }
   } = useNotificationsHomeContext()
+
+  const theme = useTheme()
 
   return (
     <TabContext value={tabPanelValue}>
@@ -422,7 +463,24 @@ export const NotificationsTabs = () => {
       >
         <TabList variant='standard' onChange={handleChangeTabs}>
           <Tab disableRipple={true} value='all' label='All' />
-          <Tab disableRipple={true} value='unread' label='Unread' />
+          <Tab
+            disableRipple={true}
+            value='unread'
+            label={`Unread`}
+            sx={{ minHeight: 0 }}
+            icon={
+              <Chip
+                size='small'
+                className='MuiChip-light'
+                sx={{
+                  color: theme.palette.primary?.main,
+                  backgroundColor: hexToRGBA(theme.palette.primary.main, 0.12)
+                }}
+                label={unreadCount}
+              />
+            }
+            iconPosition='end'
+          />
         </TabList>
       </Box>
       <Divider sx={{ mt: 0, mb: 0 }} />

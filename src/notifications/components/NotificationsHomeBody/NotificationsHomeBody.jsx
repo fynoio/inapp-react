@@ -1,6 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-import { Close, LinkOffOutlined } from '@mui/icons-material'
+import {
+  Close,
+  DeleteSweep,
+  DeleteSweepOutlined,
+  LinkOffOutlined,
+  WifiOff
+} from '@mui/icons-material'
 import {
   Box,
   IconButton,
@@ -9,8 +15,7 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
-  Tooltip,
-  Icon
+  Tooltip
 } from '@mui/material'
 import { useNotificationsHomeContext } from '../../context'
 import ConfigPanel from '../ConfigPanel'
@@ -20,7 +25,6 @@ const CloseButton = () => {
   const theme = useTheme()
 
   const {
-    data: { anchorEl },
     handlers: { handleClosePanel }
   } = useNotificationsHomeContext()
   const xs = useMediaQuery(theme.breakpoints.up('sm'))
@@ -34,49 +38,40 @@ const CloseButton = () => {
 }
 
 const PanelHeader = () => {
-  const theme = useTheme()
   const {
-    data: { unreadCount, errMsg }
+    data: { errMsg }
   } = useNotificationsHomeContext()
 
   return (
     <Box
       sx={{
         display: 'flex',
-        justifyContent: 'space-between',
         alignItems: 'center',
         width: 'auto',
         pb: 1,
         pl: 3,
         pr: 2,
-        pt: 3
+        pt: 3,
+        gap: 4
       }}
     >
       <Typography variant='h5'>Notifications</Typography>
-      <Box sx={{ display: 'inline-flex' }}>
-        {/* <IconButton onClick={handleOpenConfig}>
-        <Settings />
-      </IconButton> */}
-        {unreadCount > 0 ? (
-          <Chip
-            varient='filled'
-            size='small'
-            skin='light'
-            label={`${unreadCount} Unread`}
-            color='primary'
-            sx={{
-              color: theme.palette.primary.main,
-              backgroundColor: theme.palette.chip.background
-            }}
-          ></Chip>
-        ) : (
-          ''
-        )}
+
+      <Box
+        sx={{
+          display: 'inline-flex',
+          justifyContent: 'space-between',
+          width: '100%'
+        }}
+      >
         {errMsg === 'xhr poll error' ? (
           <Tooltip title='You are offline now, please check your internet'>
-            <Typography color={theme.palette.error.main}>•</Typography>
+            <WifiOff color='secondary' />
           </Tooltip>
-        ) : null}
+        ) : (
+          <Box />
+        )}
+
         <CloseButton />
       </Box>
     </Box>
@@ -200,13 +195,14 @@ export const NotificationsHomeBody = () => {
         }}
       >
         <PanelHeader />
-        {errMsg === undefined ||
+        {/* {errMsg === undefined ||
         errMsg === '' ||
         errMsg === 'xhr poll error' ? (
           <PanelBody />
         ) : (
           <Error />
-        )}
+        )} */}
+        <PanelBody />
         <PanelFooter />
       </Box>
     </Menu>

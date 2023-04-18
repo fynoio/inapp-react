@@ -3,6 +3,8 @@ import parse from 'html-react-parser'
 import { useInView } from 'react-intersection-observer'
 import { FixedSizeList as List } from 'react-window'
 import {
+  Check,
+  Close,
   DeleteOutline,
   DoneAll,
   HourglassEmpty,
@@ -13,11 +15,15 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import {
   Box,
   Button,
+  ClickAwayListener,
+  Collapse,
   Divider,
   Grid,
+  IconButton,
   Link,
   Menu,
   MenuItem,
+  Paper,
   Typography,
   useMediaQuery,
   useTheme
@@ -579,9 +585,26 @@ const NotificationItem = React.memo(
   }
 )
 
+const ClickAwayWrapper = ({ open, children, setAnchorElDelete }) => {
+  if (open) {
+    return (
+      <ClickAwayListener
+        onClickAway={() => {
+          setAnchorElDelete()
+        }}
+      >
+        {children}
+      </ClickAwayListener>
+    )
+  }
+
+  return children
+}
+
 const EmptyList = () => {
   const {
-    data: { tabPanelValue }
+    data: { tabPanelValue, openDeleteDialog },
+    handlers: { handleClickDelete }
   } = useNotificationsHomeContext()
   const theme = useTheme()
   const tabIsUnread = tabPanelValue === 'unread'
@@ -597,11 +620,15 @@ const EmptyList = () => {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        textAlign: 'center'
+        textAlign: 'center',
+        position: 'relative'
       }}
     >
       <HourglassEmpty fontSize='large' />
-      <Typography color='secondary' sx={{ width: '55%' }}>
+      <Typography
+        color='secondary'
+        sx={{ width: '50%', mb: tabIsUnread ? 0 : 3.1 }}
+      >
         No {tabIsUnread ? 'unread' : ''} notifications to show yet
       </Typography>
     </Box>
@@ -613,7 +640,7 @@ export const NotificationsList = ({ filter }) => {
   const { ref, inView } = useInView()
 
   const {
-    data: { list, unreadList, count },
+    data: { list, unreadList, count, openDeleteDialog },
     handlers: { loadMoreNotifications }
   } = useNotificationsHomeContext()
 
@@ -642,7 +669,7 @@ export const NotificationsList = ({ filter }) => {
 
   useEffect(() => {
     if (inView && mapperList?.length < count) {
-      loadMoreNotifications(page + 1)
+      loadMoreNotifications(page + 1, 'all')
     }
   }, [inView])
 
@@ -653,12 +680,52 @@ export const NotificationsList = ({ filter }) => {
       <Box
         ref={listRef}
         sx={{
-          height: xs ? '56vh' : '70vh'
-          // overflowY: 'auto',
-          // overflowX: 'hidden'
+          height: xs ? '56vh' : '70vh',
+          position: 'relative'
         }}
         // style={{ alignContent: 'flex-start' }}
       >
+        <Collapse
+          sx={{ position: 'absolute', top: 0, width: '100%' }}
+          in={openDeleteDialog}
+        >
+          <ClickAwayWrapper
+            open={openDeleteDialog}
+            setAnchorElDelete={handleClickDelete}
+          >
+            <Paper
+              sx={{
+                p: 3,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                borderTopLeftRadius: 0,
+                borderTopRightRadius: 0,
+                zIndex: 5000,
+                width: '100%'
+              }}
+            >
+              <Typography
+                sx={{ width: '80%', fontSize: '0.8rem' }}
+                textAlign='left'
+              >
+                Are you sure you want to delete all the notifications?
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <IconButton
+                  variant='contained'
+                  size='small'
+                  onClick={handleClickDelete}
+                >
+                  <Check />
+                </IconButton>
+                <IconButton size='small' onClick={handleClickDelete}>
+                  <Close />
+                </IconButton>
+              </Box>
+            </Paper>
+          </ClickAwayWrapper>
+        </Collapse>
         <List
           height={600}
           width={'100%'}

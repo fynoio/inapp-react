@@ -42,6 +42,14 @@ export const NotificationsHomeProvider = ({
     setCount(0)
     setUnreadCount(0)
   }
+  const [anchorDeleteEl, setAnchorDeleteEl] = useState(false)
+
+  const handleClickDelete = (event) => {
+    setAnchorDeleteEl(!anchorDeleteEl)
+  }
+
+  const openDeleteDialog = Boolean(anchorDeleteEl)
+
   const handleChangeStatus = (status) => {
     if (status.status === 'DELETED') {
       setList((prev) => prev.filter((msg) => msg._id !== status.messageId))
@@ -128,12 +136,13 @@ export const NotificationsHomeProvider = ({
     }
   }, [])
 
-  const loadMoreNotifications = (page) => {
-    socketInstance.emit('get:messages', { filter: 'all', page: page })
+  const loadMoreNotifications = (page, type) => {
+    socketInstance.emit('get:messages', { filter: type, page: page })
   }
 
   const handleChangeTabs = (event, value) => {
     setTabPanelValue(value)
+    loadMoreNotifications('1', value)
   }
 
   const handleClosePanel = () => {
@@ -201,7 +210,8 @@ export const NotificationsHomeProvider = ({
       unreadCount,
       count,
       errMsg,
-      close
+      close,
+      openDeleteDialog
     },
     handlers: {
       handleClosePanel,
@@ -213,7 +223,8 @@ export const NotificationsHomeProvider = ({
       handleMarkAsRead,
       handleDelete,
       loadMoreNotifications,
-      setClose
+      setClose,
+      handleClickDelete
     }
   }
 
