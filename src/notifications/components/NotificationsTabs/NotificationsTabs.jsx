@@ -482,6 +482,7 @@ export const NotificationsTabs = () => {
             iconPosition='end'
           />
         </TabList>
+        <Actions />
       </Box>
       <Divider sx={{ mt: 0, mb: 0 }} />
       <TabPanel value='all' sx={{ p: 0 }}>
