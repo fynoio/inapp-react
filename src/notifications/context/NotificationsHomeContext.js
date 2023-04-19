@@ -160,17 +160,17 @@ export const NotificationsHomeProvider = ({
   }
 
   const handleClickDelete = (e) => {
-    e.stopPropagation()
-    e.preventDefault()
+    e?.stopPropagation()
+    e?.preventDefault()
     setAnchorDeleteEl(!anchorDeleteEl)
   }
 
   const deleteAllMessages = (e) => {
-    e.stopPropagation()
-    e.preventDefault()
+    e?.stopPropagation()
+    e?.preventDefault()
+    setAnchorDeleteEl(false)
     socketInstance.emit('markAll:delete', signature)
     setUnreadCount(0)
-    handleClickDelete()
   }
 
   const handleMarkAllAsRead = () => {

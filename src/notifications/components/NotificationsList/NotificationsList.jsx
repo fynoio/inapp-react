@@ -598,7 +598,7 @@ const ClickAwayWrapper = ({ open, children, setAnchorElDelete }) => {
 const EmptyList = () => {
   const {
     data: { tabPanelValue, openDeleteDialog },
-    handlers: { handleClickDelete }
+    handlers: { handleClickDelete, deleteAllMessages }
   } = useNotificationsHomeContext()
   const theme = useTheme()
   const tabIsUnread = tabPanelValue === 'unread'
@@ -608,7 +608,6 @@ const EmptyList = () => {
     <Box
       sx={{
         height: xs ? '56vh ' : '70vh',
-        width: '100%',
         color: theme.palette.secondary.main,
         display: 'flex',
         flexDirection: 'column',
@@ -618,6 +617,54 @@ const EmptyList = () => {
         position: 'relative'
       }}
     >
+      <Collapse
+        sx={{
+          position: 'absolute',
+          top: 0,
+          width: '100%',
+          zIndex: 5000
+        }}
+        in={openDeleteDialog}
+      >
+        <ClickAwayWrapper
+          open={openDeleteDialog}
+          setAnchorElDelete={(e) => {
+            handleClickDelete(e)
+          }}
+        >
+          <Paper
+            sx={{
+              p: 3,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+
+              borderTopLeftRadius: 0,
+              borderTopRightRadius: 0,
+              width: '100%'
+            }}
+          >
+            <Typography
+              sx={{ width: '80%', fontSize: '0.8rem' }}
+              textAlign='left'
+            >
+              Are you sure you want to delete all the notifications?
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <IconButton
+                variant='contained'
+                size='small'
+                onClick={(e) => deleteAllMessages(e)}
+              >
+                <Check />
+              </IconButton>
+              <IconButton size='small' onClick={(e) => handleClickDelete(e)}>
+                <Close />
+              </IconButton>
+            </Box>
+          </Paper>
+        </ClickAwayWrapper>
+      </Collapse>
       <HourglassEmpty fontSize='large' />
       <Typography
         color='secondary'
@@ -691,7 +738,6 @@ export const NotificationsList = ({ filter }) => {
           sx={{
             position: 'absolute',
             top: 0,
-            width: '100%',
             zIndex: 5000
           }}
           in={openDeleteDialog}

@@ -422,19 +422,19 @@ const Actions = () => {
     handlers: { handleClickDelete, handleMarkAllAsRead }
   } = useNotificationsHomeContext()
 
-  const mapperList = tabPanelValue === 'all' ? list : unreadList
-
-  if (mapperList?.length > 0) {
+  if (list?.length > 0) {
     return (
       <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+        {unreadList?.length > 0 && (
+          <Tooltip title='Mark all as read'>
+            <IconButton onClick={(e) => handleMarkAllAsRead(e)}>
+              <DoneAll />
+            </IconButton>
+          </Tooltip>
+        )}
         <Tooltip title='Delete all'>
           <IconButton onClick={(e) => handleClickDelete(e)}>
             <DeleteSweepOutlined />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title='Mark all as read'>
-          <IconButton onClick={(e) => handleMarkAllAsRead(e)}>
-            <DoneAll />
           </IconButton>
         </Tooltip>
       </Box>
