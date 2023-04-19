@@ -478,111 +478,106 @@ const ActionsComponent = ({ item }) => {
   }
 }
 
-const NotificationItem = React.memo(
-  ({ item }) => {
-    const theme = useTheme()
-    const type = item?.notification_content?.attachments?.type
-    const read = item?.isRead
-    let mainLink = item?.notification_content?.action?.href
-    let sameTab = item?.notification_content?.action?.sameTab || false
+const NotificationItem = ({ item }) => {
+  const theme = useTheme()
+  const type = item?.notification_content?.attachments?.type
+  const read = item?.isRead
+  let mainLink = item?.notification_content?.action?.href
+  let sameTab = item?.notification_content?.action?.sameTab || false
 
-    if (mainLink && mainLink[0] !== '/') {
-      if (!(/^https:/.test(mainLink) || /^http:/.test(mainLink))) {
-        if (/[a-zA-Z]\.[a-zA-Z]/.test(mainLink)) {
-          mainLink = 'https://' + mainLink
-        } else if (mainLink !== '#') {
-          mainLink = '/' + mainLink
-        } else {
-          mainLink = 'javascript:void(0);'
-          sameTab = 'true'
-        }
+  if (mainLink && mainLink[0] !== '/') {
+    if (!(/^https:/.test(mainLink) || /^http:/.test(mainLink))) {
+      if (/[a-zA-Z]\.[a-zA-Z]/.test(mainLink)) {
+        mainLink = 'https://' + mainLink
+      } else if (mainLink !== '#') {
+        mainLink = '/' + mainLink
+      } else {
+        mainLink = 'javascript:void(0);'
+        sameTab = 'true'
       }
-    } else {
-      mainLink = 'javascript:void(0);'
-      sameTab = 'true'
     }
-
-    const {
-      data: { brandLogo },
-      handlers: { handleMarkAsRead }
-    } = useNotificationsHomeContext()
-
-    const createdAt = item?.createdAt
-
-    const title = item?.notification_content?.title
-    const body = item?.notification_content?.body
-    const logo = item?.notification_content?.icon || brandLogo
-
-    const attachmentsObject = item?.notification_content?.attachments
-    const attachmentLink = attachmentsObject?.attachment
-
-    const styles = {
-      pt: 2,
-      pb: 0,
-      px: 3,
-      background: read ? '' : theme.palette.primary.main + '1A',
-      cursor: 'pointer',
-      ':hover': { translate: '0 -2px' },
-      transition: '0.3s translate ease-in-out',
-      borderBottom: 1,
-      borderColor: theme.palette.divider
-    }
-
-    return (
-      <LinkWrapper link={mainLink} sameTab={sameTab} item={item}>
-        <Grid
-          container
-          sx={{ ...styles }}
-          onClick={(e) => {
-            e.stopPropagation()
-            handleMarkAsRead(item)
-          }}
-        >
-          <Grid item xs={1.3}>
-            <img
-              src={logo}
-              width='30px'
-              height='30px'
-              style={{ borderRadius: '4px', objectFit: 'contain' }}
-            />
-          </Grid>
-          <Grid item xs={8.7}>
-            <MainBody title={title} body={body} />
-            <ActionsComponent item={item} />
-          </Grid>
-          <Grid item xs={2}>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-end',
-                justifyContent: 'space-between'
-              }}
-            >
-              <LinkWrapper
-                item={item}
-                link={attachmentLink}
-                hover={true}
-                sameTab={'false'}
-              >
-                <AttachmentComponent
-                  type={type}
-                  attachmentsObject={attachmentsObject}
-                />
-              </LinkWrapper>
-            </Box>
-          </Grid>
-          <Grid item xs={12}>
-            <NotificationFooter createdAt={createdAt} msg={item} />
-          </Grid>
-        </Grid>
-      </LinkWrapper>
-    )
-  },
-  (prevProps, nextProps) => {
-    return prevProps._id === nextProps._id
+  } else {
+    mainLink = 'javascript:void(0);'
+    sameTab = 'true'
   }
-)
+
+  const {
+    data: { brandLogo },
+    handlers: { handleMarkAsRead }
+  } = useNotificationsHomeContext()
+
+  const createdAt = item?.createdAt
+
+  const title = item?.notification_content?.title
+  const body = item?.notification_content?.body
+  const logo = item?.notification_content?.icon || brandLogo
+
+  const attachmentsObject = item?.notification_content?.attachments
+  const attachmentLink = attachmentsObject?.attachment
+
+  const styles = {
+    pt: 2,
+    pb: 0,
+    px: 3,
+    background: read ? '' : theme.palette.primary.main + '1A',
+    cursor: 'pointer',
+    ':hover': { translate: '0 -2px' },
+    transition: '0.3s translate ease-in-out',
+    borderBottom: 1,
+    borderColor: theme.palette.divider
+  }
+
+  return (
+    <LinkWrapper link={mainLink} sameTab={sameTab} item={item}>
+      <Grid
+        container
+        sx={{ ...styles }}
+        onClick={(e) => {
+          e.stopPropagation()
+          handleMarkAsRead(item)
+        }}
+      >
+        <Grid item xs={1.3}>
+          <img
+            src={logo}
+            width='30px'
+            height='30px'
+            style={{ borderRadius: '4px', objectFit: 'contain' }}
+          />
+        </Grid>
+        <Grid item xs={8.7}>
+          <MainBody title={title} body={body} />
+          <ActionsComponent item={item} />
+        </Grid>
+        <Grid item xs={2}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              justifyContent: 'space-between'
+            }}
+          >
+            <LinkWrapper
+              item={item}
+              link={attachmentLink}
+              hover={true}
+              sameTab={'false'}
+            >
+              <AttachmentComponent
+                type={type}
+                attachmentsObject={attachmentsObject}
+              />
+            </LinkWrapper>
+          </Box>
+        </Grid>
+        <Grid item xs={12}>
+          <NotificationFooter createdAt={createdAt} msg={item} />
+        </Grid>
+      </Grid>
+    </LinkWrapper>
+  )
+}
 
 const ClickAwayWrapper = ({ open, children, setAnchorElDelete }) => {
   if (open) {
@@ -639,7 +634,14 @@ export const NotificationsList = ({ filter }) => {
   const { ref, inView } = useInView()
 
   const {
-    data: { list, unreadList, count, openDeleteDialog, tabPanelValue },
+    data: {
+      list,
+      unreadList,
+      count,
+      openDeleteDialog,
+      tabPanelValue,
+      unreadCount
+    },
     handlers: { loadMoreNotifications, deleteAllMessages, handleClickDelete }
   } = useNotificationsHomeContext()
 
@@ -666,13 +668,19 @@ export const NotificationsList = ({ filter }) => {
 
   const page = Math.ceil(mapperList?.length / 20)
 
+  const checkCount = tabPanelValue === 'all' ? count : unreadCount
+
   useEffect(() => {
-    if (inView && mapperList?.length < count) {
+    if (inView && mapperList?.length < checkCount) {
       loadMoreNotifications(page + 1, tabPanelValue)
     }
   }, [inView])
 
   const listRef = useRef(null)
+
+  useEffect(() => {
+    console.log('mapperList', mapperList)
+  }, [JSON.stringify(mapperList)])
 
   if (mapperList?.length > 0) {
     return (
@@ -694,7 +702,9 @@ export const NotificationsList = ({ filter }) => {
         >
           <ClickAwayWrapper
             open={openDeleteDialog}
-            setAnchorElDelete={handleClickDelete}
+            setAnchorElDelete={(e) => {
+              handleClickDelete(e)
+            }}
           >
             <Paper
               sx={{
@@ -718,11 +728,11 @@ export const NotificationsList = ({ filter }) => {
                 <IconButton
                   variant='contained'
                   size='small'
-                  onClick={deleteAllMessages}
+                  onClick={(e) => deleteAllMessages(e)}
                 >
                   <Check />
                 </IconButton>
-                <IconButton size='small' onClick={handleClickDelete}>
+                <IconButton size='small' onClick={(e) => handleClickDelete(e)}>
                   <Close />
                 </IconButton>
               </Box>
