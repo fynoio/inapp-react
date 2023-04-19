@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import parse from 'html-react-parser'
 import { useInView } from 'react-intersection-observer'
-import { FixedSizeList as List } from 'react-window'
 import {
   Check,
   Close,
@@ -640,7 +639,7 @@ export const NotificationsList = ({ filter }) => {
   const { ref, inView } = useInView()
 
   const {
-    data: { list, unreadList, count, openDeleteDialog },
+    data: { list, unreadList, count, openDeleteDialog, tabPanelValue },
     handlers: { loadMoreNotifications, deleteAllMessages, handleClickDelete }
   } = useNotificationsHomeContext()
 
@@ -669,7 +668,7 @@ export const NotificationsList = ({ filter }) => {
 
   useEffect(() => {
     if (inView && mapperList?.length < count) {
-      loadMoreNotifications(page + 1, 'all')
+      loadMoreNotifications(page + 1, tabPanelValue)
     }
   }, [inView])
 
@@ -683,7 +682,6 @@ export const NotificationsList = ({ filter }) => {
           height: xs ? '56vh' : '70vh',
           position: 'relative'
         }}
-        // style={{ alignContent: 'flex-start' }}
       >
         <Collapse
           sx={{
@@ -694,60 +692,63 @@ export const NotificationsList = ({ filter }) => {
           }}
           in={openDeleteDialog}
         >
-          {/* <ClickAwayWrapper
+          <ClickAwayWrapper
             open={openDeleteDialog}
             setAnchorElDelete={handleClickDelete}
-          > */}
-          <Paper
-            sx={{
-              p: 3,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-
-              borderTopLeftRadius: 0,
-              borderTopRightRadius: 0,
-              width: '100%'
-            }}
           >
-            <Typography
-              sx={{ width: '80%', fontSize: '0.8rem' }}
-              textAlign='left'
-            >
-              Are you sure you want to delete all the notifications?
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <IconButton
-                variant='contained'
-                size='small'
-                onClick={deleteAllMessages}
-              >
-                <Check />
-              </IconButton>
-              <IconButton size='small' onClick={handleClickDelete}>
-                <Close />
-              </IconButton>
-            </Box>
-          </Paper>
-          {/* </ClickAwayWrapper> */}
-        </Collapse>
-        <List
-          height={600}
-          width={'100%'}
-          itemCount={mapperList?.length}
-          itemSize={97}
-          layout='vertical'
-        >
-          {({ index, style }) => {
-            return (
-              <Box key={mapperList[index]?._id} style={style}>
-                <NotificationItem item={mapperList[index]} />
-              </Box>
-            )
-          }}
-        </List>
+            <Paper
+              sx={{
+                p: 3,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
 
-        {mapperList?.length && <Box ref={ref} />}
+                borderTopLeftRadius: 0,
+                borderTopRightRadius: 0,
+                width: '100%'
+              }}
+            >
+              <Typography
+                sx={{ width: '80%', fontSize: '0.8rem' }}
+                textAlign='left'
+              >
+                Are you sure you want to delete all the notifications?
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <IconButton
+                  variant='contained'
+                  size='small'
+                  onClick={deleteAllMessages}
+                >
+                  <Check />
+                </IconButton>
+                <IconButton size='small' onClick={handleClickDelete}>
+                  <Close />
+                </IconButton>
+              </Box>
+            </Paper>
+          </ClickAwayWrapper>
+        </Collapse>
+        <Grid
+          container
+          sx={{
+            height: xs ? '55vh' : '70vh',
+            overflowY: 'auto',
+            overflowX: 'hidden'
+          }}
+          style={{ alignContent: 'flex-start' }}
+        >
+          {/* <ScrollWrapper> */}
+          {mapperList.map((item, index) => {
+            return (
+              <Grid key={item + index} item xs={12}>
+                <NotificationItem item={item} />
+              </Grid>
+            )
+          })}
+
+          {mapperList?.length && <Box ref={ref} />}
+        </Grid>
       </Box>
     )
   }
