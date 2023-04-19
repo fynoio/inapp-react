@@ -96,16 +96,16 @@ const PanelFooter = () => {
     <div
       style={{
         position: 'absolute',
-        bottom: '2px',
+        bottom: '10px',
         width: '100%',
-        height: '2.5vh',
+        height: '1vh',
         background: theme.palette.background.paper
       }}
     >
       <div
         style={{
           display: 'flex',
-          height: '3vh',
+          height: '1vh',
           alignItems: 'center',
           justifyContent: 'center',
           gap: '2.5px',
