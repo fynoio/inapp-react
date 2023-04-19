@@ -678,10 +678,6 @@ export const NotificationsList = ({ filter }) => {
 
   const listRef = useRef(null)
 
-  useEffect(() => {
-    console.log('mapperList', mapperList)
-  }, [JSON.stringify(mapperList)])
-
   if (mapperList?.length > 0) {
     return (
       <Box
