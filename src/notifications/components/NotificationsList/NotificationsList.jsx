@@ -621,7 +621,6 @@ const EmptyList = () => {
         sx={{
           position: 'absolute',
           top: 0,
-          width: '100%',
           zIndex: 5000
         }}
         in={openDeleteDialog}
@@ -640,8 +639,7 @@ const EmptyList = () => {
               gap: 4,
 
               borderTopLeftRadius: 0,
-              borderTopRightRadius: 0,
-              width: '100%'
+              borderTopRightRadius: 0
             }}
           >
             <Typography
@@ -756,8 +754,7 @@ export const NotificationsList = ({ filter }) => {
                 gap: 4,
 
                 borderTopLeftRadius: 0,
-                borderTopRightRadius: 0,
-                width: '100%'
+                borderTopRightRadius: 0
               }}
             >
               <Typography
