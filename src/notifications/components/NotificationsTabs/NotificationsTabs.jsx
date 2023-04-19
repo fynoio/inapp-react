@@ -200,7 +200,7 @@ const AttachmentComponent = ({ type, attachmentsObject, showBlur }) => {
     case 'Document':
       return <DocumentComponent docType={docType} showBlur={showBlur} />
     default:
-      return
+      return null
   }
 }
 const preview = (value, list) => {
@@ -418,7 +418,7 @@ export const ToastStructure = ({ msg, t, socketInstance, logo, close }) => {
 
 const Actions = () => {
   const {
-    data: { tabPanelValue, list, unreadList },
+    data: { list, unreadList },
     handlers: { handleClickDelete, handleMarkAllAsRead }
   } = useNotificationsHomeContext()
 
@@ -440,6 +440,8 @@ const Actions = () => {
       </Box>
     )
   }
+
+  return null
 }
 
 export const NotificationsTabs = () => {
