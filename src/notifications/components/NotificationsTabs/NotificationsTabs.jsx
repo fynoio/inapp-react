@@ -432,13 +432,11 @@ const Actions = () => {
             <DeleteSweepOutlined />
           </IconButton>
         </Tooltip>
-        {tabPanelValue === 'unread' && (
-          <Tooltip title='Mark all as read'>
-            <IconButton onClick={(e) => handleMarkAllAsRead(e)}>
-              <DoneAll />
-            </IconButton>
-          </Tooltip>
-        )}
+        <Tooltip title='Mark all as read'>
+          <IconButton onClick={(e) => handleMarkAllAsRead(e)}>
+            <DoneAll />
+          </IconButton>
+        </Tooltip>
       </Box>
     )
   }
