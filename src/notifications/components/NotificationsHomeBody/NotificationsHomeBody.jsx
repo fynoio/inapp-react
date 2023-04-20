@@ -39,7 +39,7 @@ const CloseButton = () => {
 
 const PanelHeader = () => {
   const {
-    data: { errMsg }
+    data: { errMsg, showHeader }
   } = useNotificationsHomeContext()
 
   return (
@@ -51,11 +51,11 @@ const PanelHeader = () => {
         pb: 1,
         pl: 3,
         pr: 2,
-        pt: 3,
+        pt: showHeader ? 3 : 0,
         gap: 2
       }}
     >
-      <Typography variant='h5'>Notifications</Typography>
+      {showHeader && <Typography variant='h5'>Notifications</Typography>}
 
       <Box
         sx={{
@@ -165,7 +165,7 @@ export const NotificationsHomeBody = () => {
   const theme = useTheme()
 
   const {
-    data: { anchorEl, errMsg },
+    data: { anchorEl, errMsg, showHeader },
     handlers: { handleClosePanel }
   } = useNotificationsHomeContext()
 
@@ -183,6 +183,12 @@ export const NotificationsHomeBody = () => {
       MenuListProps={{
         sx: {
           overflowY: 'hidden',
+          p: 0
+        },
+        disablePadding: true
+      }}
+      PaperProps={{
+        sx: {
           p: 0
         }
       }}

@@ -15,25 +15,9 @@ const Component = () => {
   )
 }
 
-export const NotificationsHomeWrapper = ({
-  user,
-  workspace,
-  integration,
-  signature,
-  logo,
-  sound,
-  overrideInappUrl
-}) => {
+export const NotificationsHomeWrapper = (props) => {
   return (
-    <NotificationsHomeProvider
-      user={user}
-      workspace={workspace}
-      integration={integration}
-      signature={signature}
-      logo={logo}
-      sound={sound}
-      overrideInappUrl={overrideInappUrl}
-    >
+    <NotificationsHomeProvider {...props}>
       <Component />
     </NotificationsHomeProvider>
   )

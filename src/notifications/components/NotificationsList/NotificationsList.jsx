@@ -29,7 +29,7 @@ import {
 } from '@mui/material'
 import { useNotificationsHomeContext } from '../../context'
 import moment from 'moment'
-
+import { ViewportList } from 'react-viewport-list'
 const DocumentComponent = ({ docType = 'txt' }) => {
   const theme = useTheme()
   const isDarkMode = theme.palette.mode === 'dark'
@@ -685,7 +685,8 @@ export const NotificationsList = ({ filter }) => {
       count,
       openDeleteDialog,
       tabPanelValue,
-      unreadCount
+      unreadCount,
+      showHeader
     },
     handlers: { loadMoreNotifications, deleteAllMessages, handleClickDelete }
   } = useNotificationsHomeContext()
@@ -726,15 +727,17 @@ export const NotificationsList = ({ filter }) => {
   if (mapperList?.length > 0) {
     return (
       <Box
-        ref={listRef}
+        // ref={listRef}
         sx={{
-          height: xs ? '56vh' : '70vh',
-          position: 'relative'
+          height: xs ? (showHeader ? '56vh' : '62vh') : '70vh',
+          position: 'relative',
+          overflowY: 'auto',
+          scrollBehavior: 'auto'
         }}
       >
         <Collapse
           sx={{
-            position: 'absolute',
+            position: 'sticky',
             top: 0,
             zIndex: 5000
           }}
@@ -778,7 +781,7 @@ export const NotificationsList = ({ filter }) => {
             </Paper>
           </ClickAwayWrapper>
         </Collapse>
-        <Grid
+        {/* <Grid
           container
           sx={{
             height: xs ? '55vh' : '70vh',
@@ -786,18 +789,24 @@ export const NotificationsList = ({ filter }) => {
             overflowX: 'hidden'
           }}
           style={{ alignContent: 'flex-start' }}
+        > */}
+        <ViewportList
+          ref={listRef}
+          // viewportRef={listRef}
+          initialPrerender={20}
+          overscan={100}
+          items={mapperList}
+          axis={'y'}
+          scrollThreshold={20}
         >
-          {/* <ScrollWrapper> */}
-          {mapperList.map((item, index) => {
-            return (
-              <Grid key={item + index} item xs={12}>
-                <NotificationItem item={item} />
-              </Grid>
-            )
-          })}
-
-          {mapperList?.length && <Box ref={ref} />}
-        </Grid>
+          {(item, index) => (
+            <Grid key={item + index} item xs={12}>
+              <NotificationItem item={item} />
+              {index === page * 19 && <Box ref={ref} />}
+            </Grid>
+          )}
+        </ViewportList>
+        {/* </Grid> */}
       </Box>
     )
   }

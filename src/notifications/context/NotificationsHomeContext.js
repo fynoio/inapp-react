@@ -12,16 +12,17 @@ export const NotificationsHomeContext = React.createContext()
 export const useNotificationsHomeContext = () =>
   useContext(NotificationsHomeContext)
 
-export const NotificationsHomeProvider = ({
-  user,
-  workspace,
-  integration,
-  signature,
-  logo,
-  sound,
-  overrideInappUrl,
-  children
-}) => {
+export const NotificationsHomeProvider = ({ children, ...props }) => {
+  const {
+    user,
+    workspace,
+    integration,
+    signature,
+    themeConfig: { logo, showHeader },
+    notificationSettings: { sound },
+    overrideInappUrl
+  } = props
+
   const [close, setClose] = useState(false)
   const [errMsg, setErrMsg] = useState('')
   const [list, setList] = useState([])
@@ -243,7 +244,8 @@ export const NotificationsHomeProvider = ({
       count,
       errMsg,
       close,
-      openDeleteDialog
+      openDeleteDialog,
+      showHeader
     },
     handlers: {
       handleClosePanel,
