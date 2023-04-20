@@ -278,7 +278,10 @@ const NotificationFooter = ({ createdAt, msg }) => {
     >
       <Typography
         fontSize={'0.7rem'}
-        sx={{ color: theme.palette.secondary.main, pl: { xs: 2 } }}
+        sx={{
+          color: theme.palette.secondary.main,
+          pl: { xs: 2, sm: 0.35 }
+        }}
       >
         {moment.parseZone(createdAt).fromNow()}
       </Typography>
