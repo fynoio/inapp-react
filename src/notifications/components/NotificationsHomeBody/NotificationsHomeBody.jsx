@@ -25,13 +25,24 @@ const CloseButton = () => {
   const theme = useTheme()
 
   const {
+    data: { errMsg },
     handlers: { handleClosePanel }
   } = useNotificationsHomeContext()
   const xs = useMediaQuery(theme.breakpoints.up('sm'))
   if (!xs) {
     return (
-      <IconButton onClick={handleClosePanel}>
-        <Close />
+      <IconButton
+        sx={{
+          color: errMsg
+            ? theme.palette.primary.main
+            : theme.palette.mode === 'light'
+            ? '#ffffff'
+            : theme.palette.secondary.main
+        }}
+        onClick={handleClosePanel}
+        size='small'
+      >
+        <Close fontSize='small' />
       </IconButton>
     )
   } else return null
@@ -42,40 +53,110 @@ const PanelHeader = () => {
     data: { errMsg, showHeader }
   } = useNotificationsHomeContext()
 
-  return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        width: 'auto',
-        pb: 1,
-        pl: 3,
-        pr: 2,
-        pt: showHeader ? 3 : 0,
-        gap: 2
-      }}
-    >
-      {showHeader && <Typography variant='h5'>Notifications</Typography>}
+  const theme = useTheme()
+  // return (
+  //   <Box
+  //     sx={{
+  //       display: 'flex',
+  //       alignItems: 'center',
+  //       justifyContent: !xs ? 'space-between' : 'center',
+  //       width: '100%',
+  //       py: 0.5,
+  //       px: 2,
+  //       gap: 2,
+  //       background:
+  //         theme.palette.mode === 'light'
+  //           ? theme.palette.grey[300]
+  //           : theme.palette.grey[700]
+  //     }}
+  //   >
+  //     <Tooltip title='You are offline now, please check your internet'>
+  //       <WifiOff
+  //         color='secondary'
+  //         sx={{
+  //           fontSize: xs ? '0.7rem' : '1rem'
+  //         }}
+  //       />
+  //     </Tooltip>
+  //     <CloseButton />
+  //   </Box>
+  // )
+  const xs = useMediaQuery(theme.breakpoints.up('sm'))
 
+  if (showHeader || !xs) {
+    return (
       <Box
         sx={{
-          display: 'inline-flex',
-          justifyContent: 'space-between',
-          width: '100%'
+          display: 'flex',
+          alignItems: 'center',
+          width: 'auto',
+          pb: 1,
+          pl: 3,
+          pr: 2,
+          pt: 3,
+          gap: 2
         }}
       >
-        {errMsg === 'xhr poll error' ? (
-          <Tooltip title='You are offline now, please check your internet'>
-            <WifiOff color='secondary' />
-          </Tooltip>
-        ) : (
-          <Box />
-        )}
+        <Typography variant='h5'>Notifications</Typography>
 
+        <Box
+          sx={{
+            display: 'inline-flex',
+            justifyContent: 'space-between',
+            width: '100%'
+          }}
+        >
+          {errMsg === 'xhr poll error' ? (
+            <Tooltip title='You are offline now, please check your internet'>
+              <WifiOff color='secondary' />
+            </Tooltip>
+          ) : (
+            <Box />
+          )}
+          <CloseButton />
+        </Box>
+      </Box>
+    )
+  }
+
+  if (errMsg === 'xhr poll error') {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: !xs ? 'space-between' : 'center',
+          width: 'auto',
+          py: 0.5,
+          px: 2,
+          gap: 2,
+          background: 'rgba(0,0,0,0.2)'
+        }}
+      >
+        <Tooltip title='You are offline now, please check your internet'>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <WifiOff
+              sx={{
+                fontSize: '0.75rem',
+                color:
+                  theme.palette.mode === 'light'
+                    ? '#ffffff'
+                    : theme.palette.secondary.main
+              }}
+            />
+            <Typography
+              variant='subtitle2'
+              color={theme.palette.mode === 'light' ? '#ffffff' : 'secondary'}
+              fontSize={'0.7rem'}
+            >
+              Offline
+            </Typography>
+          </Box>
+        </Tooltip>
         <CloseButton />
       </Box>
-    </Box>
-  )
+    )
+  }
 }
 
 const PanelBody = () => {
@@ -96,9 +177,10 @@ const PanelFooter = () => {
     <div
       style={{
         position: 'absolute',
-        bottom: '10px',
+        bottom: '0px',
         width: '100%',
-        height: '1vh',
+        height: '3.5vh',
+        zIndex: 5000,
         background: theme.palette.background.paper
       }}
     >
@@ -109,7 +191,8 @@ const PanelFooter = () => {
           alignItems: 'center',
           justifyContent: 'center',
           gap: '2.5px',
-          filter: 'opacity(.5)'
+          filter: 'opacity(.5)',
+          marginTop: 10
         }}
       >
         <span
@@ -165,7 +248,7 @@ export const NotificationsHomeBody = () => {
   const theme = useTheme()
 
   const {
-    data: { anchorEl, errMsg, showHeader },
+    data: { anchorEl },
     handlers: { handleClosePanel }
   } = useNotificationsHomeContext()
 
@@ -183,17 +266,19 @@ export const NotificationsHomeBody = () => {
       MenuListProps={{
         sx: {
           overflowY: 'hidden',
-          p: 0
-        },
-        disablePadding: true
+          p: 0,
+          background: 'red'
+        }
       }}
       PaperProps={{
         sx: {
-          p: 0
+          p: 0,
+          background: 'green'
         }
       }}
     >
       <Box
+        data-testId='Hello'
         sx={{
           width: xs ? '24vw' : md ? '64vw' : '90vw',
           height: xs ? '70vh' : '100%',

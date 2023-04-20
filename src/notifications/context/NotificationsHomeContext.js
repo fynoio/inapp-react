@@ -18,10 +18,12 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     workspace,
     integration,
     signature,
-    themeConfig: { logo, showHeader },
+    themeConfig,
     notificationSettings: { sound },
     overrideInappUrl
   } = props
+
+  const { logo, showHeader = false } = themeConfig
 
   const [close, setClose] = useState(false)
   const [errMsg, setErrMsg] = useState('')
