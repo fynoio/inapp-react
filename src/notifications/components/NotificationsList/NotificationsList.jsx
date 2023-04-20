@@ -802,7 +802,7 @@ export const NotificationsList = ({ filter }) => {
           {(item, index) => (
             <Grid key={item + index} item xs={12}>
               <NotificationItem item={item} />
-              {index === page * 19 && <Box ref={ref} />}
+              {index === page * 18 && <Box ref={ref} />}
             </Grid>
           )}
         </ViewportList>
