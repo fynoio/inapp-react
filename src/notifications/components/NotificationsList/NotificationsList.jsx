@@ -278,7 +278,7 @@ const NotificationFooter = ({ createdAt, msg }) => {
     >
       <Typography
         fontSize={'0.7rem'}
-        sx={{ color: theme.palette.secondary.main }}
+        sx={{ color: theme.palette.secondary.main, pl: { xs: 2 } }}
       >
         {moment.parseZone(createdAt).fromNow()}
       </Typography>
@@ -527,6 +527,8 @@ const NotificationItem = ({ item }) => {
     borderColor: theme.palette.divider
   }
 
+  const xs = useMediaQuery(theme.breakpoints.down('sm'))
+
   return (
     <LinkWrapper link={mainLink} sameTab={sameTab} item={item}>
       <Grid
@@ -536,6 +538,7 @@ const NotificationItem = ({ item }) => {
           e.stopPropagation()
           handleMarkAsRead(item)
         }}
+        columnGap={xs ? 1 : 0}
       >
         <Grid item xs={1.3}>
           <img
