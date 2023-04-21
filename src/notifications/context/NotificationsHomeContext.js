@@ -34,6 +34,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   const [showConfig, setShowConfig] = useState(false)
   const [tabPanelValue, setTabPanelValue] = useState('all')
   const [unreadCount, setUnreadCount] = useState(0)
+  const [page, setPage] = useState(1)
   const [count, setCount] = useState(0)
   const theme = useTheme()
   const [toastData, setToastData] = useState({})
@@ -116,14 +117,14 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     socket.on('messages:state', (data) => {
       data.filter === 'all'
         ? setList((prev) => {
-            if (data.messages.messages?.length > 0 && data?.page > 1) {
+            if (data.messages.messages?.length > 0 && data?.page > 2) {
               return prev.concat(data.messages.messages)
             } else {
               return data.messages.messages
             }
           })
         : setUnreadList((prev) => {
-            if (data.messages.messages?.length > 0 && data?.page > 1) {
+            if (data.messages.messages?.length > 0 && data?.page > 2) {
               return prev.concat(data.messages.messages)
             } else {
               return data.messages.messages
@@ -131,6 +132,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
           })
       setUnreadCount(data.messages.unread)
       setCount(data.messages.total)
+      setPage(data.page)
     })
     socket.on('statusUpdated', (status) => {
       handleChangeStatus(status)
@@ -150,6 +152,12 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   useEffect(() => {
     setUnreadList(list?.filter((msg) => !msg?.isRead))
   }, [JSON.stringify(list)])
+
+  useEffect(() => {
+    if (!Boolean(anchorEl) && socketInstance) {
+      socketInstance.emit('get:messages', { filter: tabPanelValue, page: 1 })
+    }
+  }, [anchorEl])
 
   const loadMoreNotifications = (page, type) => {
     if (socketInstance) {
@@ -247,7 +255,8 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       errMsg,
       close,
       openDeleteDialog,
-      showHeader
+      showHeader,
+      page
     },
     handlers: {
       handleClosePanel,

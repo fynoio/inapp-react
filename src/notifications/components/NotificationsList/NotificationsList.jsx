@@ -692,7 +692,8 @@ export const NotificationsList = ({ filter }) => {
       openDeleteDialog,
       tabPanelValue,
       unreadCount,
-      showHeader
+      showHeader,
+      page
     },
     handlers: { loadMoreNotifications, deleteAllMessages, handleClickDelete }
   } = useNotificationsHomeContext()
@@ -718,17 +719,13 @@ export const NotificationsList = ({ filter }) => {
   //   return <PerfectScrollbar options={{ wheelPropagation: false, suppressScrollX: true }}>{children}</PerfectScrollbar>
   // }
 
-  const page = Math.ceil(mapperList?.length / 20)
-
   const checkCount = tabPanelValue === 'all' ? count : unreadCount
 
   useEffect(() => {
     if (inView && mapperList?.length < checkCount) {
-      loadMoreNotifications(page + 1, tabPanelValue)
+      loadMoreNotifications(page, tabPanelValue)
     }
   }, [inView])
-
-  const listRef = useRef(null)
 
   if (mapperList?.length > 0) {
     return (
@@ -787,32 +784,22 @@ export const NotificationsList = ({ filter }) => {
             </Paper>
           </ClickAwayWrapper>
         </Collapse>
-        {/* <Grid
+        <Grid
           container
           sx={{
-            height: xs ? '55vh' : '70vh',
+            height: '100%',
             overflowY: 'auto',
             overflowX: 'hidden'
           }}
           style={{ alignContent: 'flex-start' }}
-        > */}
-        <ViewportList
-          ref={listRef}
-          // viewportRef={listRef}
-          initialPrerender={20}
-          overscan={100}
-          items={mapperList}
-          axis={'y'}
-          scrollThreshold={20}
         >
-          {(item, index) => (
+          {mapperList.map((item, index) => (
             <Grid key={item + index} item xs={12}>
               <NotificationItem item={item} />
-              {index === page * 18 && <Box ref={ref} />}
+              {index === mapperList?.length - 2 && <Box ref={ref} />}
             </Grid>
-          )}
-        </ViewportList>
-        {/* </Grid> */}
+          ))}
+        </Grid>
       </Box>
     )
   }
