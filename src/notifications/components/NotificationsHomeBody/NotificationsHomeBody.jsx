@@ -50,14 +50,14 @@ const CloseButton = () => {
 
 const PanelHeader = () => {
   const {
-    data: { errMsg, showHeader }
+    data: { errMsg, header }
   } = useNotificationsHomeContext()
 
   const theme = useTheme()
 
   const xs = useMediaQuery(theme.breakpoints.up('sm'))
 
-  if (showHeader || !xs) {
+  if (header !== undefined || !xs) {
     return (
       <Box
         sx={{
@@ -71,7 +71,9 @@ const PanelHeader = () => {
           gap: 2
         }}
       >
-        <Typography variant='h5'>Notifications</Typography>
+        <Typography variant='h5'>
+          {header === true || header === '' ? 'Notifications' : header}
+        </Typography>
 
         <Box
           sx={{

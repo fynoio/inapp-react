@@ -692,7 +692,7 @@ export const NotificationsList = ({ filter }) => {
       openDeleteDialog,
       tabPanelValue,
       unreadCount,
-      showHeader,
+      header,
       page
     },
     handlers: { loadMoreNotifications, deleteAllMessages, handleClickDelete }
@@ -732,7 +732,7 @@ export const NotificationsList = ({ filter }) => {
       <Box
         // ref={listRef}
         sx={{
-          height: xs ? (showHeader ? '56vh' : '62vh') : '70vh',
+          height: xs ? (Boolean(header) ? '56vh' : '62vh') : '70vh',
           position: 'relative',
           overflowY: 'auto',
           scrollBehavior: 'auto'

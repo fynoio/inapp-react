@@ -23,7 +23,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     overrideInappUrl
   } = props
 
-  const { logo, showHeader = false } = themeConfig
+  const { logo, header } = themeConfig
 
   const [close, setClose] = useState(false)
   const [errMsg, setErrMsg] = useState('')
@@ -255,7 +255,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       errMsg,
       close,
       openDeleteDialog,
-      showHeader,
+      header,
       page
     },
     handlers: {
