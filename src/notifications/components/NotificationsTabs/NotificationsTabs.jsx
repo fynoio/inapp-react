@@ -167,7 +167,7 @@ const ActionsComponent = ({ item, t, socketInstance }) => {
         })}
       </Grid>
     )
-  }
+  } else return null
 }
 
 const AttachmentComponent = ({ type, attachmentsObject, showBlur }) => {

@@ -140,6 +140,16 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     socket.on('lastSeenUpdated', (time) => {
       localStorage.setItem('fynoinapp_ls', time)
     })
+    socket.on('tag:updated', (id) => {
+      var prevMessage
+      setList((prev) => {
+        prevMessage = prev.filter((item) => item._id === id)
+        return prev.filter((item) => item._id != id)
+      })
+      if (!new RegExp(/READ/).test(JSON.stringify(prevMessage[0]?.status)))
+        setUnreadCount((prev) => prev - 1)
+      setCount((prev) => prev - 1)
+    })
     socket.on('disconnect', (err) => {
       setErrMsg(err.message)
     })

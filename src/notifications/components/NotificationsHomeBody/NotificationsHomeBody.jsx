@@ -93,7 +93,7 @@ const PanelHeader = () => {
         </Box>
       </Box>
     )
-  }
+  } else return null
 
   if (errMsg === 'xhr poll error') {
     return (
@@ -132,7 +132,7 @@ const PanelHeader = () => {
         <CloseButton />
       </Box>
     )
-  }
+  } else return null
 }
 
 const PanelBody = () => {

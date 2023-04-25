@@ -478,7 +478,7 @@ const ActionsComponent = ({ item }) => {
         })}
       </Grid>
     )
-  }
+  } else return null
 }
 
 const NotificationItem = ({ item }) => {
