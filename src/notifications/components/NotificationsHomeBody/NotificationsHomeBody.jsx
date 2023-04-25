@@ -173,6 +173,7 @@ const PanelFooter = () => {
           gap: 0.5,
           position: 'sticky',
           bottom: 0,
+          zIndex: 1000,
           background: (theme) => theme.palette.background.paper
         }}
       >
