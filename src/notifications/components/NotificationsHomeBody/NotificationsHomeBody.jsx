@@ -15,7 +15,8 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
-  Tooltip
+  Tooltip,
+  LinearProgress
 } from '@mui/material'
 import { useNotificationsHomeContext } from '../../context'
 import ConfigPanel from '../ConfigPanel'
@@ -148,29 +149,44 @@ const PanelBody = () => {
 }
 
 const PanelFooter = () => {
+  const {
+    data: { showLoader }
+  } = useNotificationsHomeContext()
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        py: 0.7,
-        gap: 0.5,
-        position: 'sticky',
-        bottom: 0,
-        background: (theme) => theme.palette.background.paper
-      }}
-    >
-      <Typography sx={{ fontSize: '0.7rem', filter: 'opacity(.5)' }}>
-        Powered By
-      </Typography>
-      <img
-        src='https://uploads-ssl.webflow.com/63735bad18c742035738e107/6399dab9fdfc2105b70def91_Fyno_logo_lettered.png'
-        alt='Fyno'
-        width={'45px'}
-        height={'auto'}
-        className={'poweredLogo'}
-      />
+    <Box>
+      {showLoader !== 0 ? (
+        <LinearProgress
+          variant='determinate'
+          color='primary'
+          sx={{ zIndex: 1000, height: '2px' }}
+          value={showLoader}
+        />
+      ) : (
+        <Box sx={{ height: '2px' }} />
+      )}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          py: 0.7,
+          gap: 0.5,
+          position: 'sticky',
+          bottom: 0,
+          background: (theme) => theme.palette.background.paper
+        }}
+      >
+        <Typography sx={{ fontSize: '0.7rem', filter: 'opacity(.5)' }}>
+          Powered By
+        </Typography>
+        <img
+          src='https://uploads-ssl.webflow.com/63735bad18c742035738e107/6399dab9fdfc2105b70def91_Fyno_logo_lettered.png'
+          alt='Fyno'
+          width={'45px'}
+          height={'auto'}
+          className={'poweredLogo'}
+        />
+      </Box>
     </Box>
   )
 }
@@ -208,7 +224,7 @@ export const NotificationsHomeBody = () => {
   const theme = useTheme()
 
   const {
-    data: { anchorEl },
+    data: { anchorEl, showLoader },
     handlers: { handleClosePanel }
   } = useNotificationsHomeContext()
 
@@ -255,6 +271,7 @@ export const NotificationsHomeBody = () => {
           <Error />
         )} */}
         <PanelBody />
+
         <PanelFooter />
       </Box>
     </Menu>

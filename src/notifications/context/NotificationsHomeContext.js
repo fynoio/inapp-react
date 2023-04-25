@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { toast } from 'react-hot-toast'
 
 import socketIO from 'socket.io-client'
 
 import { ToastStructure } from '../components/NotificationsTabs'
-import { useTheme } from '@mui/material'
+import { debounce, useTheme } from '@mui/material'
 import useSound from 'use-sound'
 
 export const NotificationsHomeContext = React.createContext()
@@ -36,6 +36,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   const [unreadCount, setUnreadCount] = useState(0)
   const [page, setPage] = useState(1)
   const [count, setCount] = useState(0)
+  const [showLoader, setShowLoader] = useState(0)
   const theme = useTheme()
   const [toastData, setToastData] = useState({})
   const brandLogo = logo
@@ -79,6 +80,10 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       })
     }
   }
+
+  const resetLoader = debounce(() => {
+    setShowLoader(0)
+  }, [100])
 
   useEffect(() => {
     if (anchorEl === null && JSON.stringify(toastData) !== '{}') {
@@ -133,6 +138,8 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       setUnreadCount(data.messages.unread)
       setCount(data.messages.total)
       setPage(data.page)
+      setShowLoader(100)
+      resetLoader()
     })
     socket.on('statusUpdated', (status) => {
       handleChangeStatus(status)
@@ -171,6 +178,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
 
   const loadMoreNotifications = (page, type) => {
     if (socketInstance) {
+      setShowLoader(Math.floor(Math.random() * 31) + 30)
       socketInstance.emit('get:messages', { filter: type, page: page })
     }
   }
@@ -266,7 +274,8 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       close,
       openDeleteDialog,
       header,
-      page
+      page,
+      showLoader
     },
     handlers: {
       handleClosePanel,
