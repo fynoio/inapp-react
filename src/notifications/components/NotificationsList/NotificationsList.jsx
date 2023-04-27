@@ -29,7 +29,6 @@ import {
 } from '@mui/material'
 import { useNotificationsHomeContext } from '../../context'
 import moment from 'moment'
-import { ViewportList } from 'react-viewport-list'
 const DocumentComponent = ({ docType = 'txt' }) => {
   const theme = useTheme()
   const isDarkMode = theme.palette.mode === 'dark'
