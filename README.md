@@ -14,7 +14,13 @@ npm install --save @fyno/inapp-react
 
 ## Usage
 
-Before installing Inapp Notification Center make sure you have generated HMAC signature in the backend by following the below process
+### Prerequisite
+
+Before installing Inapp Notification Center make sure you have generated HMAC signature in the backend by following the below process. Make sure you pass your user distinct id in place of user id. This has to be generated for every user and the same needs to be passed to inapp-react SDK
+
+- WSID - You can get workspace id from fyno [api keys](https://app.fyno.io/api-keys) page
+- Integration Token - You can get integration token from [integration](https://app.fyno.io/integrations) page
+- User ID - This has to be the distinct id of the user who is currently logged in. This will help fyno to identify the user to send user specific notifications
 
 ```jsx
 import crypto from 'crypto'
@@ -23,6 +29,10 @@ const signature = crypto
   .update('USER_ID')
   .digest('hex')
 ```
+
+**_NOTE:_** Please make sure you are generating the signature on backend or middleware. You might expose your api keys if done on frontend.
+
+### SDK Initlization in frontend
 
 ```jsx
 import {FynoInappCenter} from '@fyno/inapp-react'
