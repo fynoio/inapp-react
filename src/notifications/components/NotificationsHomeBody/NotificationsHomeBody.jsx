@@ -241,6 +241,7 @@ export const NotificationsHomeBody = () => {
       <Box
         data-testid='Hello'
         sx={{
+          minWidth: xs ? '25pc' : '80%',
           width: md ? '24vw' : xs ? '64vw' : '90vw',
           height: xs ? '70vh' : '100%',
           background: theme.palette.background.paper,
