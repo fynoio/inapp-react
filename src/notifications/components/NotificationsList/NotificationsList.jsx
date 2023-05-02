@@ -602,17 +602,33 @@ const ClickAwayWrapper = ({ open, children, setAnchorElDelete }) => {
 
 const EmptyList = () => {
   const {
-    data: { tabPanelValue, openDeleteDialog },
+    data: { tabPanelValue, openDeleteDialog, header },
     handlers: { handleClickDelete, deleteAllMessages }
   } = useNotificationsHomeContext()
   const theme = useTheme()
   const tabIsUnread = tabPanelValue === 'unread'
   const xs = useMediaQuery(theme.breakpoints.up('sm'))
 
+  const getHeight = () => {
+    if (!xs) {
+      return '70vh'
+    }
+    let height = 62
+    if (xs) {
+      if (Boolean(header)) {
+        height = height - 6
+      }
+      if (openDeleteDialog) {
+        height = height - 5
+      }
+    }
+    return `${height}vh`
+  }
+
   return (
     <Box
       sx={{
-        height: xs ? '56vh ' : '70vh',
+        height: getHeight(),
         color: theme.palette.secondary.main,
         display: 'flex',
         flexDirection: 'column',
@@ -701,23 +717,6 @@ export const NotificationsList = ({ filter }) => {
 
   const xs = useMediaQuery(theme.breakpoints.up('sm'))
 
-  const styles = {
-    height: xs ? 400 : '100%',
-    width: '100%',
-    '& .MuiMenuItem-root:last-of-type': {
-      border: 0
-    }
-  }
-
-  // ** Styled PerfectScrollbar component
-  // const PerfectScrollbar = styled(PerfectScrollbarComponent)({
-  //   ...styles
-  // })
-
-  // const ScrollWrapper = ({ children }) => {
-  //   return <PerfectScrollbar options={{ wheelPropagation: false, suppressScrollX: true }}>{children}</PerfectScrollbar>
-  // }
-
   const checkCount = tabPanelValue === 'all' ? count : unreadCount
 
   useEffect(() => {
@@ -726,15 +725,25 @@ export const NotificationsList = ({ filter }) => {
     }
   }, [inView])
 
+  const getHeight = () => {
+    if (!xs) {
+      return '70vh'
+    }
+    let height = 62
+    if (xs) {
+      if (Boolean(header)) {
+        height = height - 6
+      }
+    }
+    return `${height}vh`
+  }
+
   if (mapperList?.length > 0) {
     return (
       <Box
-        // ref={listRef}
         sx={{
-          height: xs ? (Boolean(header) ? '56vh' : '62vh') : '70vh',
-          position: 'relative',
-          overflowY: 'auto',
-          scrollBehavior: 'auto'
+          height: getHeight(),
+          position: 'relative'
         }}
       >
         <Collapse
@@ -788,7 +797,9 @@ export const NotificationsList = ({ filter }) => {
           sx={{
             height: '100%',
             overflowY: 'auto',
-            overflowX: 'hidden'
+            overflowX: 'hidden',
+            pointerEvents: openDeleteDialog ? 'none' : '',
+            opacity: openDeleteDialog ? '50%' : '100%'
           }}
           style={{ alignContent: 'flex-start' }}
         >
@@ -798,6 +809,18 @@ export const NotificationsList = ({ filter }) => {
               {index === mapperList?.length - 2 && <Box ref={ref} />}
             </Grid>
           ))}
+          {mapperList?.length === checkCount && mapperList?.length > 19 && (
+            <Grid
+              item
+              xs={12}
+              textAlign='center'
+              sx={{ background: theme.palette.secondary.main + '1A', py: 1 }}
+            >
+              <Typography variant='caption' color='secondary'>
+                Showing all notifications
+              </Typography>
+            </Grid>
+          )}
         </Grid>
       </Box>
     )

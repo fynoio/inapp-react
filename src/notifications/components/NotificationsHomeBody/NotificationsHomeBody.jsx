@@ -15,7 +15,8 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
-  Tooltip
+  Tooltip,
+  LinearProgress
 } from '@mui/material'
 import { useNotificationsHomeContext } from '../../context'
 import ConfigPanel from '../ConfigPanel'
@@ -35,9 +36,7 @@ const CloseButton = () => {
         sx={{
           color: errMsg
             ? theme.palette.secondary.main
-            : theme.palette.mode === 'light'
-            ? '#ffffff'
-            : theme.palette.secondary.main
+            : theme.palette.text.primary
         }}
         onClick={handleClosePanel}
         size='small'
@@ -55,9 +54,9 @@ const PanelHeader = () => {
 
   const theme = useTheme()
 
-  const xs = useMediaQuery(theme.breakpoints.up('sm'))
+  const xsUp = useMediaQuery(theme.breakpoints.up('sm'))
 
-  if (header !== undefined || !xs) {
+  if (header !== undefined || !xsUp) {
     return (
       <Box
         sx={{
@@ -72,7 +71,9 @@ const PanelHeader = () => {
         }}
       >
         <Typography variant='h5'>
-          {header === true || header === '' ? 'Notifications' : header}
+          {header === true || header === '' || (!header && !xsUp)
+            ? 'Notifications'
+            : header}
         </Typography>
 
         <Box
@@ -93,7 +94,7 @@ const PanelHeader = () => {
         </Box>
       </Box>
     )
-  } else return null
+  }
 
   if (errMsg === 'xhr poll error') {
     return (
@@ -101,7 +102,7 @@ const PanelHeader = () => {
         sx={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: !xs ? 'space-between' : 'center',
+          justifyContent: !xsUp ? 'space-between' : 'center',
           width: 'auto',
           py: 0.5,
           px: 2,
@@ -148,29 +149,44 @@ const PanelBody = () => {
 }
 
 const PanelFooter = () => {
+  const {
+    data: { showLoader }
+  } = useNotificationsHomeContext()
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        py: 0.7,
-        gap: 0.5,
-        position: 'sticky',
-        bottom: 0,
-        background: (theme) => theme.palette.background.paper
-      }}
-    >
-      <Typography sx={{ fontSize: '0.7rem', filter: 'opacity(.5)' }}>
-        Powered By
-      </Typography>
-      <img
-        src='https://uploads-ssl.webflow.com/63735bad18c742035738e107/6399dab9fdfc2105b70def91_Fyno_logo_lettered.png'
-        alt='Fyno'
-        width={'45px'}
-        height={'auto'}
-        className={'poweredLogo'}
-      />
+    <Box>
+      {showLoader !== 0 ? (
+        <LinearProgress
+          variant='determinate'
+          color='primary'
+          sx={{ zIndex: 1000, height: '2px' }}
+          value={showLoader}
+        />
+      ) : (
+        <Box sx={{ height: '2px' }} />
+      )}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          py: 0.7,
+          gap: 0.5,
+          position: 'sticky',
+          bottom: 0,
+          background: (theme) => theme.palette.background.paper
+        }}
+      >
+        <Typography sx={{ fontSize: '0.7rem', filter: 'opacity(.5)' }}>
+          Powered By
+        </Typography>
+        <img
+          src='https://uploads-ssl.webflow.com/63735bad18c742035738e107/6399dab9fdfc2105b70def91_Fyno_logo_lettered.png'
+          alt='Fyno'
+          width={'45px'}
+          height={'auto'}
+          className={'poweredLogo'}
+        />
+      </Box>
     </Box>
   )
 }
@@ -208,7 +224,7 @@ export const NotificationsHomeBody = () => {
   const theme = useTheme()
 
   const {
-    data: { anchorEl },
+    data: { anchorEl, showLoader },
     handlers: { handleClosePanel }
   } = useNotificationsHomeContext()
 
@@ -255,6 +271,7 @@ export const NotificationsHomeBody = () => {
           <Error />
         )} */}
         <PanelBody />
+
         <PanelFooter />
       </Box>
     </Menu>
