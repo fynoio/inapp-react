@@ -384,43 +384,43 @@ export const LinkWrapper = ({
     position: 'absolute'
   }
   return (
-    <Link
-      target={sameTab === 'true' ? '_self' : '_blank'}
-      href={`${link}`}
-      style={{ textDecoration: 'none' }}
+    // <Link
+    //   target={sameTab === 'true' ? '_self' : '_blank'}
+    //   href={`${link}`}
+    //   style={{ textDecoration: 'none' }}
+    // >
+    <Box
+      onClick={(e) => {
+        handleMarkAsRead(item)
+      }}
+      sx={{ position: 'relative' }}
     >
-      <Box
-        onClick={(e) => {
-          handleMarkAsRead(item)
-        }}
-        sx={{ position: 'relative' }}
-      >
-        {hasAttachment && (
-          <Box
-            sx={{ ...HoverBoxStyles }}
-            onMouseOver={() => {
-              setShowBlur(true)
-            }}
-            onMouseOut={() => {
-              setShowBlur(false)
-            }}
-          >
-            <OpenInNewIcon fontSize='small' />
-          </Box>
-        )}
+      {hasAttachment && (
         <Box
-          sx={{
-            filter: showBlur
-              ? theme.palette.mode === 'light'
-                ? 'brightness(50%) blur(1px)'
-                : 'blur(1px)'
-              : ''
+          sx={{ ...HoverBoxStyles }}
+          onMouseOver={() => {
+            setShowBlur(true)
+          }}
+          onMouseOut={() => {
+            setShowBlur(false)
           }}
         >
-          {children}
+          <OpenInNewIcon fontSize='small' />
         </Box>
+      )}
+      <Box
+        sx={{
+          filter: showBlur
+            ? theme.palette.mode === 'light'
+              ? 'brightness(50%) blur(1px)'
+              : 'blur(1px)'
+            : ''
+        }}
+      >
+        {children}
       </Box>
-    </Link>
+    </Box>
+    // </Link>
   )
 }
 
@@ -444,6 +444,9 @@ const ActionsComponent = ({ item }) => {
                 target={sameTab === 'false' ? '_blank' : '_self'}
                 href={`${item?.action}`}
                 style={{ textDecoration: 'none' }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                }}
               >
                 <Button
                   disableElevation
@@ -462,6 +465,9 @@ const ActionsComponent = ({ item }) => {
                 target={sameTab === 'false' ? '_blank' : '_self'}
                 href={`${item?.action}`}
                 style={{ textDecoration: 'none' }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                }}
               >
                 <Button
                   disableElevation
@@ -539,6 +545,7 @@ const NotificationItem = ({ item }) => {
         onClick={(e) => {
           e.stopPropagation()
           handleMarkAsRead(item)
+          window.open(mainLink, sameTab === 'true' ? '_self' : '_blank')
         }}
         columnGap={xs ? 1 : 0}
       >
@@ -550,7 +557,7 @@ const NotificationItem = ({ item }) => {
             style={{ borderRadius: '4px', objectFit: 'contain' }}
           />
         </Grid>
-        <Grid item xs={8.7}>
+        <Grid item xs={7.7}>
           <MainBody title={title} body={body} />
           <ActionsComponent item={item} />
         </Grid>
@@ -742,8 +749,14 @@ export const NotificationsList = ({ filter }) => {
     return (
       <Box
         sx={{
-          height: getHeight(),
-          position: 'relative'
+          height: xs
+            ? Boolean(header !== undefined)
+              ? '56.25vh'
+              : '62.75vh'
+            : '70vh',
+          position: 'relative',
+          overflowY: 'auto',
+          scrollBehavior: 'auto'
         }}
       >
         <Collapse

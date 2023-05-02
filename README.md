@@ -49,6 +49,7 @@ class Example extends Component {
       primary: 'PRIMARY_COLOR',
       lightBackground: 'LIGHT_THEME_BACKGROUND_COLOR',
       darkBackground: 'DARK_THEME_BACKGROUND_COLOR'
+      header: 'Notifications' // By default the header will not be shown to make the UX better, If specified header will be shown with the title specified in inapp-center.
     }, //optional
     notificationSettings: {
       sound: 'LINK_TO_NOTIFICATION_SOUND'

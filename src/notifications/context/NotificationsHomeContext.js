@@ -148,13 +148,19 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       localStorage.setItem('fynoinapp_ls', time)
     })
     socket.on('tag:updated', (id) => {
-      var prevMessage
+      var id_done = ''
+
       setList((prev) => {
-        prevMessage = prev.filter((item) => item._id === id)
+        var prevMessage = prev.filter((item) => item._id === id)
+        if (
+          id_done !== id &&
+          !new RegExp(/\"READ\"/).test(JSON.stringify(prevMessage[0]?.status))
+        ) {
+          setUnreadCount((prev) => prev - 1)
+          id_done = id
+        }
         return prev.filter((item) => item._id != id)
       })
-      if (!new RegExp(/READ/).test(JSON.stringify(prevMessage[0]?.status)))
-        setUnreadCount((prev) => prev - 1)
       setCount((prev) => prev - 1)
     })
     socket.on('disconnect', (err) => {

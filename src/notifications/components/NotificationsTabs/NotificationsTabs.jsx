@@ -123,7 +123,8 @@ const ActionsComponent = ({ item, t, socketInstance }) => {
             return (
               <a
                 key={item + index}
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation()
                   toast.dismiss(t.id)
                   socketInstance.emit('message:read', data)
                 }}
@@ -346,14 +347,14 @@ export const ToastStructure = ({ msg, t, socketInstance, logo, close }) => {
   }
 
   return (
-    <a
+    <Box
       target={sameTab === 'false' ? '_blank' : '_self'}
-      onClick={() => {
+      onClick={(e) => {
+        e.stopPropagation()
         toast.dismiss(t.id)
         socketInstance.emit('message:read', msg)
+        window.open(link, sameTab === 'true' ? '_self' : '_blank')
       }}
-      href={`${link}`}
-      rel='noopener noreferrer'
       style={{ textDecoration: 'none', width: '100%' }}
     >
       <Grid container spacing={0} alignItems='center'>
@@ -377,17 +378,18 @@ export const ToastStructure = ({ msg, t, socketInstance, logo, close }) => {
               justifyContent: 'space-between'
             }}
           >
-            <a
+            <Box
               href={attachmentLink}
-              target='_blank'
-              style={{ textDecoration: 'none' }}
-              rel='noopener noreferrer'
+              onClick={(e) => {
+                e.stopPropagation()
+                window.open(attachmentLink, '_blank')
+              }}
             >
               <AttachmentComponent
                 type={type}
                 attachmentsObject={attachmentsObject}
               />
-            </a>
+            </Box>
           </Box>
         </Grid>
         <ActionsComponent item={msg} t={t} socketInstance={socketInstance} />
@@ -412,7 +414,7 @@ export const ToastStructure = ({ msg, t, socketInstance, logo, close }) => {
           ''
         )}
       </Grid>
-    </a>
+    </Box>
   )
 }
 

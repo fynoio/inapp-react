@@ -146,16 +146,18 @@ const PanelFooter = () => {
   } = useNotificationsHomeContext()
   return (
     <Box>
-      {showLoader !== 0 ? <></> : <Box sx={{ height: '2px' }} />}
       <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          py: 0.7,
+          // py: 0.7,
           gap: 0.5,
-          position: 'sticky',
+          height: '2.25vh',
+          position: 'absolute',
           bottom: 0,
+          left: 0,
+          right: 0,
           background: (theme) => theme.palette.background.paper
         }}
       >
@@ -237,8 +239,9 @@ export const NotificationsHomeBody = () => {
       }}
     >
       <Box
-        data-testId='Hello'
+        data-testid='Hello'
         sx={{
+          minWidth: xs ? '25pc' : '80%',
           width: md ? '24vw' : xs ? '64vw' : '90vw',
           height: xs ? '70vh' : '100%',
           background: theme.palette.background.paper,
