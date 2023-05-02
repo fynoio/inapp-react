@@ -557,7 +557,7 @@ const NotificationItem = ({ item }) => {
             style={{ borderRadius: '4px', objectFit: 'contain' }}
           />
         </Grid>
-        <Grid item xs={8.7}>
+        <Grid item xs={7.7}>
           <MainBody title={title} body={body} />
           <ActionsComponent item={item} />
         </Grid>

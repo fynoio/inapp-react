@@ -154,16 +154,6 @@ const PanelFooter = () => {
   } = useNotificationsHomeContext()
   return (
     <Box>
-      {showLoader !== 0 ? (
-        <LinearProgress
-          variant='determinate'
-          color='primary'
-          sx={{ zIndex: 1000, height: '2px' }}
-          value={showLoader}
-        />
-      ) : (
-        <Box sx={{ height: '2px' }} />
-      )}
       <Box
         sx={{
           display: 'flex',
