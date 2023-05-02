@@ -1,22 +1,14 @@
-import React, { useState } from 'react'
+import React from 'react'
 
-import {
-  Close,
-  DeleteSweep,
-  DeleteSweepOutlined,
-  LinkOffOutlined,
-  WifiOff
-} from '@mui/icons-material'
+import { Close, LinkOffOutlined, WifiOff } from '@mui/icons-material'
 import {
   Box,
   IconButton,
   Menu,
-  Chip,
   Typography,
   useMediaQuery,
   useTheme,
-  Tooltip,
-  LinearProgress
+  Tooltip
 } from '@mui/material'
 import { useNotificationsHomeContext } from '../../context'
 import ConfigPanel from '../ConfigPanel'
