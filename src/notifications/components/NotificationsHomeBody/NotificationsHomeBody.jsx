@@ -36,9 +36,7 @@ const CloseButton = () => {
         sx={{
           color: errMsg
             ? theme.palette.secondary.main
-            : theme.palette.mode === 'light'
-            ? '#ffffff'
-            : theme.palette.secondary.main
+            : theme.palette.text.primary
         }}
         onClick={handleClosePanel}
         size='small'
@@ -56,9 +54,9 @@ const PanelHeader = () => {
 
   const theme = useTheme()
 
-  const xs = useMediaQuery(theme.breakpoints.up('sm'))
+  const xsUp = useMediaQuery(theme.breakpoints.up('sm'))
 
-  if (header !== undefined || !xs) {
+  if (header !== undefined || !xsUp) {
     return (
       <Box
         sx={{
@@ -73,7 +71,9 @@ const PanelHeader = () => {
         }}
       >
         <Typography variant='h5'>
-          {header === true || header === '' ? 'Notifications' : header}
+          {header === true || header === '' || (!header && !xsUp)
+            ? 'Notifications'
+            : header}
         </Typography>
 
         <Box
@@ -94,7 +94,7 @@ const PanelHeader = () => {
         </Box>
       </Box>
     )
-  } else return null
+  }
 
   if (errMsg === 'xhr poll error') {
     return (
@@ -102,7 +102,7 @@ const PanelHeader = () => {
         sx={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: !xs ? 'space-between' : 'center',
+          justifyContent: !xsUp ? 'space-between' : 'center',
           width: 'auto',
           py: 0.5,
           px: 2,
