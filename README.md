@@ -20,7 +20,7 @@ Before installing Inapp Notification Center make sure you have generated HMAC si
 
 - WSID - You can get workspace id from fyno [api keys](https://app.fyno.io/api-keys) page
 - Integration Token - You can get integration token from [integration](https://app.fyno.io/integrations) page
-- User ID - This has to be the distinct id of the user who is currently logged in. This will help fyno to identify the user to send user specific notifications
+- User ID - This has to be the distinct id of currently logged in user. This will help fyno to identify the user to send user specific notifications
 
 ```jsx
 import crypto from 'crypto'
