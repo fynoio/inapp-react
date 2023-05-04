@@ -360,7 +360,7 @@ export const ToastStructure = ({ msg, t, socketInstance, logo, close }) => {
       <Grid container spacing={0} alignItems='center'>
         <Grid item xs={1.5} justifyContent='center' alignItems={'center'}>
           <img
-            src={logo}
+            src={icon}
             width='30px'
             height='30px'
             style={{ borderRadius: '4px', objectFit: 'contain' }}
