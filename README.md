@@ -52,7 +52,8 @@ class Example extends Component {
       header: 'Notifications' // By default the header will not be shown to make the UX better, If specified header will be shown with the title specified in inapp-center.
     }, //optional
     notificationSettings: {
-      sound: 'LINK_TO_NOTIFICATION_SOUND'
+      sound: 'LINK_TO_NOTIFICATION_SOUND',
+      invertTheme: false //If you want notification toast with the inverted theme make this to true
     } //optional
   }
   render() {
@@ -75,7 +76,8 @@ class Example extends Component {
       darkBackground: 'DARK_THEME_BACKGROUND_COLOR'
   }
   const notificationSettings = {
-    sound: 'LINK_TO_NOTIFICATION_SOUND'
+    sound: 'LINK_TO_NOTIFICATION_SOUND',
+    invertTheme: false //If you want notification toast with the inverted theme make this to true
   }
   render() {
     return <FynoInappCenter theme="light" user="{userid}" workspace="{workspace_id}" integration="{integration_id}" signature="{signature generated from backend}" themeConfig={themeConfig} notificationSettings={notificationSettings}/>
