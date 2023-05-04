@@ -19,7 +19,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     integration,
     signature,
     themeConfig,
-    notificationSettings: { sound },
+    notificationSettings,
     overrideInappUrl
   } = props
 
@@ -40,7 +40,11 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   const theme = useTheme()
   const [toastData, setToastData] = useState({})
   const brandLogo = logo
-  const [play] = useSound(sound)
+  var soundEnabled = null
+  if (notificationSettings && notificationSettings.sound) {
+    const [play] = useSound(notificationSettings.sound)
+    soundEnabled = play
+  }
   const resetState = () => {
     setErrMsg('')
     setList([])
@@ -245,8 +249,8 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   }
 
   const handleToast = (data, socket) => {
-    if (sound) {
-      play()
+    if (notificationSettings && notificationSettings.sound) {
+      soundEnabled()
     }
     toast((t) => (
       <ToastStructure
