@@ -490,7 +490,7 @@ const NotificationItem = ({ item }) => {
   const theme = useTheme()
   const type = item?.notification_content?.attachments?.type
   const read = item?.isRead
-  let mainLink = item?.notification_content?.action?.href
+  let mainLink = item?.notification_content?.action?.href || null
   let sameTab = item?.notification_content?.action?.sameTab || false
 
   if (mainLink && mainLink[0] !== '/') {
@@ -500,12 +500,12 @@ const NotificationItem = ({ item }) => {
       } else if (mainLink !== '#') {
         mainLink = '/' + mainLink
       } else {
-        mainLink = 'javascript:void(0);'
+        mainLink = null
         sameTab = 'true'
       }
     }
   } else {
-    mainLink = 'javascript:void(0);'
+    mainLink = null
     sameTab = 'true'
   }
 
@@ -538,56 +538,55 @@ const NotificationItem = ({ item }) => {
   const xs = useMediaQuery(theme.breakpoints.down('sm'))
 
   return (
-    <LinkWrapper link={mainLink} sameTab={sameTab} item={item}>
-      <Grid
-        container
-        sx={{ ...styles }}
-        onClick={(e) => {
-          e.stopPropagation()
-          handleMarkAsRead(item)
+    <Grid
+      container
+      sx={{ ...styles }}
+      onClick={(e) => {
+        e.stopPropagation()
+        handleMarkAsRead(item)
+        if (mainLink)
           window.open(mainLink, sameTab === 'true' ? '_self' : '_blank')
-        }}
-        columnGap={xs ? 1 : 0}
-      >
-        <Grid item xs={1.3}>
-          <img
-            src={logo}
-            width='30px'
-            height='30px'
-            style={{ borderRadius: '4px', objectFit: 'contain' }}
-          />
-        </Grid>
-        <Grid item xs={7.7}>
-          <MainBody title={title} body={body} />
-          <ActionsComponent item={item} />
-        </Grid>
-        <Grid item xs={2}>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-end',
-              justifyContent: 'space-between'
-            }}
-          >
-            <LinkWrapper
-              item={item}
-              link={attachmentLink}
-              hover={true}
-              sameTab={'false'}
-            >
-              <AttachmentComponent
-                type={type}
-                attachmentsObject={attachmentsObject}
-              />
-            </LinkWrapper>
-          </Box>
-        </Grid>
-        <Grid item xs={12}>
-          <NotificationFooter createdAt={createdAt} msg={item} />
-        </Grid>
+      }}
+      columnGap={xs ? 1 : 0}
+    >
+      <Grid item xs={1.3}>
+        <img
+          src={logo}
+          width='30px'
+          height='30px'
+          style={{ borderRadius: '4px', objectFit: 'contain' }}
+        />
       </Grid>
-    </LinkWrapper>
+      <Grid item xs={7.7}>
+        <MainBody title={title} body={body} />
+        <ActionsComponent item={item} />
+      </Grid>
+      <Grid item xs={2}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            justifyContent: 'space-between'
+          }}
+        >
+          <LinkWrapper
+            item={item}
+            link={attachmentLink}
+            hover={true}
+            sameTab={'false'}
+          >
+            <AttachmentComponent
+              type={type}
+              attachmentsObject={attachmentsObject}
+            />
+          </LinkWrapper>
+        </Box>
+      </Grid>
+      <Grid item xs={12}>
+        <NotificationFooter createdAt={createdAt} msg={item} />
+      </Grid>
+    </Grid>
   )
 }
 
