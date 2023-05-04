@@ -40,10 +40,41 @@ export const FynoInappCenter = (props) => {
         disabled: mode === 'light' ? '#ADACB4' : '#84818F',
         border: mode === 'light' ? '#C8C7CA' : '#8782A0'
       },
+      toasttext: {
+        primary:
+          mode === 'light'
+            ? notificationSettings?.invertTheme
+              ? '#E8E4FC'
+              : '#474550'
+            : notificationSettings?.invertTheme
+            ? '#474550'
+            : '#E8E4FC',
+        secondary:
+          mode === 'light'
+            ? notificationSettings?.invertTheme
+              ? '#AAA6BF'
+              : '#5A5761'
+            : notificationSettings?.invertTheme
+            ? '#5A5761'
+            : '#AAA6BF',
+        disabled: mode === 'light' ? '#ADACB4' : '#84818F',
+        border: mode === 'light' ? '#C8C7CA' : '#8782A0'
+      },
       divider: `rgba(${mainColor}, 0.12)`,
       background: {
         paper:
           mode === 'light'
+            ? themeConfig?.lightBackground || '#FFF'
+            : themeConfig?.darkBackground || '#3B345D',
+        inverted:
+          mode === 'dark'
+            ? themeConfig?.lightBackground || '#FFF'
+            : themeConfig?.darkBackground || '#3B345D',
+        default: defaultBgColor()
+      },
+      inverted: {
+        paper:
+          mode === 'dark'
             ? themeConfig?.lightBackground || '#FFF'
             : themeConfig?.darkBackground || '#3B345D',
         default: defaultBgColor()
@@ -69,7 +100,15 @@ export const FynoInappCenter = (props) => {
         position={notificationSettings?.toastPosition || 'top-right'}
         toastOptions={{
           duration: notificationSettings?.duration || 5000,
-          style: { width: '100%', background: theme.palette.background.paper }
+          style: {
+            width: '100%',
+            background: notificationSettings?.invertTheme
+              ? theme.palette.inverted.paper
+              : theme.palette.background.paper,
+            color: notificationSettings?.invertTheme
+              ? theme.palette.inverted.paper
+              : theme.palette.background.paper
+          }
         }}
       />
     </ThemeProvider>

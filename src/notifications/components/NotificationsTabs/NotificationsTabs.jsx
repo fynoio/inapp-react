@@ -304,14 +304,14 @@ const MainBody = ({ body, title }) => {
         <Typography
           fontSize={'0.85rem'}
           fontWeight={600}
-          color={theme.palette.text.primary}
+          color={theme.palette.toasttext.primary}
         >
           {title}
         </Typography>
         <Typography
           fontSize={'0.7rem'}
           fontWeight={200}
-          color={theme.palette.text.primary}
+          color={theme.palette.toasttext.primary}
         >
           {parse(renderBody)}
         </Typography>
@@ -325,7 +325,7 @@ export const ToastStructure = ({ msg, t, socketInstance, logo, close }) => {
   const body = msg?.notification_content?.body
   const type = msg?.notification_content?.attachments?.type
   const attachmentsObject = msg?.notification_content?.attachments
-  const attachmentLink = attachmentsObject?.attachment || 'javascript:void(0);'
+  const attachmentLink = attachmentsObject?.attachment || null
   const icon = msg?.notification_content?.icon || logo
   let link = msg?.notification_content?.action?.href
   let sameTab = msg?.notification_content?.action?.sameTab || 'false'
@@ -337,12 +337,12 @@ export const ToastStructure = ({ msg, t, socketInstance, logo, close }) => {
       } else if (link !== '#') {
         link = '/' + link
       } else {
-        link = 'javascript:void(0);'
+        link = null
         sameTab = 'true'
       }
     }
   } else {
-    link = 'javascript:void(0);'
+    link = null
     sameTab = 'true'
   }
 
@@ -353,7 +353,7 @@ export const ToastStructure = ({ msg, t, socketInstance, logo, close }) => {
         e.stopPropagation()
         toast.dismiss(t.id)
         socketInstance.emit('message:read', msg)
-        window.open(link, sameTab === 'true' ? '_self' : '_blank')
+        if (link) window.open(link, sameTab === 'true' ? '_self' : '_blank')
       }}
       style={{ textDecoration: 'none', width: '100%' }}
     >
