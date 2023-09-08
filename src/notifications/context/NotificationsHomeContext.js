@@ -20,6 +20,8 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     signature,
     themeConfig,
     notificationSettings,
+    onMessageRecieved,
+    onMessageClicked,
     overrideInappUrl
   } = props
 
@@ -61,6 +63,9 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       setCount((prev) => prev - 1)
       if (!status?.isRead) {
         setUnreadCount((prev) => prev - 1)
+        if (onMessageClicked) {
+          onMessageClicked('DELETED', status.messageId)
+        }
       }
     } else if (status.status === 'READ') {
       setList((prev) => {
@@ -68,6 +73,9 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
         if (message) {
           message?.status.push(status)
           message.isRead = true
+          if (onMessageClicked) {
+            onMessageClicked('READ', message)
+          }
         }
 
         return prev
@@ -120,8 +128,13 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     })
     socket.on('message', (data) => {
       socket.emit('message:recieved', { id: data._Id })
-      setToastData(data)
-      handleIncomingMessage(data)
+      if (!data?.notification_content?.silent_message) {
+        setToastData(data)
+        handleIncomingMessage(data)
+      }
+      if (onMessageRecieved) {
+        onMessageRecieved(data)
+      }
     })
     socket.on('messages:state', (data) => {
       data.filter === 'all'
