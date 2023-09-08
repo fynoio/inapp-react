@@ -128,8 +128,10 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     })
     socket.on('message', (data) => {
       socket.emit('message:recieved', { id: data._Id })
-      setToastData(data)
-      handleIncomingMessage(data)
+      if (!data?.notification_content?.silent_message) {
+        setToastData(data)
+        handleIncomingMessage(data)
+      }
       if (onMessageRecieved) {
         onMessageRecieved(data)
       }
