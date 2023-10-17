@@ -22,15 +22,121 @@ Before installing Inapp Notification Center make sure you have generated HMAC si
 - Integration Token - You can get integration token from [integration](https://app.fyno.io/integrations) page
 - User ID - This has to be the distinct id of currently logged in user. This will help fyno to identify the user to send user specific notifications
 
-```jsx
+### HMAC signature generation
+
+1. Javascript - Node
+
+```javascript - Node
 import crypto from 'crypto'
+//or
+// const crypto = require('crypto')
 const signature = crypto
   .createHmac('sha256', 'WSID' + 'INTEGRATION_TOKEN')
   .update('USER_ID')
   .digest('hex')
 ```
 
-**_NOTE:_** Please make sure you are generating the signature on backend or middleware. You might expose your api keys if done on frontend.
+2. JavaScript - JS
+
+```javascript - JS
+const crypto = require('crypto-js')
+const secretKey = 'WSID' + 'INTEGRATION_TOKEN'
+const userId = 'USER_ID'
+
+const signature = CryptoJS.HmacSHA256(userId, secretKey).toString(
+  CryptoJS.enc.Hex
+)
+```
+
+3. Python
+
+```python
+import hashlib
+import hmac
+
+secret_key = b'WSID'+b'INTEGRATION_TOKEN'
+user_id = 'USER_ID'
+
+signature = hmac.new(secret_key, user_id.encode('utf-8'), hashlib.sha256).hexdigest()
+```
+
+4. Java
+
+```java
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+
+public class SignatureExample {
+
+    public static void main(String[] args) throws Exception {
+        String secretKey = "WSID" + "INTEGRATION_TOKEN"; // Concatenate the secret key
+        String userId = "USER_ID";
+
+        // Create a new instance of the HmacSHA256 algorithm
+        Mac mac = Mac.getInstance("HmacSHA256");
+        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+        mac.init(secretKeySpec);
+
+        // Compute the hash
+        byte[] hash = mac.doFinal(userId.getBytes(StandardCharsets.UTF_8));
+
+        // Convert the hash to a hexadecimal string
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : hash) {
+            String hex = String.format("%02x", b);
+            hexString.append(hex);
+        }
+
+        String signature = hexString.toString();
+    }
+}
+```
+
+5. PHP
+
+```php
+$secretKey = 'WSID'.'INTEGRATION_TOKEN';
+$userId = 'USER_ID';
+
+$signature = hash_hmac('sha256', $userId, $secretKey);
+```
+
+6. Ruby
+
+```ruby
+require 'openssl'
+
+secret_key = 'WSID'+'INTEGRATION_TOKEN'
+user_id = 'USER_ID'
+
+signature = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha256'), secret_key, user_id)
+```
+
+7. C#
+
+```c#
+using System;
+using System.Security.Cryptography;
+using System.Text;
+
+class Program
+{
+    static void Main()
+    {
+        string secretKey = "WSIDINTEGRATION_TOKEN";
+        string userId = "USER_ID";
+
+        using (HMACSHA256 hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secretKey))
+        {
+            byte[] hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userId));
+            string signature = BitConverter.ToString(hash).Replace("-", "").ToLower();
+        }
+    }
+}
+```
+
+**_NOTE:_** Please make sure if you are generating the signature on frontend, You might expose your api keys. It's recommended to do the token generation 
 
 ### SDK Initlization in frontend
 

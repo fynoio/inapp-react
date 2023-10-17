@@ -105,18 +105,16 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   }, [toastData])
 
   useEffect(() => {
-    const inappUrl = overrideInappUrl
-      ? overrideInappUrl
-      : 'https://inapp.fyno.io'
+    const inappUrl = overrideInappUrl || 'https://inapp.fyno.io'
     const socket = socketIO(inappUrl, {
+      transports: ['websocket', 'polling'],
       auth: {
         user_id: user,
         WS_ID: workspace,
-        Integration_ID: integration
-      },
-      extraHeaders: {
+        Integration_ID: integration,
         'x-fyno-signature': signature
-      }
+      },
+      withCredentials: true
     })
     socket.on('connect_error', (err) => {
       setErrMsg(err.message)
