@@ -1,10 +1,12 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react'
+/* eslint-disable no-unused-expressions */
+/* eslint-disable camelcase */
+import React, { useContext, useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 
 import socketIO from 'socket.io-client'
 
 import { ToastStructure } from '../components/NotificationsTabs'
-import { debounce, useTheme } from '@mui/material'
+import { debounce } from '@mui/material'
 import useSound from 'use-sound'
 
 export const NotificationsHomeContext = React.createContext()
@@ -25,7 +27,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     overrideInappUrl
   } = props
 
-  const { logo, header } = themeConfig
+  const { logo, header, position, offset } = themeConfig
 
   const [close, setClose] = useState(false)
   const [errMsg, setErrMsg] = useState('')
@@ -39,8 +41,9 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   const [page, setPage] = useState(1)
   const [count, setCount] = useState(0)
   const [showLoader, setShowLoader] = useState(0)
-  const theme = useTheme()
   const [toastData, setToastData] = useState({})
+  const [notificationCenterPosition] = useState(position || 'default')
+  const [notificationCenterOffset] = useState(offset || 0)
   const brandLogo = logo
   var soundEnabled = null
   if (notificationSettings && notificationSettings.sound) {
@@ -71,13 +74,13 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       setList((prev) => {
         const message = prev.find((msg) => msg._id === status.messageId)
         if (message) {
+          // eslint-disable-next-line no-unused-expressions
           message?.status.push(status)
           message.isRead = true
           if (onMessageClicked) {
             onMessageClicked('READ', message)
           }
         }
-
         return prev
       })
       setUnreadList((prev) =>
@@ -87,7 +90,6 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     } else {
       setList((prev) => {
         prev.find((msg) => msg._id === status.messageId).status.push(status)
-
         return prev
       })
     }
@@ -107,12 +109,15 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   useEffect(() => {
     const inappUrl = overrideInappUrl || 'https://inapp.fyno.io'
     const socket = socketIO(inappUrl, {
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'],
       auth: {
         user_id: user,
         WS_ID: workspace,
-        Integration_ID: integration,
-        'x-fyno-signature': signature
+        Integration_ID: integration
+      },
+      extraHeaders: {
+        'x-fyno-signature': signature,
+        cookie: `x-fyno-cookie=${signature}`
       },
       withCredentials: true
     })
@@ -160,6 +165,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       handleChangeStatus(status)
     })
     socket.on('lastSeenUpdated', (time) => {
+      // eslint-disable-next-line no-undef
       localStorage.setItem('fynoinapp_ls', time)
     })
     socket.on('tag:updated', (id) => {
@@ -169,12 +175,12 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
         var prevMessage = prev.filter((item) => item._id === id)
         if (
           id_done !== id &&
-          !new RegExp(/\"READ\"/).test(JSON.stringify(prevMessage[0]?.status))
+          !new RegExp(/"READ"/).test(JSON.stringify(prevMessage[0]?.status))
         ) {
           setUnreadCount((prev) => prev - 1)
           id_done = id
         }
-        return prev.filter((item) => item._id != id)
+        return prev.filter((item) => item._id !== id)
       })
       setCount((prev) => prev - 1)
     })
@@ -192,7 +198,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   }, [JSON.stringify(list)])
 
   useEffect(() => {
-    if (!Boolean(anchorEl) && socketInstance) {
+    if (!anchorEl && socketInstance) {
       socketInstance.emit('get:messages', { filter: tabPanelValue, page: 1 })
     }
   }, [anchorEl])
@@ -296,7 +302,9 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       openDeleteDialog,
       header,
       page,
-      showLoader
+      showLoader,
+      notificationCenterPosition,
+      notificationCenterOffset
     },
     handlers: {
       handleClosePanel,
