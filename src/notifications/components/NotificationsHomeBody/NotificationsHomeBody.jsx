@@ -61,7 +61,7 @@ const PanelHeader = () => {
           pt: 3,
           gap: 2
         }}
-        data-testid = "noti-center-header"
+        data-testid='noti-center-header'
       >
         <Typography variant='h5'>
           {header === true || header === '' || (!header && !xsUp)
@@ -117,7 +117,7 @@ const PanelHeader = () => {
             <Typography
               variant='subtitle2'
               color={theme.palette.mode === 'light' ? '#ffffff' : 'secondary'}
-              fontSize={'0.7rem'}
+              fontSize='0.7rem'
             >
               Offline
             </Typography>
@@ -146,7 +146,7 @@ const PanelFooter = () => {
     data: { showLoader }
   } = useNotificationsHomeContext()
   return (
-    <Box>
+    <Box data-testid='noti-center-footer'>
       <Box
         date-testid = "noti-center-footer"
         sx={{
@@ -169,9 +169,9 @@ const PanelFooter = () => {
         <img
           src='https://uploads-ssl.webflow.com/63735bad18c742035738e107/6399dab9fdfc2105b70def91_Fyno_logo_lettered.png'
           alt='Fyno'
-          width={'45px'}
-          height={'auto'}
-          className={'poweredLogo'}
+          width='45px'
+          height='auto'
+          className='poweredLogo'
         />
       </Box>
     </Box>
@@ -211,7 +211,12 @@ export const NotificationsHomeBody = () => {
   const theme = useTheme()
 
   const {
-    data: { anchorEl, showLoader, notificationCenterPosition, notificationCenterOffset },
+    data: {
+      anchorEl,
+      showLoader,
+      notificationCenterPosition,
+      notificationCenterOffset
+    },
     handlers: { handleClosePanel }
   } = useNotificationsHomeContext()
 
@@ -237,22 +242,45 @@ export const NotificationsHomeBody = () => {
         sx: {
           p: 0,
           background: 'green',
-          ...(notificationCenterPosition !== 'default' ? {minWidth: 0, width: 0} : {})
-        },
+          // minWidth: 0,
+          // width: 0,
+          // zIndex: -9999,
+          boxShadow: 'none',
+          ...(notificationCenterPosition !== 'default'
+            ? { minWidth: 0, width: 0 }
+            : {})
+        }
       }}
     >
       <Box
         data-testid='Hello'
         sx={{
-          boxShadow: '0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)',
+          boxShadow:
+            '0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)',
           minWidth: xs ? '25pc' : '80%',
           width: md ? '24vw' : xs ? '64vw' : '90vw',
-          height: xs ? notificationCenterPosition === 'left' || notificationCenterPosition === 'right' ? '100%' : '70vh' : '100%',
+          height: xs
+            ? notificationCenterPosition === 'left' ||
+              notificationCenterPosition === 'right'
+              ? '100%'
+              : '70vh'
+            : '100%',
           background: theme.palette.background.paper,
-          position: notificationCenterPosition === 'left' || notificationCenterPosition === 'right' ? 'fixed' : 'relative',
-          ...(notificationCenterPosition === 'left' || notificationCenterPosition === 'right' ? { top: 0 } : {}),
-          ...(notificationCenterPosition === 'left' ? { left: notificationCenterOffset || 100 } : {}),
-          ...(notificationCenterPosition === 'right' ? { right: notificationCenterOffset || 100 } : {})
+          position:
+            notificationCenterPosition === 'left' ||
+            notificationCenterPosition === 'right'
+              ? 'fixed'
+              : 'relative',
+          ...(notificationCenterPosition === 'left' ||
+          notificationCenterPosition === 'right'
+            ? { top: 0 }
+            : {}),
+          ...(notificationCenterPosition === 'left'
+            ? { left: notificationCenterOffset || 100 }
+            : {}),
+          ...(notificationCenterPosition === 'right'
+            ? { right: notificationCenterOffset || 100 }
+            : {})
         }}
       >
         <PanelHeader />

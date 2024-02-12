@@ -1,12 +1,13 @@
-import React, { useState } from 'react'
+/* eslint-disable camelcase */
+import React from 'react'
 import toast from 'react-hot-toast'
 import parse from 'html-react-parser'
 
 import {
   LibraryBooks,
-  Add,
   DoneAll,
-  DeleteSweepOutlined
+  DeleteSweepOutlined,
+  Close
 } from '@mui/icons-material'
 import { TabContext, TabList, TabPanel } from '@mui/lab'
 import {
@@ -19,15 +20,11 @@ import {
   useTheme,
   IconButton,
   Chip,
-  ClickAwayListener,
-  Popper,
-  Paper,
   Tooltip
 } from '@mui/material'
-import { Close } from '@mui/icons-material'
 import { useNotificationsHomeContext } from '../../context'
 
-import NotificationsList, { LinkWrapper } from '../NotificationsList'
+import NotificationsList from '../NotificationsList'
 import { hexToRGBA } from '../../helpers/hextoRGBA'
 
 const DocumentComponent = ({ docType = 'txt' }) => {
@@ -135,7 +132,7 @@ const ActionsComponent = ({ item, t, socketInstance }) => {
               >
                 <Button
                   disableElevation
-                  variant={'outlined'}
+                  variant='outlined'
                   onClick={() => toast.dismiss(t.id)}
                   size='small'
                   sx={{ fontSize: '0.5rem' }}
@@ -155,7 +152,7 @@ const ActionsComponent = ({ item, t, socketInstance }) => {
               >
                 <Button
                   disableElevation
-                  variant={'contained'}
+                  variant='contained'
                   onClick={() => toast.dismiss(t.id)}
                   size='small'
                   sx={{ fontSize: '0.5rem' }}
@@ -208,21 +205,21 @@ const preview = (value, list) => {
   if (value) {
     var preview_val = value
     for (const key in list) {
-      let regex = new RegExp(key, list[key].scope)
+      const regex = new RegExp(key, list[key]?.scope)
       preview_val =
         typeof preview_val === 'string'
-        ? preview_val?.replace(regex, list[key].with)
-        : preview_val?.map((item) => {
-              return item?.replace(regex, list[key].with)
-          })
-  }
+          ? preview_val?.replace(regex, list[key]?.with)
+          : preview_val?.map((item) => {
+              return item?.replace(regex, list[key]?.with)
+            })
+    }
 
     const tt_regex =
       /(<tt style="word-wrap: break-word; white-space: pre-wrap; word-break: break-word;">(?:\n|.)+?<\/tt>)/gm
 
-    let m;
-    let replace = [];
-    let replace_with = [];
+    let m
+    const replace = []
+    const replace_with = []
 
     while ((m = tt_regex.exec(preview_val)) !== null) {
       // This is necessary to avoid infinite loops with zero-width matches
@@ -230,7 +227,7 @@ const preview = (value, list) => {
         tt_regex.lastIndex++
       }
 
-      let replace_with_temp = m[0]
+      const replace_with_temp = m[0]
         .replace(/<i>|<\/i>?/gm, '_')
         .replace(/<b>|<\/b>?/gm, '*')
         .replace(/<s>|<\/s>?/gm, '~')
@@ -302,14 +299,14 @@ const MainBody = ({ body, title }) => {
     >
       <Box>
         <Typography
-          fontSize={'0.85rem'}
+          fontSize='0.85rem'
           fontWeight={600}
           color={theme.palette.toasttext.primary}
         >
           {title}
         </Typography>
         <Typography
-          fontSize={'0.7rem'}
+          fontSize='0.7rem'
           fontWeight={200}
           color={theme.palette.toasttext.primary}
         >
@@ -358,7 +355,7 @@ export const ToastStructure = ({ msg, t, socketInstance, logo, close }) => {
       style={{ textDecoration: 'none', width: '100%' }}
     >
       <Grid container spacing={0} alignItems='center'>
-        <Grid item xs={1.5} justifyContent='center' alignItems={'center'}>
+        <Grid item xs={1.5} justifyContent='center' alignItems='center'>
           <img
             src={icon}
             width='30px'
@@ -463,12 +460,16 @@ export const NotificationsTabs = () => {
           alignItems: 'center'
         }}
       >
-        <TabList variant='standard' onChange={handleChangeTabs} data-testid="noti-center-tabs">
-          <Tab disableRipple={true} value='all' label='All' />
+        <TabList
+          variant='standard'
+          onChange={handleChangeTabs}
+          data-testid='noti-center-tabs'
+        >
+          <Tab disableRipple value='all' label='All' />
           <Tab
-            disableRipple={true}
+            disableRipple
             value='unread'
-            label={`Unread`}
+            label='Unread'
             sx={{ minHeight: 0 }}
             icon={
               <Chip
@@ -491,7 +492,7 @@ export const NotificationsTabs = () => {
         <NotificationsList filter={false} />
       </TabPanel>
       <TabPanel value='unread' sx={{ p: 0 }}>
-        <NotificationsList filter={true} />
+        <NotificationsList filter />
       </TabPanel>
     </TabContext>
   )

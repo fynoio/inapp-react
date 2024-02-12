@@ -1,10 +1,12 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react'
+/* eslint-disable no-unused-expressions */
+/* eslint-disable camelcase */
+import React, { useContext, useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 
 import socketIO from 'socket.io-client'
 
 import { ToastStructure } from '../components/NotificationsTabs'
-import { debounce, useTheme } from '@mui/material'
+import { debounce } from '@mui/material'
 import useSound from 'use-sound'
 
 export const NotificationsHomeContext = React.createContext()
@@ -40,8 +42,8 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   const [count, setCount] = useState(0)
   const [showLoader, setShowLoader] = useState(0)
   const [toastData, setToastData] = useState({})
-  const [notificationCenterPosition, setNotificationCenterPosition] = useState(position || 'default')
-  const [notificationCenterOffset, setNotificationCenterOffset] = useState(offset || 0)
+  const [notificationCenterPosition] = useState(position || 'default')
+  const [notificationCenterOffset] = useState(offset || 0)
   const brandLogo = logo
   var soundEnabled = null
   if (notificationSettings && notificationSettings.sound) {
@@ -72,13 +74,13 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       setList((prev) => {
         const message = prev.find((msg) => msg._id === status.messageId)
         if (message) {
+          // eslint-disable-next-line no-unused-expressions
           message?.status.push(status)
           message.isRead = true
           if (onMessageClicked) {
             onMessageClicked('READ', message)
           }
         }
-
         return prev
       })
       setUnreadList((prev) =>
@@ -88,7 +90,6 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     } else {
       setList((prev) => {
         prev.find((msg) => msg._id === status.messageId).status.push(status)
-
         return prev
       })
     }
@@ -116,7 +117,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       },
       extraHeaders: {
         'x-fyno-signature': signature,
-        cookie: "x-fyno-cookie=" + signature
+        cookie: `x-fyno-cookie=${signature}`
       },
       withCredentials: true
     });
@@ -164,6 +165,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       handleChangeStatus(status)
     })
     socket.on('lastSeenUpdated', (time) => {
+      // eslint-disable-next-line no-undef
       localStorage.setItem('fynoinapp_ls', time)
     })
     socket.on('tag:updated', (id) => {
@@ -173,7 +175,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
         var prevMessage = prev.filter((item) => item._id === id)
         if (
           id_done !== id &&
-          !new RegExp(/\"READ\"/).test(JSON.stringify(prevMessage[0]?.status))
+          !new RegExp(/"READ"/).test(JSON.stringify(prevMessage[0]?.status))
         ) {
           setUnreadCount((prev) => prev - 1)
           id_done = id
