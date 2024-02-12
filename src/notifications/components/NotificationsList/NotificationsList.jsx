@@ -142,21 +142,21 @@ const preview = (value, list) => {
   if (value) {
     var preview_val = value
     for (const key in list) {
-      let regex = new RegExp(key, list[key]['scope'])
+      let regex = new RegExp(key, list[key].scope)
       preview_val =
         typeof preview_val === 'string'
-          ? preview_val?.replace(regex, list[key]['with'])
+          ? preview_val?.replace(regex, list[key].with)
           : preview_val?.map((item) => {
-              return item?.replace(regex, list[key]['with'])
+              return item?.replace(regex, list[key].with)
             })
     }
 
     const tt_regex =
-      /(<tt style=\"word-wrap: break-word; white-space: pre-wrap; word-break: break-word;\">(?:\n|.)+?<\/tt>)/gm
+      /(<tt style="word-wrap: break-word; white-space: pre-wrap; word-break: break-word;">(?:\n|.)+?<\/tt>)/gm
 
-    let m,
-      replace = [],
-      replace_with = []
+    let m
+    let replace = []
+    let replace_with = []
 
     while ((m = tt_regex.exec(preview_val)) !== null) {
       // This is necessary to avoid infinite loops with zero-width matches
@@ -169,7 +169,7 @@ const preview = (value, list) => {
         .replace(/<b>|<\/b>?/gm, '*')
         .replace(/<s>|<\/s>?/gm, '~')
 
-      if (m[0] != replace_with_temp) {
+      if (m[0] !== replace_with_temp) {
         replace.push(m[0])
         replace_with.push(replace_with_temp)
       }
@@ -307,6 +307,14 @@ const NotificationFooter = ({ createdAt, msg }) => {
         }}
         open={openMenu}
         anchorEl={buttonRef.current}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right'
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right'
+        }}
         onClose={(e) => {
           e.preventDefault()
           e.stopPropagation()
@@ -425,6 +433,9 @@ export const LinkWrapper = ({
 }
 
 const ActionsComponent = ({ item }) => {
+  const {
+    handlers: { handleMarkAsRead }
+  } = useNotificationsHomeContext()
   const buttons = item?.notification_content?.buttons
 
   if (buttons?.length > 0) {
@@ -446,7 +457,9 @@ const ActionsComponent = ({ item }) => {
                 style={{ textDecoration: 'none' }}
                 onClick={(e) => {
                   e.stopPropagation()
+                  handleMarkAsRead(item)
                 }}
+                rel='noreferrer'
               >
                 <Button
                   disableElevation
@@ -467,7 +480,9 @@ const ActionsComponent = ({ item }) => {
                 style={{ textDecoration: 'none' }}
                 onClick={(e) => {
                   e.stopPropagation()
+                  handleMarkAsRead(item)
                 }}
+                rel='noreferrer'
               >
                 <Button
                   disableElevation
@@ -621,7 +636,7 @@ const EmptyList = () => {
     }
     let height = 62
     if (xs) {
-      if (Boolean(header)) {
+      if (header) {
         height = height - 6
       }
       if (openDeleteDialog) {
@@ -714,7 +729,8 @@ export const NotificationsList = ({ filter }) => {
       tabPanelValue,
       unreadCount,
       header,
-      page
+      page,
+      notificationCenterPosition
     },
     handlers: { loadMoreNotifications, deleteAllMessages, handleClickDelete }
   } = useNotificationsHomeContext()
@@ -730,6 +746,49 @@ export const NotificationsList = ({ filter }) => {
       loadMoreNotifications(page, tabPanelValue)
     }
   }, [inView])
+  var getRemaingingHeightForContent = function getRemaingingHeightForContent(
+    offset
+  ) {
+    if (offset === void 0) {
+      offset = 0
+    }
+    if (typeof window !== 'undefined') {
+      var _window
+      var totalHeight =
+        (_window = window) === null || _window === void 0
+          ? void 0
+          : _window.innerHeight
+      var headerComp = document.querySelector(
+        '[data-testid="noti-center-header"]'
+      )
+      var tabComp = document.querySelector('[data-testid="noti-center-tabs"]')
+      var footerComp = document.querySelector(
+        '[data-testid="noti-center-footer"]'
+      )
+      var headerCompHeight = headerComp
+        ? headerComp === null || headerComp === void 0
+          ? void 0
+          : headerComp.offsetHeight
+        : 64
+      var tabCompHeight = tabComp
+        ? tabComp === null || tabComp === void 0
+          ? void 0
+          : tabComp.offsetHeight
+        : 0
+      var footerCompHeight = footerComp
+        ? footerComp === null || footerComp === void 0
+          ? void 0
+          : footerComp.offsetHeight
+        : 0
+      var remainingHeight =
+        totalHeight -
+        headerCompHeight -
+        tabCompHeight -
+        footerCompHeight -
+        offset
+      return remainingHeight
+    }
+  }
 
   const getHeight = () => {
     if (!xs) {
@@ -749,7 +808,10 @@ export const NotificationsList = ({ filter }) => {
       <Box
         sx={{
           height: xs
-            ? Boolean(header !== undefined)
+            ? notificationCenterPosition === 'left' ||
+              notificationCenterPosition === 'right'
+              ? getRemaingingHeightForContent() - 20
+              : header !== undefined
               ? '56.25vh'
               : '62.75vh'
             : '70vh',

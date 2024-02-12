@@ -25,7 +25,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     overrideInappUrl
   } = props
 
-  const { logo, header } = themeConfig
+  const { logo, header, position, offset } = themeConfig
 
   const [close, setClose] = useState(false)
   const [errMsg, setErrMsg] = useState('')
@@ -39,8 +39,9 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   const [page, setPage] = useState(1)
   const [count, setCount] = useState(0)
   const [showLoader, setShowLoader] = useState(0)
-  const theme = useTheme()
   const [toastData, setToastData] = useState({})
+  const [notificationCenterPosition, setNotificationCenterPosition] = useState(position || 'default')
+  const [notificationCenterOffset, setNotificationCenterOffset] = useState(offset || 0)
   const brandLogo = logo
   var soundEnabled = null
   if (notificationSettings && notificationSettings.sound) {
@@ -107,15 +108,18 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   useEffect(() => {
     const inappUrl = overrideInappUrl || 'https://inapp.fyno.io'
     const socket = socketIO(inappUrl, {
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'],
       auth: {
         user_id: user,
         WS_ID: workspace,
-        Integration_ID: integration,
-        'x-fyno-signature': signature
+        Integration_ID: integration
+      },
+      extraHeaders: {
+        'x-fyno-signature': signature,
+        cookie: "x-fyno-cookie=" + signature
       },
       withCredentials: true
-    })
+    });
     socket.on('connect_error', (err) => {
       setErrMsg(err.message)
     })
@@ -174,7 +178,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
           setUnreadCount((prev) => prev - 1)
           id_done = id
         }
-        return prev.filter((item) => item._id != id)
+        return prev.filter((item) => item._id !== id)
       })
       setCount((prev) => prev - 1)
     })
@@ -192,7 +196,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   }, [JSON.stringify(list)])
 
   useEffect(() => {
-    if (!Boolean(anchorEl) && socketInstance) {
+    if (!anchorEl && socketInstance) {
       socketInstance.emit('get:messages', { filter: tabPanelValue, page: 1 })
     }
   }, [anchorEl])
@@ -296,7 +300,9 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       openDeleteDialog,
       header,
       page,
-      showLoader
+      showLoader,
+      notificationCenterPosition,
+      notificationCenterOffset
     },
     handlers: {
       handleClosePanel,

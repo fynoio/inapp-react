@@ -208,21 +208,21 @@ const preview = (value, list) => {
   if (value) {
     var preview_val = value
     for (const key in list) {
-      let regex = new RegExp(key, list[key]['scope'])
+      let regex = new RegExp(key, list[key].scope)
       preview_val =
         typeof preview_val === 'string'
-          ? preview_val?.replace(regex, list[key]['with'])
-          : preview_val?.map((item) => {
-              return item?.replace(regex, list[key]['with'])
-            })
-    }
+        ? preview_val?.replace(regex, list[key].with)
+        : preview_val?.map((item) => {
+              return item?.replace(regex, list[key].with)
+          })
+  }
 
     const tt_regex =
-      /(<tt style=\"word-wrap: break-word; white-space: pre-wrap; word-break: break-word;\">(?:\n|.)+?<\/tt>)/gm
+      /(<tt style="word-wrap: break-word; white-space: pre-wrap; word-break: break-word;">(?:\n|.)+?<\/tt>)/gm
 
-    let m,
-      replace = [],
-      replace_with = []
+    let m;
+    let replace = [];
+    let replace_with = [];
 
     while ((m = tt_regex.exec(preview_val)) !== null) {
       // This is necessary to avoid infinite loops with zero-width matches
@@ -235,7 +235,7 @@ const preview = (value, list) => {
         .replace(/<b>|<\/b>?/gm, '*')
         .replace(/<s>|<\/s>?/gm, '~')
 
-      if (m[0] != replace_with_temp) {
+      if (m[0] !== replace_with_temp) {
         replace.push(m[0])
         replace_with.push(replace_with_temp)
       }
@@ -463,7 +463,7 @@ export const NotificationsTabs = () => {
           alignItems: 'center'
         }}
       >
-        <TabList variant='standard' onChange={handleChangeTabs}>
+        <TabList variant='standard' onChange={handleChangeTabs} data-testid="noti-center-tabs">
           <Tab disableRipple={true} value='all' label='All' />
           <Tab
             disableRipple={true}
