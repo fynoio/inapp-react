@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import React, { useEffect, useRef, useState } from 'react'
 import parse from 'html-react-parser'
 import { useInView } from 'react-intersection-observer'
@@ -19,7 +20,6 @@ import {
   Divider,
   Grid,
   IconButton,
-  Link,
   Menu,
   MenuItem,
   Paper,
@@ -142,21 +142,21 @@ const preview = (value, list) => {
   if (value) {
     var preview_val = value
     for (const key in list) {
-      let regex = new RegExp(key, list[key]['scope'])
+      const regex = new RegExp(key, list[key].scope)
       preview_val =
         typeof preview_val === 'string'
-          ? preview_val?.replace(regex, list[key]['with'])
+          ? preview_val?.replace(regex, list[key].with)
           : preview_val?.map((item) => {
-              return item?.replace(regex, list[key]['with'])
+              return item?.replace(regex, list[key].with)
             })
     }
 
     const tt_regex =
-      /(<tt style=\"word-wrap: break-word; white-space: pre-wrap; word-break: break-word;\">(?:\n|.)+?<\/tt>)/gm
+      /(<tt style="word-wrap: break-word; white-space: pre-wrap; word-break: break-word;">(?:\n|.)+?<\/tt>)/gm
 
-    let m,
-      replace = [],
-      replace_with = []
+    let m
+    const replace = []
+    const replace_with = []
 
     while ((m = tt_regex.exec(preview_val)) !== null) {
       // This is necessary to avoid infinite loops with zero-width matches
@@ -164,12 +164,12 @@ const preview = (value, list) => {
         tt_regex.lastIndex++
       }
 
-      let replace_with_temp = m[0]
+      const replace_with_temp = m[0]
         .replace(/<i>|<\/i>?/gm, '_')
         .replace(/<b>|<\/b>?/gm, '*')
         .replace(/<s>|<\/s>?/gm, '~')
 
-      if (m[0] != replace_with_temp) {
+      if (m[0] !== replace_with_temp) {
         replace.push(m[0])
         replace_with.push(replace_with_temp)
       }
@@ -235,14 +235,14 @@ const MainBody = ({ body, title }) => {
     >
       <Box>
         <Typography
-          fontSize={'0.85rem'}
+          fontSize='0.85rem'
           fontWeight={600}
           color={theme.palette.text.primary}
         >
           {title}
         </Typography>
         <Typography
-          fontSize={'0.8rem'}
+          fontSize='0.8rem'
           fontWeight={200}
           color={theme.palette.text.primary}
         >
@@ -273,10 +273,10 @@ const NotificationFooter = ({ createdAt, msg }) => {
         my: 1,
         pl: { xs: '8%', sm: '10%' }
       }}
-      component={'div'}
+      component='div'
     >
       <Typography
-        fontSize={'0.7rem'}
+        fontSize='0.7rem'
         sx={{
           color: theme.palette.secondary.main,
           pl: { xs: 2, sm: 0.35 }
@@ -425,6 +425,9 @@ export const LinkWrapper = ({
 }
 
 const ActionsComponent = ({ item }) => {
+  const {
+    handlers: { handleMarkAsRead }
+  } = useNotificationsHomeContext()
   const buttons = item?.notification_content?.buttons
 
   if (buttons?.length > 0) {
@@ -446,11 +449,13 @@ const ActionsComponent = ({ item }) => {
                 style={{ textDecoration: 'none' }}
                 onClick={(e) => {
                   e.stopPropagation()
+                  handleMarkAsRead(item)
                 }}
+                rel='noreferrer'
               >
                 <Button
                   disableElevation
-                  variant={'outlined'}
+                  variant='outlined'
                   size='small'
                   sx={{ fontSize: '0.6rem' }}
                 >
@@ -467,11 +472,13 @@ const ActionsComponent = ({ item }) => {
                 style={{ textDecoration: 'none' }}
                 onClick={(e) => {
                   e.stopPropagation()
+                  handleMarkAsRead(item)
                 }}
+                rel='noreferrer'
               >
                 <Button
                   disableElevation
-                  variant={'contained'}
+                  variant='contained'
                   size='small'
                   sx={{ fontSize: '0.6rem' }}
                 >
@@ -570,12 +577,7 @@ const NotificationItem = ({ item }) => {
             justifyContent: 'space-between'
           }}
         >
-          <LinkWrapper
-            item={item}
-            link={attachmentLink}
-            hover={true}
-            sameTab={'false'}
-          >
+          <LinkWrapper item={item} link={attachmentLink} hover sameTab='false'>
             <AttachmentComponent
               type={type}
               attachmentsObject={attachmentsObject}
@@ -621,7 +623,7 @@ const EmptyList = () => {
     }
     let height = 62
     if (xs) {
-      if (Boolean(header)) {
+      if (header) {
         height = height - 6
       }
       if (openDeleteDialog) {
@@ -714,7 +716,8 @@ export const NotificationsList = ({ filter }) => {
       tabPanelValue,
       unreadCount,
       header,
-      page
+      page,
+      notificationCenterPosition
     },
     handlers: { loadMoreNotifications, deleteAllMessages, handleClickDelete }
   } = useNotificationsHomeContext()
@@ -730,14 +733,41 @@ export const NotificationsList = ({ filter }) => {
       loadMoreNotifications(page, tabPanelValue)
     }
   }, [inView])
+  const getRemaingingHeightForContent = (offset = 0) => {
+    if (typeof window !== 'undefined') {
+      // Get the total height of the viewport
+      const totalHeight = window?.innerHeight
 
+      const headerComp = document.querySelector(
+        '[data-testid="noti-center-header"]'
+      )
+      const tabComp = document.querySelector('[data-testid="noti-center-tabs"]')
+      const footerComp = document.querySelector(
+        '[data-testid="noti-center-footer"]'
+      )
+      const headerCompHeight = headerComp ? headerComp?.offsetHeight : 64
+      const tabCompHeight = tabComp ? tabComp?.offsetHeight : 0
+      const footerCompHeight = footerComp ? footerComp?.offsetHeight : 0
+      // Calculate the remaining height
+      const remainingHeight =
+        totalHeight -
+        headerCompHeight -
+        tabCompHeight -
+        footerCompHeight -
+        offset
+
+      return remainingHeight
+    }
+  }
+
+  // eslint-disable-next-line no-unused-vars
   const getHeight = () => {
     if (!xs) {
       return '70vh'
     }
     let height = 62
     if (xs) {
-      if (Boolean(header)) {
+      if (header) {
         height = height - 6
       }
     }
@@ -749,7 +779,10 @@ export const NotificationsList = ({ filter }) => {
       <Box
         sx={{
           height: xs
-            ? Boolean(header !== undefined)
+            ? notificationCenterPosition === 'left' ||
+              notificationCenterPosition === 'right'
+              ? getRemaingingHeightForContent() - 20
+              : header !== undefined
               ? '56.25vh'
               : '62.75vh'
             : '70vh',
