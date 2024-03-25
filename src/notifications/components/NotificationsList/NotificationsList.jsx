@@ -563,6 +563,7 @@ const NotificationItem = ({ item }) => {
           window.open(mainLink, sameTab === 'true' ? '_self' : '_blank')
       }}
       columnGap={xs ? 1 : 0}
+      className='notification-item-row'
     >
       <Grid item xs={1.3}>
         <img
