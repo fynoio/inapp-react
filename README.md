@@ -136,7 +136,7 @@ class Program
 }
 ```
 
-**_NOTE:_** Please make sure if you are generating the signature on frontend, You might expose your api keys. It's recommended to do the token generation 
+**_NOTE:_** Please make sure if you are generating the signature on frontend, You might expose your api keys. It's recommended to do the token generation
 
 ### SDK Initlization in frontend
 
@@ -146,15 +146,16 @@ import {FynoInappCenter} from '@fyno/inapp-react'
 class Example extends Component {
   const config = {
     mode: 'THEME_MODE',//<light|dark>
-    userId: 'USER_ID',
-    workspaceId: 'WSID',
+    user: 'USER_ID',
+    workspace: 'WSID',
     integration: 'INTRGRATION_ID',
     signature: 'signature'
     themeConfig: {
       logo: 'LINK_TO_BRAND_LOGO',
       primary: 'PRIMARY_COLOR',
       lightBackground: 'LIGHT_THEME_BACKGROUND_COLOR',
-      darkBackground: 'DARK_THEME_BACKGROUND_COLOR'
+      darkBackground: 'DARK_THEME_BACKGROUND_COLOR',
+      font: 'CUSTOM_FONT / FONT_FAMILY', //Default font for inapp notification center is Roboto
       header: 'Notifications' // By default the header will not be shown to make the UX better, If specified header will be shown with the title specified in inapp-center.
     }, //optional
     notificationSettings: {

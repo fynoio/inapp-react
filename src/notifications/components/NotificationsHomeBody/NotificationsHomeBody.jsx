@@ -62,6 +62,7 @@ const PanelHeader = () => {
           gap: 2
         }}
         data-testid='noti-center-header'
+        className='noti-center-header'
       >
         <Typography variant='h5'>
           {header === true || header === '' || (!header && !xsUp)
@@ -148,6 +149,7 @@ const PanelFooter = () => {
   return (
     <Box data-testid='noti-center-footer'>
       <Box
+        date-testid='noti-center-footer'
         sx={{
           display: 'flex',
           alignItems: 'center',
@@ -224,6 +226,7 @@ export const NotificationsHomeBody = () => {
 
   return (
     <Menu
+      className='inapp-container'
       anchorEl={anchorEl}
       disableScrollLock={false}
       open={Boolean(anchorEl)}
@@ -233,18 +236,15 @@ export const NotificationsHomeBody = () => {
       MenuListProps={{
         sx: {
           overflowY: 'hidden',
-          p: 0,
-          background: 'red'
+          p: 0
         }
       }}
       PaperProps={{
         sx: {
           p: 0,
-          background: 'green',
           // minWidth: 0,
           // width: 0,
           // zIndex: -9999,
-          boxShadow: 'none',
           ...(notificationCenterPosition !== 'default'
             ? { minWidth: 0, width: 0 }
             : {})
@@ -253,6 +253,7 @@ export const NotificationsHomeBody = () => {
     >
       <Box
         data-testid='Hello'
+        className='notification-panel'
         sx={{
           boxShadow:
             '0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)',

@@ -1,6 +1,6 @@
 {
   "name": "@fyno/inapp-react",
-  "version": "1.0.17",
+  "version": "1.0.20",
   "description": "React SDK for invoking Fyno inapp notifications center",
   "author": "Fyno",
   "license": "MIT",

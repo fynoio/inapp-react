@@ -8,7 +8,7 @@ import NotificationsHomeBody from '../NotificationsHomeBody'
 
 const Component = () => {
   return (
-    <Box>
+    <Box data-testid='component'>
       <NotificationsButton />
       <NotificationsHomeBody />
     </Box>
@@ -18,7 +18,7 @@ const Component = () => {
 export const NotificationsHomeWrapper = (props) => {
   return (
     <NotificationsHomeProvider {...props}>
-      <Component />
+      <Component data-testid='NotificationsHomeWrapper' class="notification-home"/>
     </NotificationsHomeProvider>
   )
 }

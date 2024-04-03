@@ -120,7 +120,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
         cookie: `x-fyno-cookie=${signature}`
       },
       withCredentials: true
-    })
+    });
     socket.on('connect_error', (err) => {
       setErrMsg(err.message)
     })

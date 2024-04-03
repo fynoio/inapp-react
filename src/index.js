@@ -20,6 +20,9 @@ export const FynoInappCenter = (props) => {
     } else return '#231F37'
   }
   const theme = createTheme({
+    typography: {
+      fontFamily: themeConfig.font || ["Roboto","Helvetica","Arial","sans-serif"].join(",")
+    },
     palette: {
       common: {
         black: '#000',

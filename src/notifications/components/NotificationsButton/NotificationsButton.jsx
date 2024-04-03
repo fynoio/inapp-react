@@ -11,7 +11,7 @@ export const NotificationsButton = () => {
   } = useNotificationsHomeContext()
 
   return (
-    <IconButton color='inherit' aria-haspopup='true' onClick={handleOpenPanel}>
+    <IconButton color='inherit' aria-haspopup='true' onClick={handleOpenPanel} className='fyno-notification-icon'>
       <Badge color='error' overlap='circular' variant='dot' invisible={!unreadCount > 0}>
         <NotificationsOutlined />
       </Badge>
