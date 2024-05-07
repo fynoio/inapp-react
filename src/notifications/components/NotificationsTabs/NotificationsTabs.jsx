@@ -7,7 +7,8 @@ import {
   LibraryBooks,
   DoneAll,
   DeleteSweepOutlined,
-  Close
+  Close,
+  Settings
 } from '@mui/icons-material'
 import { TabContext, TabList, TabPanel } from '@mui/lab'
 import {
@@ -417,8 +418,8 @@ export const ToastStructure = ({ msg, t, socketInstance, logo, close }) => {
 
 const Actions = () => {
   const {
-    data: { list, unreadList },
-    handlers: { handleClickDelete, handleMarkAllAsRead }
+    data: { list, unreadList, header },
+    handlers: { handleClickDelete, handleMarkAllAsRead, handleOpenConfig }
   } = useNotificationsHomeContext()
 
   if (list?.length > 0) {
@@ -436,6 +437,13 @@ const Actions = () => {
             <DeleteSweepOutlined />
           </IconButton>
         </Tooltip>
+        {!header && (
+          <Tooltip title='Channel preference'>
+            <IconButton onClick={(e) => handleOpenConfig()}>
+              <Settings fontSize='small' />
+            </IconButton>
+          </Tooltip>
+        )}
       </Box>
     )
   }
