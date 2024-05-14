@@ -6,18 +6,25 @@ import {
   useMediaQuery,
   useTheme,
   Tooltip,
+  Link,
   Icon,
   Chip,
+  Divider,
   Button,
   Collapse,
   CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   Paper
 } from '@mui/material'
 import { useNotificationsHomeContext } from '../../context'
 import {
   Lock,
   CheckCircle,
-  ArrowBackIosNew,
+  Close,
+  Check,
   HourglassEmpty
 } from '@mui/icons-material'
 import isEqual from 'lodash/isEqual'
@@ -65,136 +72,8 @@ function getDifferentPreferences(newConfig, oldConfig) {
 
   return differentPreferences
 }
-const PanelHeader = () => {
-  const theme = useTheme()
-  const [preferenceUpdated, setPreferenceUpdated] = useState(false)
-  const buttonRef = useRef()
-  const {
-    data: {
-      errMsg,
-      userPreference,
-      socketInstance,
-      openConfigUnsaved,
-      resetPreference
-    },
-    handlers: {
-      setShowConfig,
-      setUserPreference,
-      setOpenConfigUnsaved,
-      setResetPreference
-    }
-  } = useNotificationsHomeContext()
-  useEffect(() => {
-    socketInstance.on('preference:update', () => {
-      setUserPreference((prev) => {
-        prev.isDirty = false
-        setPreferenceUpdated(true)
-        return prev
-      })
-    })
-    setResetPreference(cloneDeep(userPreference))
-  }, [])
 
-  useEffect(() => {
-    setTimeout(() => {
-      setPreferenceUpdated(false)
-    }, 1000)
-  }, [preferenceUpdated])
-
-  const handleSavePreference = async () => {
-    setUserPreference((prev) => {
-      const preference = getDifferentPreferences(prev, resetPreference)
-      socketInstance.emit('set:preference', preference)
-      const temp = { ...prev }
-      return temp
-    })
-    buttonRef.current.innerHTML = 'Saving...'
-  }
-  return (
-    <React.Fragment>
-      <Box
-        sx={{
-          height: '26pt',
-          display: 'flex',
-          alignItems: 'center',
-          pb: 1,
-          pl: 2,
-          pr: 2,
-          pt: 2,
-          gap: 1,
-          justifyItems: 'center',
-          justifyContent: 'space-between',
-          boxShadow: `0px 2px 10px 0px ${
-            theme.palette.mode === 'dark'
-              ? 'rgb(125 104 163 / 13%)'
-              : 'rgba(58, 53, 65, 0.10)'
-          }`
-        }}
-        data-testid='noti-center-header'
-        className='noti-center-header'
-      >
-        <IconButton
-          size='small'
-          onClick={(e) => {
-            if (userPreference.isDirty) setOpenConfigUnsaved(true)
-            else setShowConfig(false)
-          }}
-          sx={{ flexGrow: '0' }}
-        >
-          <ArrowBackIosNew />
-        </IconButton>
-        <Typography
-          variant='subtitle'
-          sx={{
-            minWidth: 250,
-            flexGrow: '24',
-            fontSize: '16px',
-            fontWeight: '500'
-          }}
-        >
-          Notification Settings
-        </Typography>
-        {userPreference.isDirty && (
-          <Box sx={{ m: 1, position: 'relative', flexGrow: '1' }}>
-            <Button
-              disableElevation
-              variant='text'
-              ref={buttonRef}
-              size='small'
-              disabled={preferenceUpdated || openConfigUnsaved}
-              onClick={handleSavePreference}
-              disableRipple={true}
-              sx={{
-                ...(theme.palette.mode === 'dark'
-                  ? {
-                      color: '#fff !important'
-                    }
-                  : {})
-              }}
-            >
-              Save
-            </Button>
-            {preferenceUpdated && (
-              <CircularProgress
-                size={24}
-                sx={{
-                  color: 'success',
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  marginTop: '-12px',
-                  marginLeft: '-12px'
-                }}
-              />
-            )}
-          </Box>
-        )}
-      </Box>
-    </React.Fragment>
-  )
-}
-
-const PanelBody = (props) => {
+const PanelBody = () => {
   const theme = useTheme()
   const {
     data: {
@@ -249,6 +128,65 @@ const PanelBody = (props) => {
         justifyContent: sectionsArr.length > 0 ? 'flex-start' : 'center'
       }}
     >
+      {/* <Collapse in={openConfigUnsaved}>
+        <Paper
+          sx={{
+            p: 3,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+            minHeight: 'auto',
+            borderTopLeftRadius: 0,
+            borderTopRightRadius: 0
+          }}
+        >
+          <Typography
+            sx={{ width: '80%', fontSize: '0.8rem' }}
+            textAlign='left'
+          >
+            You have unsaved changes, Do you want to go back without saving?
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Tooltip title='Discard and close'>
+              <IconButton
+                size='small'
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  setOpenConfigUnsaved(false)
+                  setShowConfig(false)
+                }}
+              >
+                <Close />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='Save and close'>
+              <IconButton
+                variant='contained'
+                size='small'
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  setUserPreference((prev) => {
+                    const preference = getDifferentPreferences(
+                      prev,
+                      resetPreference
+                    )
+                    socketInstance.emit('set:preference', preference)
+                    const temp = { ...prev }
+                    temp.isDirty = false
+                    return temp
+                  })
+                  setOpenConfigUnsaved(false)
+                  setShowConfig(false)
+                }}
+              >
+                <Check />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </Paper>
+      </Collapse> */}
       <Collapse in={openConfigUnsaved}>
         <Paper
           sx={{
@@ -356,14 +294,16 @@ const PanelBody = (props) => {
               key={section + index}
               sx={{
                 paddingX: 2,
-                paddingTop: 2
+                paddingY: 2,
+                marginBottom: 2
               }}
             >
-              <Box sx={{ marginBottom: 1, marginLeft: 2 }}>
+              <Box sx={{ marginBottom: 1, marginLeft: 1 }}>
                 <Typography
-                  fontSize='14px'
+                  fontSize='1rem'
                   fontWeight={600}
                   color={theme.palette.text.primary}
+                  marginBottom={1}
                 >
                   {section}
                 </Typography>
@@ -373,18 +313,11 @@ const PanelBody = (props) => {
                   background:
                     theme.palette.mode === 'dark' ? '#231F37' : '#FFFFFF',
                   padding: 2,
-                  borderRadius: '0.75rem'
+                  borderRadius: '10px'
                 }}
               >
                 {userPreference.result[section].map((topic, index) => (
-                  <Box
-                    sx={{
-                      ...(index !== userPreference.result[section].length - 1
-                        ? { paddingBottom: 3 }
-                        : {})
-                    }}
-                    key={topic.subscription_id}
-                  >
+                  <Box sx={{ paddingBottom: 2 }} key={topic.subscription_id}>
                     <Box
                       sx={{
                         display: 'flex',
@@ -393,7 +326,7 @@ const PanelBody = (props) => {
                       }}
                     >
                       <Typography
-                        fontSize='14px'
+                        fontSize='1rem'
                         color={theme.palette.text.primary}
                       >
                         {topic.name}
@@ -427,7 +360,7 @@ const PanelBody = (props) => {
                         display: 'flex',
                         flexDirection: 'row',
                         flexWrap: 'wrap',
-                        gap: 1
+                        gap: 2
                       }}
                     >
                       {Object.entries(topic.preference).map(
@@ -492,97 +425,142 @@ const PanelBody = (props) => {
   )
 }
 
-const PanelFooter = () => {
-  const {
-    data: { showLoader }
-  } = useNotificationsHomeContext()
-  return (
-    <Box
-      data-testid='noti-center-footer'
-      sx={{ width: '100%', height: 30, position: 'sticky', bottom: '0' }}
-    >
-      <Box
-        date-testid='noti-center-footer'
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          // py: 0.7,
-          gap: 0.5,
-          height: '100%',
-          left: 0,
-          right: 0,
-          background: (theme) => theme.palette.background.configBackground
-        }}
-      >
-        <Typography sx={{ fontSize: '0.7rem', filter: 'opacity(.5)' }}>
-          Powered By
-        </Typography>
-        <img
-          src='https://uploads-ssl.webflow.com/63735bad18c742035738e107/6399dab9fdfc2105b70def91_Fyno_logo_lettered.png'
-          alt='Fyno'
-          width='45px'
-          height='auto'
-          className='poweredLogo'
-        />
-      </Box>
-    </Box>
-  )
-}
-
-export const ConfigPanel = () => {
+export const ConfigPopup = () => {
   const theme = useTheme()
-  const xs = useMediaQuery(theme.breakpoints.up('sm'))
-  const md = useMediaQuery(theme.breakpoints.up('md'))
+  const buttonRef = useRef()
+  const [preferenceUpdated, setPreferenceUpdated] = useState(false)
+  useEffect(() => {
+    setTimeout(() => {
+      setPreferenceUpdated(false)
+    }, 1000)
+  }, [preferenceUpdated])
+
   const {
     data: {
-      showLoader,
-      notificationCenterPosition,
-      notificationCenterOffset,
-      themeConfig,
-      showBranding,
-      userPreference
+      socketInstance,
+      showConfig,
+      preferenceMode,
+      userPreference,
+      resetPreference,
+      openConfigUnsaved
+    },
+    handlers: {
+      setUserPreference,
+      setResetPreference,
+      setShowConfig,
+      setOpenConfigUnsaved
     }
   } = useNotificationsHomeContext()
+  const handleSavePreference = async () => {
+    setPreferenceUpdated(true)
+    setUserPreference((prev) => {
+      const preference = getDifferentPreferences(prev, resetPreference)
+      socketInstance.emit('set:preference', preference)
+      const temp = { ...prev }
+      return temp
+    })
+  }
+  useEffect(() => {
+    socketInstance.on('preference:update', () => {
+      setPreferenceUpdated(false)
+      setUserPreference((prev) => {
+        prev.isDirty = false
+        return prev
+      })
+    })
+    setResetPreference(cloneDeep(userPreference))
+  }, [])
   return (
-    <Box
-      data-testid='Hello'
-      className='notification-panel'
-      sx={{
-        boxSizing: 'content-box',
-        boxShadow:
-          '0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)',
-        minWidth: xs ? '28pc' : '80%',
-        width: md ? '24vw' : xs ? '64vw' : '90vw',
-        height: xs
-          ? notificationCenterPosition === 'left' ||
-            notificationCenterPosition === 'right'
-            ? '100%'
-            : '70vh'
-          : '100%',
-        background: theme.palette.background.configBackground,
-        position:
-          notificationCenterPosition === 'left' ||
-          notificationCenterPosition === 'right'
-            ? 'fixed'
-            : 'relative',
-        ...(notificationCenterPosition === 'left' ||
-        notificationCenterPosition === 'right'
-          ? { top: 0 }
-          : {}),
-        ...(notificationCenterPosition === 'left'
-          ? { left: notificationCenterOffset || 100 }
-          : {}),
-        ...(notificationCenterPosition === 'right'
-          ? { right: notificationCenterOffset || 100 }
-          : {})
+    <Dialog
+      className='preference-dialog'
+      open={showConfig && preferenceMode === 'modal'}
+      keepMounted
+      sx={{ width: '100%' }}
+      PaperProps={{
+        sx: {
+          backgroundImage: 'none',
+          borderRadius: '0.75rem',
+          minWidth: '30%',
+          maxWidth: '520px'
+        }
       }}
     >
-      <PanelHeader />
-      {/* <Divider sx={{ mt: 0, mb: 0 }} /> */}
-      <PanelBody />
-      {showBranding === true ? <PanelFooter /> : null}
-    </Box>
+      <DialogTitle
+        sx={{
+          m: 0,
+          p: 2,
+          textAlign: 'center',
+          fontWeight: '500',
+          fontSize: '16px'
+        }}
+      >
+        Notification Settings
+      </DialogTitle>
+      <IconButton
+        aria-label='close'
+        sx={{
+          position: 'absolute',
+          right: 8,
+          top: 8,
+          color: (theme) => theme.palette.grey[500]
+        }}
+        onClick={() => {
+          if (userPreference.isDirty) setOpenConfigUnsaved(true)
+          else {
+            setShowConfig(false)
+          }
+        }}
+      >
+        <Close />
+      </IconButton>
+      <DialogContent dividers sx={{ padding: 0 }}>
+        <PanelBody />
+      </DialogContent>
+      <DialogActions sx={{ alignSelf: 'center' }}>
+        {preferenceUpdated || openConfigUnsaved || !userPreference.isDirty ? (
+          <Tooltip text='No Changes to save' placement='right-end'>
+            <Box>
+              <Button
+                variant='contained'
+                disabled={
+                  preferenceUpdated ||
+                  openConfigUnsaved ||
+                  !userPreference.isDirty
+                }
+                disableRipple={true}
+              >
+                Save
+              </Button>
+            </Box>
+          </Tooltip>
+        ) : (
+          <Button
+            ref={buttonRef}
+            variant='contained'
+            disabled={
+              preferenceUpdated || openConfigUnsaved || !userPreference.isDirty
+            }
+            onClick={handleSavePreference}
+            disableRipple={true}
+          >
+            Save
+            {preferenceUpdated && (
+              <CircularProgress
+                size={24}
+                sx={{
+                  color: 'success',
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  marginTop: '-12px',
+                  marginLeft: '-12px'
+                }}
+              />
+            )}
+          </Button>
+        )}
+      </DialogActions>
+    </Dialog>
   )
 }
 
@@ -698,4 +676,4 @@ export const PreferenceButton = (props) => {
   )
 }
 
-export default ConfigPanel
+export default ConfigPopup

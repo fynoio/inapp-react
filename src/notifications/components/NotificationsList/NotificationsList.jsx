@@ -295,13 +295,14 @@ const NotificationFooter = ({ createdAt, msg }) => {
         sx={{
           cursor: 'pointer',
           ':hover': { background: theme.palette.action.focus },
-          borderRadius: 10,
+          borderRadius: '10px',
           zIndex: 50
         }}
       />
       <Menu
         PaperProps={{
           style: {
+            borderRadius: '10px',
             backgroundImage: 'none'
           }
         }}
@@ -717,7 +718,8 @@ export const NotificationsList = ({ filter }) => {
       unreadCount,
       header,
       page,
-      notificationCenterPosition
+      notificationCenterPosition,
+      showBranding
     },
     handlers: { loadMoreNotifications, deleteAllMessages, handleClickDelete }
   } = useNotificationsHomeContext()
@@ -773,7 +775,6 @@ export const NotificationsList = ({ filter }) => {
     }
     return `${height}vh`
   }
-
   if (mapperList?.length > 0) {
     return (
       <Box
@@ -784,7 +785,9 @@ export const NotificationsList = ({ filter }) => {
               ? getRemaingingHeightForContent() - 20
               : header !== undefined
               ? '56.25vh'
-              : '62.75vh'
+              : showBranding
+              ? '62.75vh'
+              : '64.75vh'
             : '70vh',
           position: 'relative',
           overflowY: 'auto',

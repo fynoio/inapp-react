@@ -7,7 +7,9 @@ import {
   LibraryBooks,
   DoneAll,
   DeleteSweepOutlined,
-  Close
+  Close,
+  Settings,
+  SettingsOutlined
 } from '@mui/icons-material'
 import { TabContext, TabList, TabPanel } from '@mui/lab'
 import {
@@ -20,7 +22,8 @@ import {
   useTheme,
   IconButton,
   Chip,
-  Tooltip
+  Tooltip,
+  useMediaQuery
 } from '@mui/material'
 import { useNotificationsHomeContext } from '../../context'
 
@@ -417,30 +420,37 @@ export const ToastStructure = ({ msg, t, socketInstance, logo, close }) => {
 
 const Actions = () => {
   const {
-    data: { list, unreadList },
-    handlers: { handleClickDelete, handleMarkAllAsRead }
+    data: { list, unreadList, header, preferenceMode },
+    handlers: { handleClickDelete, handleMarkAllAsRead, handleOpenConfig }
   } = useNotificationsHomeContext()
+  const theme = useTheme()
+  const xsUp = useMediaQuery(theme.breakpoints.up('sm'))
 
-  if (list?.length > 0) {
-    return (
-      <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
-        {unreadList?.length > 0 && (
-          <Tooltip title='Mark all as read'>
-            <IconButton onClick={(e) => handleMarkAllAsRead(e)}>
-              <DoneAll />
-            </IconButton>
-          </Tooltip>
-        )}
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+      {list?.length > 0 && unreadList?.length > 0 && (
+        <Tooltip title='Mark all as read'>
+          <IconButton onClick={(e) => handleMarkAllAsRead(e)}>
+            <DoneAll />
+          </IconButton>
+        </Tooltip>
+      )}
+      {list?.length > 0 && (
         <Tooltip title='Delete all'>
           <IconButton onClick={(e) => handleClickDelete(e)}>
             <DeleteSweepOutlined />
           </IconButton>
         </Tooltip>
-      </Box>
-    )
-  }
-
-  return null
+      )}
+      {!header && xsUp && preferenceMode !== 'none' && (
+        <Tooltip title='Channel preference'>
+          <IconButton onClick={(e) => handleOpenConfig()}>
+            <SettingsOutlined fontSize='small' color='secondary' />
+          </IconButton>
+        </Tooltip>
+      )}
+    </Box>
+  )
 }
 
 export const NotificationsTabs = () => {

@@ -6,7 +6,7 @@ import { toast } from 'react-hot-toast'
 import socketIO from 'socket.io-client'
 
 import { ToastStructure } from '../components/NotificationsTabs'
-import { debounce } from '@mui/material'
+import { debounce, useTheme, Typography } from '@mui/material'
 import useSound from 'use-sound'
 
 export const NotificationsHomeContext = React.createContext()
@@ -26,9 +26,11 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     onMessageClicked,
     overrideInappUrl
   } = props
-
-  const { logo, header, position, offset } = themeConfig
-
+  const [isSeen, setIsSeen] = useState(true)
+  const [userPreference, setUserPreference] = useState({})
+  const { logo, header, position, offset, preference_mode } = themeConfig
+  const [resetPreference, setResetPreference] = useState({})
+  const [showBranding, setShowBranding] = useState(true)
   const [close, setClose] = useState(false)
   const [errMsg, setErrMsg] = useState('')
   const [list, setList] = useState([])
@@ -44,6 +46,8 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   const [toastData, setToastData] = useState({})
   const [notificationCenterPosition] = useState(position || 'default')
   const [notificationCenterOffset] = useState(offset || 0)
+  const [preferenceMode] = useState(preference_mode || 'none')
+  const [openConfigUnsaved, setOpenConfigUnsaved] = useState(false)
   const brandLogo = logo
   var soundEnabled = null
   if (notificationSettings && notificationSettings.sound) {
@@ -126,6 +130,11 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     })
     socket.on('connectionSuccess', (data) => {
       resetState()
+      if (data?.config?.branding === false) {
+        setShowBranding(data?.config?.branding)
+      } else {
+        setShowBranding(true)
+      }
       setSocketInstance(socket)
       socket.emit('get:messages', { filter: 'all', page: 1 })
     })
@@ -164,9 +173,8 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     socket.on('statusUpdated', (status) => {
       handleChangeStatus(status)
     })
-    socket.on('lastSeenUpdated', (time) => {
-      // eslint-disable-next-line no-undef
-      localStorage.setItem('fynoinapp_ls', time)
+    socket.on('lastSeenUpdated', (data) => {
+      setIsSeen(data)
     })
     socket.on('tag:updated', (id) => {
       var id_done = ''
@@ -186,6 +194,28 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     })
     socket.on('disconnect', (err) => {
       setErrMsg(err.message)
+    })
+
+    socket.on('preferences:state', (preference) => {
+      setUserPreference(preference)
+      setShowConfig(!showConfig)
+    })
+
+    socket.on('preference:update', () => {
+      toast.success(
+        () => (
+          <Typography sx={{ color: theme.palette.text.primary }}>
+            Channel preference updated
+          </Typography>
+        ),
+        {
+          position: 'top-center',
+          duration: 2000,
+          style: {
+            color: theme.palette.toasttext.primary
+          }
+        }
+      )
     })
 
     return () => {
@@ -239,6 +269,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   }
 
   const handleOpenPanel = (event) => {
+    socketInstance.emit('updateLastSeen')
     setAnchorEl(event.currentTarget)
   }
 
@@ -304,7 +335,13 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       page,
       showLoader,
       notificationCenterPosition,
-      notificationCenterOffset
+      notificationCenterOffset,
+      userPreference,
+      openConfigUnsaved,
+      resetPreference,
+      preferenceMode,
+      showBranding,
+      isSeen
     },
     handlers: {
       handleClosePanel,

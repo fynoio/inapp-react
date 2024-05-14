@@ -1,6 +1,12 @@
 import React from 'react'
 
-import { Close, LinkOffOutlined, WifiOff } from '@mui/icons-material'
+import {
+  Close,
+  LinkOffOutlined,
+  Settings,
+  SettingsOutlined,
+  WifiOff
+} from '@mui/icons-material'
 import {
   Box,
   IconButton,
@@ -39,9 +45,31 @@ const CloseButton = () => {
   } else return null
 }
 
+const ConfigButton = () => {
+  const theme = useTheme()
+
+  const {
+    data: { errMsg },
+    handlers: { handleOpenConfig }
+  } = useNotificationsHomeContext()
+  return (
+    <IconButton
+      sx={{
+        color: errMsg
+          ? theme.palette.secondary.main
+          : theme.palette.text.primary
+      }}
+      onClick={handleOpenConfig}
+      size='small'
+    >
+      <SettingsOutlined fontSize='small' color='secondary' />
+    </IconButton>
+  )
+}
+
 const PanelHeader = () => {
   const {
-    data: { errMsg, header }
+    data: { errMsg, header, preferenceMode }
   } = useNotificationsHomeContext()
 
   const theme = useTheme()
@@ -57,7 +85,7 @@ const PanelHeader = () => {
           width: 'auto',
           pb: 1,
           pl: 3,
-          pr: 2,
+          pr: 3,
           pt: 3,
           gap: 2
         }}
@@ -83,8 +111,9 @@ const PanelHeader = () => {
           ) : (
             <Box />
           )}
-          <CloseButton />
+          <CloseButton color='secondary' />
         </Box>
+        {preferenceMode !== 'none' && <ConfigButton color='secondary' />}
       </Box>
     )
   }
@@ -214,11 +243,12 @@ export const NotificationsHomeBody = () => {
       anchorEl,
       showLoader,
       notificationCenterPosition,
-      notificationCenterOffset
+      notificationCenterOffset,
+      preferenceMode,
+      showBranding
     },
     handlers: { handleClosePanel }
   } = useNotificationsHomeContext()
-
   const xs = useMediaQuery(theme.breakpoints.up('sm'))
   const md = useMediaQuery(theme.breakpoints.up('md'))
 
@@ -227,7 +257,11 @@ export const NotificationsHomeBody = () => {
       anchorEl={anchorEl}
       disableScrollLock={false}
       open={Boolean(anchorEl)}
-      sx={{ left: { sm: -50 } }}
+      sx={{
+        left: { sm: -50 },
+        visibility:
+          showConfig && preferenceMode === 'modal' ? 'hidden' : 'visible'
+      }}
       onClose={handleClosePanel}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       MenuListProps={{
@@ -240,7 +274,7 @@ export const NotificationsHomeBody = () => {
       PaperProps={{
         sx: {
           p: 0,
-          background: 'green',
+          borderRadius: '0.75rem',
           // minWidth: 0,
           // width: 0,
           // zIndex: -9999,
@@ -251,15 +285,25 @@ export const NotificationsHomeBody = () => {
         }
       }}
     >
-      <Box
-        data-testid='Hello'
-        sx={{
-          boxShadow:
-            '0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)',
-          minWidth: xs ? '25pc' : '80%',
-          width: md ? '24vw' : xs ? '64vw' : '90vw',
-          height: xs
-            ? notificationCenterPosition === 'left' ||
+      {!showConfig ? (
+        <Box
+          data-testid='Hello'
+          className='notification-panel'
+          sx={{
+            boxSizing: 'content-box',
+            boxShadow:
+              '0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)',
+            minWidth: xs ? '28pc' : '80%',
+            width: md ? '24vw' : xs ? '64vw' : '90vw',
+            height: xs
+              ? notificationCenterPosition === 'left' ||
+                notificationCenterPosition === 'right'
+                ? '100%'
+                : '70vh'
+              : '100%',
+            background: theme.palette.background.paper,
+            position:
+              notificationCenterPosition === 'left' ||
               notificationCenterPosition === 'right'
               ? '100%'
               : '70vh'
@@ -292,8 +336,13 @@ export const NotificationsHomeBody = () => {
         )} */}
         <PanelBody />
 
-        <PanelFooter />
-      </Box>
+          {showBranding === true ? <PanelFooter /> : null}
+        </Box>
+      ) : preferenceMode === 'embed' ? (
+        <ConfigPanel />
+      ) : (
+        <ConfigPopup />
+      )}
     </Menu>
   )
 }
