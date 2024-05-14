@@ -305,36 +305,29 @@ export const NotificationsHomeBody = () => {
             position:
               notificationCenterPosition === 'left' ||
               notificationCenterPosition === 'right'
-              ? '100%'
-              : '70vh'
-            : '100%',
-          background: theme.palette.background.paper,
-          position:
-            notificationCenterPosition === 'left' ||
+                ? 'fixed'
+                : 'relative',
+            ...(notificationCenterPosition === 'left' ||
             notificationCenterPosition === 'right'
-              ? 'fixed'
-              : 'relative',
-          ...(notificationCenterPosition === 'left' ||
-          notificationCenterPosition === 'right'
-            ? { top: 0 }
-            : {}),
-          ...(notificationCenterPosition === 'left'
-            ? { left: notificationCenterOffset || 100 }
-            : {}),
-          ...(notificationCenterPosition === 'right'
-            ? { right: notificationCenterOffset || 100 }
-            : {})
-        }}
-      >
-        <PanelHeader />
-        {/* {errMsg === undefined ||
+              ? { top: 0 }
+              : {}),
+            ...(notificationCenterPosition === 'left'
+              ? { left: notificationCenterOffset || 100 }
+              : {}),
+            ...(notificationCenterPosition === 'right'
+              ? { right: notificationCenterOffset || 100 }
+              : {})
+          }}
+        >
+          <PanelHeader />
+          {/* {errMsg === undefined ||
         errMsg === '' ||
         errMsg === 'xhr poll error' ? (
           <PanelBody />
         ) : (
           <Error />
         )} */}
-        <PanelBody />
+          <PanelBody />
 
           {showBranding === true ? <PanelFooter /> : null}
         </Box>
