@@ -15,10 +15,13 @@ import {
   Collapse,
   ClickAwayListener,
   CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   Paper
 } from '@mui/material'
 import { useNotificationsHomeContext } from '../../context'
-import { toast } from 'react-hot-toast'
 import {
   Lock,
   CheckCircle,
@@ -74,14 +77,14 @@ function getDifferentPreferences(newConfig, oldConfig) {
 }
 const PanelHeader = () => {
   const [preferenceUpdated, setPreferenceUpdated] = useState(false)
-  const buttonRef = useRef()
   const {
     data: {
       errMsg,
       userPreference,
       socketInstance,
       openConfigUnsaved,
-      resetPreference
+      resetPreference,
+      showConfig
     },
     handlers: {
       setShowConfig,
@@ -90,16 +93,6 @@ const PanelHeader = () => {
       setResetPreference
     }
   } = useNotificationsHomeContext()
-  useEffect(() => {
-    socketInstance.on('preference:update', () => {
-      setUserPreference((prev) => {
-        prev.isDirty = false
-        setPreferenceUpdated(true)
-        return prev
-      })
-    })
-    setResetPreference(cloneDeep(userPreference))
-  }, [])
 
   useEffect(() => {
     setTimeout(() => {
@@ -109,17 +102,13 @@ const PanelHeader = () => {
 
   const theme = useTheme()
 
-  const handleSavePreference = async () => {
-    setUserPreference((prev) => {
-      const preference = getDifferentPreferences(prev, resetPreference)
-      socketInstance.emit('set:preference', preference)
-      const temp = { ...prev }
-      return temp
-    })
-    buttonRef.current.innerHTML = 'Saving...'
-  }
   return (
     <React.Fragment>
+      <Collapse in={preferenceUpdated}>
+        <Alert icon={<Check fontSize='inherit' />} severity='success'>
+          Channel preferences saved
+        </Alert>
+      </Collapse>
       <Box
         sx={{
           display: 'grid',
@@ -499,56 +488,141 @@ const PanelFooter = () => {
   )
 }
 
-export const ConfigPanel = () => {
+export const ConfigPopup = () => {
   const theme = useTheme()
   const xs = useMediaQuery(theme.breakpoints.up('sm'))
   const md = useMediaQuery(theme.breakpoints.up('md'))
+  const buttonRef = useRef()
+  const [preferenceUpdated, setPreferenceUpdated] = useState(false)
+  useEffect(() => {
+    setTimeout(() => {
+      setPreferenceUpdated(false)
+    }, 1000)
+  }, [preferenceUpdated])
+
   const {
     data: {
-      showLoader,
-      notificationCenterPosition,
-      notificationCenterOffset,
-      themeConfig
+      socketInstance,
+      showConfig,
+      preferenceMode,
+      userPreference,
+      resetPreference,
+      openConfigUnsaved
+    },
+    handlers: {
+      setUserPreference,
+      setResetPreference,
+      setShowConfig,
+      setOpenConfigUnsaved
     }
   } = useNotificationsHomeContext()
+  const handleSavePreference = async () => {
+    setPreferenceUpdated(true)
+    setUserPreference((prev) => {
+      const preference = getDifferentPreferences(prev, resetPreference)
+      socketInstance.emit('set:preference', preference)
+      const temp = { ...prev }
+      return temp
+    })
+  }
+  useEffect(() => {
+    socketInstance.on('preference:update', () => {
+      setPreferenceUpdated(false)
+      setUserPreference((prev) => {
+        prev.isDirty = false
+        return prev
+      })
+    })
+    setResetPreference(cloneDeep(userPreference))
+  }, [])
   return (
-    <Box
-      data-testid='Hello'
-      className='notification-panel'
-      sx={{
-        boxShadow:
-          '0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)',
-        minWidth: xs ? '25pc' : '80%',
-        width: md ? '24vw' : xs ? '64vw' : '90vw',
-        height: xs
-          ? notificationCenterPosition === 'left' ||
-            notificationCenterPosition === 'right'
-            ? '100%'
-            : '70vh'
-          : '100%',
-        background: theme.palette.background.paper,
-        position:
-          notificationCenterPosition === 'left' ||
-          notificationCenterPosition === 'right'
-            ? 'fixed'
-            : 'relative',
-        ...(notificationCenterPosition === 'left' ||
-        notificationCenterPosition === 'right'
-          ? { top: 0 }
-          : {}),
-        ...(notificationCenterPosition === 'left'
-          ? { left: notificationCenterOffset || 100 }
-          : {}),
-        ...(notificationCenterPosition === 'right'
-          ? { right: notificationCenterOffset || 100 }
-          : {})
-      }}
+    // <Dialog open={showConfig && preferenceMode === 'modal'} keepMounted>
+    //   <DialogTitle alignSelf={'center'}>{'Preferences'}</DialogTitle>
+    //   <Divider />
+    //   <DialogContent sx={{ padding: 0 }}>
+    //     <PanelBody />
+    //   </DialogContent>
+    //   <DialogActions sx={{ justifyContent: 'center' }}>
+    //     <Button variant='contained'>Save</Button>
+    //   </DialogActions>
+    // </Dialog>
+    // <Modal open={showConfig && preferenceMode === 'modal'}>
+    //   <PanelHeader />
+    //   <Divider sx={{ mt: 0, mb: 0 }} />
+    //   <PanelBody />
+    //   <PanelFooter />
+    // </Modal>
+    <Dialog
+      open={showConfig && preferenceMode === 'modal'}
+      keepMounted
+      sx={{ width: '100%' }}
     >
-      <PanelHeader />
-      <Divider sx={{ mt: 0, mb: 0 }} />
-      <PanelBody />
-      <PanelFooter />
-    </Box>
+      <DialogTitle sx={{ m: 0, p: 2, textAlign: 'center' }}>
+        Preferences
+      </DialogTitle>
+      <IconButton
+        aria-label='close'
+        sx={{
+          position: 'absolute',
+          right: 8,
+          top: 8,
+          color: (theme) => theme.palette.grey[500]
+        }}
+        onClick={() => {
+          if (userPreference.isDirty) setOpenConfigUnsaved(true)
+          else setShowConfig(false)
+        }}
+      >
+        <Close />
+      </IconButton>
+      <DialogContent dividers>
+        <PanelBody />
+      </DialogContent>
+      <DialogActions sx={{ alignSelf: 'center' }}>
+        {preferenceUpdated || openConfigUnsaved || !userPreference.isDirty ? (
+          <Tooltip text='No Changes to save' placement='right-end'>
+            <Box>
+              <Button
+                variant='contained'
+                disabled={
+                  preferenceUpdated ||
+                  openConfigUnsaved ||
+                  !userPreference.isDirty
+                }
+                disableRipple
+              >
+                Save
+              </Button>
+            </Box>
+          </Tooltip>
+        ) : (
+          <Button
+            ref={buttonRef}
+            variant='contained'
+            disabled={
+              preferenceUpdated || openConfigUnsaved || !userPreference.isDirty
+            }
+            onClick={handleSavePreference}
+            disableRipple
+          >
+            Save
+            {preferenceUpdated && (
+              <CircularProgress
+                size={24}
+                sx={{
+                  color: 'success',
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  marginTop: '-12px',
+                  marginLeft: '-12px'
+                }}
+              />
+            )}
+          </Button>
+        )}
+      </DialogActions>
+    </Dialog>
   )
 }
 
@@ -611,19 +685,9 @@ export const PreferenceButton = (props) => {
             color='#ffffff4f'
           >
             {type === 'required' ? (
-              <Lock
-                sx={{
-                  width: '.8em',
-                  height: '.8em'
-                }}
-              />
+              <Lock />
             ) : type === 'opted-in' ? (
-              <CheckCircle
-                sx={{
-                  width: '.8em',
-                  height: '.8em'
-                }}
-              />
+              <CheckCircle />
             ) : null}
           </Icon>
         </Typography>
@@ -643,4 +707,4 @@ export const PreferenceButton = (props) => {
   )
 }
 
-export default ConfigPanel
+export default ConfigPopup

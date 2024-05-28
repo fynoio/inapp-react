@@ -20,6 +20,11 @@ export const FynoInappCenter = (props) => {
     } else return '#231F37'
   }
   const theme = createTheme({
+    typography: {
+      fontFamily:
+        themeConfig.font ||
+        ['Roboto', 'Helvetica', 'Arial', 'sans-serif'].join(',')
+    },
     palette: {
       common: {
         black: '#000',
@@ -101,7 +106,6 @@ export const FynoInappCenter = (props) => {
         toastOptions={{
           duration: notificationSettings?.duration || 5000,
           style: {
-            width: '100%',
             background: notificationSettings?.invertTheme
               ? theme.palette.inverted.paper
               : theme.palette.background.paper,

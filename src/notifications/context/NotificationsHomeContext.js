@@ -6,7 +6,7 @@ import { toast } from 'react-hot-toast'
 import socketIO from 'socket.io-client'
 
 import { ToastStructure } from '../components/NotificationsTabs'
-import { debounce } from '@mui/material'
+import { debounce, useTheme } from '@mui/material'
 import useSound from 'use-sound'
 
 export const NotificationsHomeContext = React.createContext()
@@ -26,8 +26,9 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     onMessageClicked,
     overrideInappUrl
   } = props
-
-  const { logo, header, position, offset } = themeConfig
+  const [userPreference, setUserPreference] = useState({})
+  const { logo, header, position, offset, preference_mode } = themeConfig
+  const [resetPreference, setResetPreference] = useState({})
 
   const [close, setClose] = useState(false)
   const [errMsg, setErrMsg] = useState('')
@@ -44,6 +45,8 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   const [toastData, setToastData] = useState({})
   const [notificationCenterPosition] = useState(position || 'default')
   const [notificationCenterOffset] = useState(offset || 0)
+  const [preferenceMode] = useState(preference_mode || 'modal')
+  const [openConfigUnsaved, setOpenConfigUnsaved] = useState(false)
   const brandLogo = logo
   var soundEnabled = null
   if (notificationSettings && notificationSettings.sound) {
@@ -59,7 +62,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   const [anchorDeleteEl, setAnchorDeleteEl] = useState(false)
 
   const openDeleteDialog = Boolean(anchorDeleteEl)
-
+  const theme = useTheme()
   const handleChangeStatus = (status) => {
     if (status.status === 'DELETED') {
       setList((prev) => prev.filter((msg) => msg._id !== status.messageId))
@@ -155,7 +158,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
               return data.messages.messages
             }
           })
-      setUnreadCount(data.messages.unread)
+      setUnreadCount(data.messages.unreadCount)
       setCount(data.messages.total)
       setPage(data.page)
       setShowLoader(100)
@@ -186,6 +189,21 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     })
     socket.on('disconnect', (err) => {
       setErrMsg(err.message)
+    })
+
+    socket.on('preferences:state', (preference) => {
+      setUserPreference(preference)
+      setShowConfig(!showConfig)
+    })
+
+    socket.on('preference:update', () => {
+      toast.success('Channel preference updated', {
+        position: 'top-right',
+        duration: 2000,
+        style: {
+          color: theme.palette.text
+        }
+      })
     })
 
     return () => {
@@ -243,7 +261,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   }
 
   const handleOpenConfig = () => {
-    setShowConfig(!showConfig)
+    socketInstance?.emit('get:preference')
   }
 
   const handleClick = () => {}
@@ -304,7 +322,11 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       page,
       showLoader,
       notificationCenterPosition,
-      notificationCenterOffset
+      notificationCenterOffset,
+      userPreference,
+      openConfigUnsaved,
+      resetPreference,
+      preferenceMode
     },
     handlers: {
       handleClosePanel,
@@ -319,7 +341,11 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       setClose,
       handleClickDelete,
       deleteAllMessages,
-      handleMarkAllAsRead
+      handleMarkAllAsRead,
+      setUserPreference,
+      setShowConfig,
+      setOpenConfigUnsaved,
+      setResetPreference
     }
   }
 

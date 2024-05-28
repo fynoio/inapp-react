@@ -307,6 +307,14 @@ const NotificationFooter = ({ createdAt, msg }) => {
         }}
         open={openMenu}
         anchorEl={buttonRef.current}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right'
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right'
+        }}
         onClose={(e) => {
           e.preventDefault()
           e.stopPropagation()
@@ -555,6 +563,7 @@ const NotificationItem = ({ item }) => {
           window.open(mainLink, sameTab === 'true' ? '_self' : '_blank')
       }}
       columnGap={xs ? 1 : 0}
+      className='notification-item-row'
     >
       <Grid item xs={1.3}>
         <img

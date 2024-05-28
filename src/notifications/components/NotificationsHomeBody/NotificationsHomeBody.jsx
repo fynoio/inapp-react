@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-import { Close, LinkOffOutlined, WifiOff } from '@mui/icons-material'
+import { Close, LinkOffOutlined, Settings, WifiOff } from '@mui/icons-material'
 import {
   Box,
   IconButton,
@@ -8,10 +8,13 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
-  Tooltip
+  Tooltip,
+  Chip,
+  Checkbox
 } from '@mui/material'
 import { useNotificationsHomeContext } from '../../context'
 import ConfigPanel from '../ConfigPanel'
+import ConfigPopup from '../ConfigPopup'
 import NotificationsTabs from '../NotificationsTabs'
 
 const CloseButton = () => {
@@ -39,6 +42,28 @@ const CloseButton = () => {
   } else return null
 }
 
+const ConfigButton = () => {
+  const theme = useTheme()
+
+  const {
+    data: { errMsg },
+    handlers: { handleOpenConfig }
+  } = useNotificationsHomeContext()
+  return (
+    <IconButton
+      sx={{
+        color: errMsg
+          ? theme.palette.secondary.main
+          : theme.palette.text.primary
+      }}
+      onClick={handleOpenConfig}
+      size='small'
+    >
+      <Settings fontSize='small' />
+    </IconButton>
+  )
+}
+
 const PanelHeader = () => {
   const {
     data: { errMsg, header }
@@ -62,6 +87,7 @@ const PanelHeader = () => {
           gap: 2
         }}
         data-testid='noti-center-header'
+        className='noti-center-header'
       >
         <Typography variant='h5'>
           {header === true || header === '' || (!header && !xsUp)
@@ -85,6 +111,7 @@ const PanelHeader = () => {
           )}
           <CloseButton />
         </Box>
+        <ConfigButton />
       </Box>
     )
   }
@@ -124,6 +151,7 @@ const PanelHeader = () => {
           </Box>
         </Tooltip>
         <CloseButton />
+        <ConfigButton />
       </Box>
     )
   } else return null
@@ -133,12 +161,7 @@ const PanelBody = () => {
   const {
     data: { showConfig }
   } = useNotificationsHomeContext()
-
-  if (!showConfig) {
-    return <NotificationsTabs />
-  } else if (showConfig) {
-    return <ConfigPanel />
-  }
+  return <NotificationsTabs />
 }
 
 const PanelFooter = () => {
@@ -148,6 +171,7 @@ const PanelFooter = () => {
   return (
     <Box data-testid='noti-center-footer'>
       <Box
+        date-testid='noti-center-footer'
         sx={{
           display: 'flex',
           alignItems: 'center',
@@ -155,7 +179,7 @@ const PanelFooter = () => {
           // py: 0.7,
           gap: 0.5,
           height: '2.25vh',
-          position: 'absolute',
+          position: 'relative',
           bottom: 0,
           left: 0,
           right: 0,
@@ -213,8 +237,10 @@ export const NotificationsHomeBody = () => {
     data: {
       anchorEl,
       showLoader,
+      showConfig,
       notificationCenterPosition,
-      notificationCenterOffset
+      notificationCenterOffset,
+      preferenceMode
     },
     handlers: { handleClosePanel }
   } = useNotificationsHomeContext()
@@ -224,6 +250,7 @@ export const NotificationsHomeBody = () => {
 
   return (
     <Menu
+      className='inapp-container'
       anchorEl={anchorEl}
       disableScrollLock={false}
       open={Boolean(anchorEl)}
@@ -233,67 +260,71 @@ export const NotificationsHomeBody = () => {
       MenuListProps={{
         sx: {
           overflowY: 'hidden',
-          p: 0,
-          background: 'red'
+          p: 0
         }
       }}
       PaperProps={{
         sx: {
           p: 0,
-          background: 'green',
           // minWidth: 0,
           // width: 0,
           // zIndex: -9999,
-          boxShadow: 'none',
           ...(notificationCenterPosition !== 'default'
             ? { minWidth: 0, width: 0 }
             : {})
         }
       }}
     >
-      <Box
-        data-testid='Hello'
-        sx={{
-          boxShadow:
-            '0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)',
-          minWidth: xs ? '25pc' : '80%',
-          width: md ? '24vw' : xs ? '64vw' : '90vw',
-          height: xs
-            ? notificationCenterPosition === 'left' ||
+      {!showConfig ? (
+        <Box
+          data-testid='Hello'
+          className='notification-panel'
+          sx={{
+            boxShadow:
+              '0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)',
+            minWidth: xs ? '25pc' : '80%',
+            width: md ? '24vw' : xs ? '64vw' : '90vw',
+            height: xs
+              ? notificationCenterPosition === 'left' ||
+                notificationCenterPosition === 'right'
+                ? '100%'
+                : '70vh'
+              : '100%',
+            background: theme.palette.background.paper,
+            position:
+              notificationCenterPosition === 'left' ||
               notificationCenterPosition === 'right'
-              ? '100%'
-              : '70vh'
-            : '100%',
-          background: theme.palette.background.paper,
-          position:
-            notificationCenterPosition === 'left' ||
+                ? 'fixed'
+                : 'relative',
+            ...(notificationCenterPosition === 'left' ||
             notificationCenterPosition === 'right'
-              ? 'fixed'
-              : 'relative',
-          ...(notificationCenterPosition === 'left' ||
-          notificationCenterPosition === 'right'
-            ? { top: 0 }
-            : {}),
-          ...(notificationCenterPosition === 'left'
-            ? { left: notificationCenterOffset || 100 }
-            : {}),
-          ...(notificationCenterPosition === 'right'
-            ? { right: notificationCenterOffset || 100 }
-            : {})
-        }}
-      >
-        <PanelHeader />
-        {/* {errMsg === undefined ||
+              ? { top: 0 }
+              : {}),
+            ...(notificationCenterPosition === 'left'
+              ? { left: notificationCenterOffset || 100 }
+              : {}),
+            ...(notificationCenterPosition === 'right'
+              ? { right: notificationCenterOffset || 100 }
+              : {})
+          }}
+        >
+          <PanelHeader />
+          {/* {errMsg === undefined ||
         errMsg === '' ||
         errMsg === 'xhr poll error' ? (
           <PanelBody />
         ) : (
           <Error />
         )} */}
-        <PanelBody />
+          <PanelBody />
 
-        <PanelFooter />
-      </Box>
+          <PanelFooter />
+        </Box>
+      ) : preferenceMode === 'embed' ? (
+        <ConfigPanel />
+      ) : (
+        <ConfigPopup />
+      )}
     </Menu>
   )
 }
