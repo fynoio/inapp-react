@@ -8,7 +8,8 @@ import socketIO from 'socket.io-client'
 import { ToastStructure } from '../components/NotificationsTabs'
 import { debounce, useTheme, Typography } from '@mui/material'
 import useSound from 'use-sound'
-
+import isEqual from 'lodash/isEqual'
+import cloneDeep from 'lodash/cloneDeep'
 export const NotificationsHomeContext = React.createContext()
 
 export const useNotificationsHomeContext = () =>
@@ -21,14 +22,23 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     integration,
     signature,
     themeConfig,
+    globalChannels,
     notificationSettings,
     onMessageRecieved,
     onMessageClicked,
     overrideInappUrl
   } = props
+  const theme = useTheme()
   const [isSeen, setIsSeen] = useState(true)
   const [userPreference, setUserPreference] = useState({})
-  const { logo, header, position, offset, preference_mode } = themeConfig
+  const {
+    logo,
+    header,
+    position,
+    offset,
+    preference_mode,
+    notification_center
+  } = themeConfig
   const [resetPreference, setResetPreference] = useState({})
   const [showBranding, setShowBranding] = useState(true)
   const [close, setClose] = useState(false)
@@ -47,7 +57,23 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   const [notificationCenterPosition] = useState(position || 'default')
   const [notificationCenterOffset] = useState(offset || 0)
   const [preferenceMode] = useState(preference_mode || 'none')
+  const [notificationCenterConfig] = useState(
+    notification_center || {
+      anchorOrigin: { vertical: 'bottom', horizontal: 'right' },
+      transformOrigin: { vertical: 'top', horizontal: 'right' }
+    }
+  )
+
   const [openConfigUnsaved, setOpenConfigUnsaved] = useState(false)
+  const [globalChannelPreference, setGlobalChannelPreference] = useState(
+    globalChannels.reduce((acc, curr) => {
+      acc[curr] = false
+      return acc
+    }, {}) || {}
+  )
+  const [resetGlobalChannelPreference, setResetGlobalChannelPreference] =
+    useState({ ...globalChannelPreference })
+  const [updatedPreference, setUpdatedPreference] = useState({})
   const brandLogo = logo
   var soundEnabled = null
   if (notificationSettings && notificationSettings.sound) {
@@ -117,7 +143,8 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       auth: {
         user_id: user,
         WS_ID: workspace,
-        Integration_ID: integration
+        Integration_ID: integration,
+        'x-fyno-signature': signature
       },
       extraHeaders: {
         'x-fyno-signature': signature,
@@ -198,7 +225,34 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
 
     socket.on('preferences:state', (preference) => {
       setUserPreference(preference)
-      setShowConfig(!showConfig)
+      setGlobalChannelPreference((prev) => {
+        if (!preference.result) return prev
+        else {
+          const newPref = Object.entries(preference.result).reduce(
+            (acc, curr) => {
+              curr[1].map((value) => {
+                if (!value.is_global_opted_out) return acc
+                else {
+                  acc = { ...acc, ...value.is_global_opted_out }
+                }
+              })
+              return acc
+            },
+            prev
+          )
+          return newPref
+        }
+      })
+      setResetPreference(cloneDeep(preference))
+      setResetGlobalChannelPreference(cloneDeep(globalChannelPreference))
+      setUpdatedPreference({})
+      console.log('before', showConfig)
+      setShowConfig((val) => {
+        console.log('current value of show config is ' + val)
+        return !val
+      })
+      console.log('after', showConfig)
+      setOpenConfigUnsaved(false)
     })
 
     socket.on('preference:update', () => {
@@ -216,6 +270,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
           }
         }
       )
+      socket.emit('get:preference')
     })
 
     return () => {
@@ -226,6 +281,10 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   useEffect(() => {
     setUnreadList(list?.filter((msg) => !msg?.isRead))
   }, [JSON.stringify(list)])
+
+  useEffect(() => {
+    console.log('show config changed to ' + showConfig)
+  }, [showConfig])
 
   useEffect(() => {
     if (!anchorEl && socketInstance) {
@@ -274,7 +333,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   }
 
   const handleOpenConfig = () => {
-    setShowConfig(!showConfig)
+    socketInstance?.emit('get:preference')
   }
 
   const handleClick = () => {}
@@ -341,7 +400,11 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       resetPreference,
       preferenceMode,
       showBranding,
-      isSeen
+      isSeen,
+      globalChannelPreference,
+      updatedPreference,
+      notificationCenterConfig,
+      resetGlobalChannelPreference
     },
     handlers: {
       handleClosePanel,
@@ -356,7 +419,14 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       setClose,
       handleClickDelete,
       deleteAllMessages,
-      handleMarkAllAsRead
+      handleMarkAllAsRead,
+      setUserPreference,
+      setShowConfig,
+      setOpenConfigUnsaved,
+      setResetPreference,
+      setGlobalChannelPreference,
+      setUpdatedPreference,
+      setResetGlobalChannelPreference
     }
   }
 

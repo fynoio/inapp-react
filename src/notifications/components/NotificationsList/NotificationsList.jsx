@@ -95,9 +95,9 @@ const DocumentComponent = ({ docType = 'txt' }) => {
   }
 
   return (
-    <Box sx={{ ...boxStyles }}>
+    <Box sx={{ ...boxStyles }} className={`notification-attachment ${docType}`}>
       <LibraryBooks fontSize='small' />
-      <Typography sx={{ fontSize: '0.6rem' }}>
+      <Typography sx={{ fontSize: '0.6rem' }} className='attachemnt-name'>
         {temp[docType]?.title || docType.toUpperCase()}
       </Typography>
     </Box>
@@ -120,6 +120,7 @@ const AttachmentComponent = ({ type, attachmentsObject, showBlur }) => {
           width='50rem'
           height='50rem'
           style={{ borderRadius: 5 }}
+          className='notification-attachment image'
         />
       )
     case 'Video':
@@ -129,6 +130,7 @@ const AttachmentComponent = ({ type, attachmentsObject, showBlur }) => {
           width='50rem'
           height='50rem'
           style={{ borderRadius: 5 }}
+          className='notification-attachment video'
         />
       )
     case 'Document':
@@ -238,6 +240,7 @@ const MainBody = ({ body, title }) => {
           fontSize='0.85rem'
           fontWeight={600}
           color={theme.palette.text.primary}
+          className='notification-title'
         >
           {title}
         </Typography>
@@ -245,6 +248,7 @@ const MainBody = ({ body, title }) => {
           fontSize='0.8rem'
           fontWeight={200}
           color={theme.palette.text.primary}
+          className='notification-body'
         >
           {parse(renderBody)}
         </Typography>
@@ -257,7 +261,7 @@ const NotificationFooter = ({ createdAt, msg }) => {
   const theme = useTheme()
 
   const {
-    handlers: { handleMarkAsRead, handleDelete }
+    handlers: { handleMarkAsRead, handleDelete, notificationCenterConfig }
   } = useNotificationsHomeContext()
 
   const [openMenu, setOpenMenu] = useState(false)
@@ -274,6 +278,7 @@ const NotificationFooter = ({ createdAt, msg }) => {
         pl: { xs: '8%', sm: '10%' }
       }}
       component='div'
+      className='notification-footer'
     >
       <Typography
         fontSize='0.7rem'
@@ -308,6 +313,18 @@ const NotificationFooter = ({ createdAt, msg }) => {
         }}
         open={openMenu}
         anchorEl={buttonRef.current}
+        anchorOrigin={{
+          vertical:
+            notificationCenterConfig?.anchorOrigin?.vertical || 'bottom',
+          horizontal:
+            notificationCenterConfig?.anchorOrigin?.horizontal || 'right'
+        }}
+        transformOrigin={{
+          vertical:
+            notificationCenterConfig?.transformOrigin?.vertical || 'top',
+          horizontal:
+            notificationCenterConfig?.transformOrigin?.horizontal || 'right'
+        }}
         onClose={(e) => {
           e.preventDefault()
           e.stopPropagation()
@@ -438,6 +455,7 @@ const ActionsComponent = ({ item }) => {
         flexDirection='row-reverse'
         justifyContent='flex-end'
         sx={{ gap: 1, mt: 1 }}
+        className='buttons-section'
       >
         {buttons.map((item, index) => {
           const sameTab = item?.sameTab || 'false'
@@ -459,6 +477,7 @@ const ActionsComponent = ({ item }) => {
                   variant='outlined'
                   size='small'
                   sx={{ fontSize: '0.6rem' }}
+                  className='fyno-secondary-action'
                 >
                   {item?.label}
                 </Button>
@@ -482,6 +501,7 @@ const ActionsComponent = ({ item }) => {
                   variant='contained'
                   size='small'
                   sx={{ fontSize: '0.6rem' }}
+                  className='fyno-primary-action'
                 >
                   {item?.label}
                 </Button>
@@ -556,16 +576,18 @@ const NotificationItem = ({ item }) => {
           window.open(mainLink, sameTab === 'true' ? '_self' : '_blank')
       }}
       columnGap={xs ? 1 : 0}
+      className='notification-item'
     >
-      <Grid item xs={1.3}>
+      <Grid item xs={1.3} className='notification-icon-section'>
         <img
           src={logo}
           width='30px'
           height='30px'
           style={{ borderRadius: '4px', objectFit: 'contain' }}
+          className='notification-icon'
         />
       </Grid>
-      <Grid item xs={7.7}>
+      <Grid item xs={7.7} className='notification-content'>
         <MainBody title={title} body={body} />
         <ActionsComponent item={item} />
       </Grid>
@@ -646,6 +668,7 @@ const EmptyList = () => {
         textAlign: 'center',
         position: 'relative'
       }}
+      className='no-messages-section'
     >
       <Collapse
         sx={{
@@ -793,6 +816,7 @@ export const NotificationsList = ({ filter }) => {
           overflowY: 'auto',
           scrollBehavior: 'auto'
         }}
+        className='notification-list'
       >
         <Collapse
           sx={{
@@ -850,6 +874,7 @@ export const NotificationsList = ({ filter }) => {
             opacity: openDeleteDialog ? '50%' : '100%'
           }}
           style={{ alignContent: 'flex-start' }}
+          className='notification-list-grid'
         >
           {mapperList.map((item, index) => (
             <Grid key={item + index} item xs={12}>

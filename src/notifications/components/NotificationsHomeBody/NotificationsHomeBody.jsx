@@ -18,6 +18,7 @@ import {
 } from '@mui/material'
 import { useNotificationsHomeContext } from '../../context'
 import ConfigPanel from '../ConfigPanel'
+import ConfigPopup from '../ConfigPopup'
 import NotificationsTabs from '../NotificationsTabs'
 
 const CloseButton = () => {
@@ -90,6 +91,7 @@ const PanelHeader = () => {
           gap: 2
         }}
         data-testid='noti-center-header'
+        className='notification-center-header'
       >
         <Typography variant='h5'>
           {header === true || header === '' || (!header && !xsUp)
@@ -245,7 +247,8 @@ export const NotificationsHomeBody = () => {
       notificationCenterPosition,
       notificationCenterOffset,
       preferenceMode,
-      showBranding
+      showBranding,
+      showConfig
     },
     handlers: { handleClosePanel }
   } = useNotificationsHomeContext()
@@ -267,8 +270,7 @@ export const NotificationsHomeBody = () => {
       MenuListProps={{
         sx: {
           overflowY: 'hidden',
-          p: 0,
-          background: 'red'
+          p: 0
         }
       }}
       PaperProps={{
@@ -278,7 +280,6 @@ export const NotificationsHomeBody = () => {
           // minWidth: 0,
           // width: 0,
           // zIndex: -9999,
-          boxShadow: 'none',
           ...(notificationCenterPosition !== 'default'
             ? { minWidth: 0, width: 0 }
             : {})

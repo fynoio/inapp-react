@@ -78,8 +78,12 @@ export const FynoInappCenter = (props) => {
         default: defaultBgColor(),
         configBackground:
           mode === 'light'
-            ? themeConfig?.lightBackground || '#F4F5FA'
-            : themeConfig?.darkBackground || '#3B345D'
+            ? themeConfig?.lightConfigBackground || '#FFF'
+            : themeConfig?.darkConfigBackground || '#3B345D',
+        configSection:
+          mode === 'light'
+            ? themeConfig?.lightConfigSectionBackground || '#F4F5FA'
+            : themeConfig?.darkConfigSectionBackground || '#231F37'
       },
       inverted: {
         paper:
