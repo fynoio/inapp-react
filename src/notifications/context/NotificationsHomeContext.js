@@ -225,33 +225,28 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
 
     socket.on('preferences:state', (preference) => {
       setUserPreference(preference)
+      let newPref
       setGlobalChannelPreference((prev) => {
         if (!preference.result) return prev
         else {
-          const newPref = Object.entries(preference.result).reduce(
-            (acc, curr) => {
-              curr[1].map((value) => {
-                if (!value.is_global_opted_out) return acc
-                else {
-                  acc = { ...acc, ...value.is_global_opted_out }
-                }
-              })
-              return acc
-            },
-            prev
-          )
+          newPref = Object.entries(preference.result).reduce((acc, curr) => {
+            curr[1].map((value) => {
+              if (!value.is_global_opted_out) return acc
+              else {
+                acc = { ...acc, ...value.is_global_opted_out }
+              }
+            })
+            return acc
+          }, prev)
+          setResetGlobalChannelPreference(cloneDeep(newPref))
           return newPref
         }
       })
       setResetPreference(cloneDeep(preference))
-      setResetGlobalChannelPreference(cloneDeep(globalChannelPreference))
       setUpdatedPreference({})
-      console.log('before', showConfig)
       setShowConfig((val) => {
-        console.log('current value of show config is ' + val)
         return !val
       })
-      console.log('after', showConfig)
       setOpenConfigUnsaved(false)
     })
 
@@ -281,10 +276,6 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   useEffect(() => {
     setUnreadList(list?.filter((msg) => !msg?.isRead))
   }, [JSON.stringify(list)])
-
-  useEffect(() => {
-    console.log('show config changed to ' + showConfig)
-  }, [showConfig])
 
   useEffect(() => {
     if (!anchorEl && socketInstance) {

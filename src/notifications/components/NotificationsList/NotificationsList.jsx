@@ -314,16 +314,12 @@ const NotificationFooter = ({ createdAt, msg }) => {
         open={openMenu}
         anchorEl={buttonRef.current}
         anchorOrigin={{
-          vertical:
-            notificationCenterConfig?.anchorOrigin?.vertical || 'bottom',
-          horizontal:
-            notificationCenterConfig?.anchorOrigin?.horizontal || 'right'
+          vertical: 'bottom',
+          horizontal: 'right'
         }}
         transformOrigin={{
-          vertical:
-            notificationCenterConfig?.transformOrigin?.vertical || 'top',
-          horizontal:
-            notificationCenterConfig?.transformOrigin?.horizontal || 'right'
+          vertical: 'top',
+          horizontal: 'right'
         }}
         onClose={(e) => {
           e.preventDefault()

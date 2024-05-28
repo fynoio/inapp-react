@@ -50,6 +50,12 @@ export const GlobalPreference = ({ channels }) => {
         return temp
       })
     }
+    setUpdatedPreference((prev) => {
+      let temp = { ...prev }
+      if (!temp['all']) temp['all'] = {}
+      temp['all'][channel] = value === 'on' ? 'opted-in' : 'opted-out'
+      return temp
+    })
     setGlobalChannelPreference((prev) => {
       const temp = { ...prev }
       temp[channel] = !temp[channel]

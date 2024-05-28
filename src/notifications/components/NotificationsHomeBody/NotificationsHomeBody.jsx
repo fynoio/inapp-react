@@ -93,7 +93,7 @@ const PanelHeader = () => {
         data-testid='noti-center-header'
         className='notification-center-header'
       >
-        <Typography variant='h5'>
+        <Typography variant='h5' className='header-text'>
           {header === true || header === '' || (!header && !xsUp)
             ? 'Notifications'
             : header}
@@ -248,7 +248,8 @@ export const NotificationsHomeBody = () => {
       notificationCenterOffset,
       preferenceMode,
       showBranding,
-      showConfig
+      showConfig,
+      notificationCenterConfig
     },
     handlers: { handleClosePanel }
   } = useNotificationsHomeContext()
@@ -266,7 +267,16 @@ export const NotificationsHomeBody = () => {
           showConfig && preferenceMode === 'modal' ? 'hidden' : 'visible'
       }}
       onClose={handleClosePanel}
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      anchorOrigin={{
+        vertical: notificationCenterConfig?.anchorOrigin?.vertical || 'bottom',
+        horizontal:
+          notificationCenterConfig?.anchorOrigin?.horizontal || 'right'
+      }}
+      transformOrigin={{
+        vertical: notificationCenterConfig?.transformOrigin?.vertical || 'top',
+        horizontal:
+          notificationCenterConfig?.transformOrigin?.horizontal || 'left'
+      }}
       MenuListProps={{
         sx: {
           overflowY: 'hidden',
