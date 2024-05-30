@@ -262,15 +262,14 @@ export const NotificationsHomeBody = () => {
       disableScrollLock={false}
       open={Boolean(anchorEl)}
       sx={{
-        left: { sm: -50 },
+        // left: { sm: -50 },
         visibility:
           showConfig && preferenceMode === 'modal' ? 'hidden' : 'visible'
       }}
       onClose={handleClosePanel}
       anchorOrigin={{
         vertical: notificationCenterConfig?.anchorOrigin?.vertical || 'bottom',
-        horizontal:
-          notificationCenterConfig?.anchorOrigin?.horizontal || 'right'
+        horizontal: notificationCenterConfig?.anchorOrigin?.horizontal || 'left'
       }}
       transformOrigin={{
         vertical: notificationCenterConfig?.transformOrigin?.vertical || 'top',

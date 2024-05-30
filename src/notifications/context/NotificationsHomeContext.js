@@ -59,8 +59,8 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   const [preferenceMode] = useState(preference_mode || 'none')
   const [notificationCenterConfig] = useState(
     notification_center || {
-      anchorOrigin: { vertical: 'bottom', horizontal: 'right' },
-      transformOrigin: { vertical: 'top', horizontal: 'right' }
+      anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
+      transformOrigin: { vertical: 'top', horizontal: 'left' }
     }
   )
 

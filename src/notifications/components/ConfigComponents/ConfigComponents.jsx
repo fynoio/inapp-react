@@ -156,6 +156,7 @@ export const PanelBody = (props) => {
     <Box
       sx={{
         height: getHeight(),
+        boxSizing: 'content-box',
         color: theme.palette.secondary.main,
         display: 'flex',
         flexDirection: 'column',
@@ -165,14 +166,20 @@ export const PanelBody = (props) => {
       }}
       className='fyno-user-preferences-container'
     >
-      <Collapse in={openConfigUnsaved}>
+      <Collapse
+        sx={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 5000
+        }}
+        in={openConfigUnsaved}
+      >
         <Paper
           sx={{
             p: 3,
             display: 'flex',
             alignItems: 'center',
             gap: 1,
-            minHeight: 'auto',
             borderTopLeftRadius: 0,
             borderTopRightRadius: 0
           }}
@@ -258,64 +265,65 @@ export const PanelBody = (props) => {
           </Box>
         </Paper>
       </Collapse>
-      {globalChannelPreference &&
-        Object.keys(globalChannelPreference).length > 0 && (
-          <GlobalPreference channels={Object.keys(globalChannelPreference)} />
-        )}
-      {sectionsArr.length > 0 ? (
-        <Box sx={{ opacity: openConfigUnsaved ? '50%' : '100%' }}>
-          {sectionsArr.map((section, index) => (
-            <Box
-              key={section + index}
-              sx={{
-                paddingX: 2,
-                paddingTop: 2
-              }}
-              className='preference-section'
-            >
-              <Box sx={{ marginBottom: 1, marginLeft: 0.5 }}>
-                <Typography
-                  fontSize='14px'
-                  fontWeight={600}
-                  color={theme.palette.text.primary}
-                  className='section-title'
-                >
-                  {section}
-                </Typography>
-              </Box>
+      <Box sx={{ opacity: openConfigUnsaved ? '50%' : '100%' }}>
+        {globalChannelPreference &&
+          Object.keys(globalChannelPreference).length > 0 && (
+            <GlobalPreference channels={Object.keys(globalChannelPreference)} />
+          )}
+        {sectionsArr.length > 0 ? (
+          <Box>
+            {sectionsArr.map((section, index) => (
               <Box
+                key={section + index}
                 sx={{
-                  background: theme.palette.background.configSection,
-                  padding: 2,
-                  borderRadius: '0.75rem'
+                  paddingX: 2,
+                  paddingTop: 2
                 }}
-                className='section-topics-list'
+                className='preference-section'
               >
-                {userPreference.result[section].map((topic, index) => (
-                  <Box
-                    sx={{
-                      ...(index !== userPreference.result[section].length - 1
-                        ? { paddingBottom: 3 }
-                        : {})
-                    }}
-                    key={topic.subscription_id}
-                    className='preference-section-topic'
+                <Box sx={{ marginBottom: 1, marginLeft: 0.5 }}>
+                  <Typography
+                    fontSize='14px'
+                    fontWeight={600}
+                    color={theme.palette.text.primary}
+                    className='section-title'
                   >
+                    {section}
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    background: theme.palette.background.configSection,
+                    padding: 2,
+                    borderRadius: '0.75rem'
+                  }}
+                  className='section-topics-list'
+                >
+                  {userPreference.result[section].map((topic, index) => (
                     <Box
                       sx={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'space-between'
+                        ...(index !== userPreference.result[section].length - 1
+                          ? { paddingBottom: 3 }
+                          : {})
                       }}
+                      key={topic.subscription_id}
+                      className='preference-section-topic'
                     >
-                      <Typography
-                        fontSize='14px'
-                        color={theme.palette.text.primary}
-                        className='preference-topic-name'
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          justifyContent: 'space-between'
+                        }}
                       >
-                        {topic.name}
-                      </Typography>
-                      {/* <Link
+                        <Typography
+                          fontSize='14px'
+                          color={theme.palette.text.primary}
+                          className='preference-topic-name'
+                        >
+                          {topic.name}
+                        </Typography>
+                        {/* <Link
                         sx={{ cursor: 'pointer', fontSize: '.9rem' }}
                         onClick={() => {
                           handleSelectAll(
@@ -337,83 +345,84 @@ export const PanelBody = (props) => {
                           ? 'Select All'
                           : 'De-Select All'}
                       </Link> */}
-                    </Box>
-                    <Box
-                      sx={{
-                        paddingTop: 1,
-                        display: 'flex',
-                        flexDirection: 'row',
-                        flexWrap: 'wrap',
-                        gap: 1
-                      }}
-                      className='topic-preferences'
-                    >
-                      {Object.entries(topic.preference).map(
-                        (channel) =>
-                          channel[1] === 'required' && (
-                            <PreferenceButton
-                              section={section}
-                              topic={topic}
-                              tooltip={true}
-                              type={channel[1]}
-                              label={channel[0]}
-                            />
+                      </Box>
+                      <Box
+                        sx={{
+                          paddingTop: 1,
+                          display: 'flex',
+                          flexDirection: 'row',
+                          flexWrap: 'wrap',
+                          gap: 1
+                        }}
+                        className='topic-preferences'
+                      >
+                        {Object.entries(topic.preference).map(
+                          (channel) =>
+                            channel[1] === 'required' && (
+                              <PreferenceButton
+                                section={section}
+                                topic={topic}
+                                tooltip={true}
+                                type={channel[1]}
+                                label={channel[0]}
+                              />
+                            )
+                        )}
+                        {Object.entries(topic.preference).map((channel) => {
+                          // console.log(
+                          //   channel[0],
+                          //   channel[1] === 'opted-in' ||
+                          //     (globalChannelPreference[channel[0]] &&
+                          //       globalChannelPreference[channel[0]] === false)
+                          // )
+                          return (
+                            channel[1] !== 'required' && (
+                              <PreferenceButton
+                                key={channel[0]}
+                                section={section}
+                                topic={topic}
+                                tooltip={
+                                  globalChannelPreference[channel[0]] || false
+                                }
+                                type={
+                                  globalChannelPreference[channel[0]] &&
+                                  globalChannelPreference[channel[0]] === true
+                                    ? 'opted-out'
+                                    : channel[1]
+                                }
+                                label={channel[0]}
+                              />
+                            )
                           )
-                      )}
-                      {Object.entries(topic.preference).map((channel) => {
-                        // console.log(
-                        //   channel[0],
-                        //   channel[1] === 'opted-in' ||
-                        //     (globalChannelPreference[channel[0]] &&
-                        //       globalChannelPreference[channel[0]] === false)
-                        // )
-                        return (
-                          channel[1] !== 'required' && (
-                            <PreferenceButton
-                              key={channel[0]}
-                              section={section}
-                              topic={topic}
-                              tooltip={
-                                globalChannelPreference[channel[0]] || false
-                              }
-                              type={
-                                globalChannelPreference[channel[0]] &&
-                                globalChannelPreference[channel[0]] === true
-                                  ? 'opted-out'
-                                  : channel[1]
-                              }
-                              label={channel[0]}
-                            />
-                          )
-                        )
-                      })}
-                    </Box>
-                    {/* {index + 1 ===
+                        })}
+                      </Box>
+                      {/* {index + 1 ===
                     userPreference.result[section].length ? null : (
                       <Divider sx={{ paddingTop: 2 }} />
                     )} */}
-                  </Box>
-                ))}
+                    </Box>
+                  ))}
+                </Box>
               </Box>
-            </Box>
-          ))}
-        </Box>
-      ) : (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            textAlign: 'center',
-            alignItems: 'center'
-          }}
-        >
-          <HourglassEmpty fontSize='large' color='secondary' />
-          <Typography color='secondary' sx={{ paddingX: 2 }}>
-            No preferences available at the moment
-          </Typography>
-        </Box>
-      )}
+            ))}
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              textAlign: 'center',
+              alignItems: 'center'
+            }}
+          >
+            <HourglassEmpty fontSize='large' color='secondary' />
+            <Typography color='secondary' sx={{ paddingX: 2 }}>
+              No preferences available at the moment
+            </Typography>
+          </Box>
+        )}
+      </Box>
     </Box>
   )
 }
@@ -471,7 +480,6 @@ export const PreferenceSaveButton = (props) => {
   const [preferenceUpdated, setPreferenceUpdated] = useState(false)
   const buttonRef = useRef()
   const theme = useTheme()
-  console.log(props)
   useEffect(() => {
     setTimeout(() => {
       setPreferenceUpdated(false)
