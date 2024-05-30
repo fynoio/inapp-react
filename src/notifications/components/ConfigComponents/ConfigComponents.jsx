@@ -273,7 +273,7 @@ export const PanelBody = (props) => {
               }}
               className='preference-section'
             >
-              <Box sx={{ marginBottom: 1, marginLeft: 2 }}>
+              <Box sx={{ marginBottom: 1, marginLeft: 0.5 }}>
                 <Typography
                   fontSize='14px'
                   fontWeight={600}

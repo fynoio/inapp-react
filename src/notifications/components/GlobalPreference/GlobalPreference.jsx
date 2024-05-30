@@ -87,18 +87,25 @@ export const GlobalPreference = ({ channels }) => {
     }
   }
   return (
-    <Box>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        paddingTop: 2.5,
+        gap: 2.5
+      }}
+    >
       {channels.map((channel) => (
         <Box
           sx={{
             display: 'flex',
-            padding: 2,
+            paddingX: 2.5,
             gap: 4,
-            justifyContent: 'center',
+            justifyContent: 'space-between',
             alignItems: 'center'
           }}
         >
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
             <Typography
               variant='text'
               sx={{ fontSize: '14px', fontWeight: 600 }}
@@ -106,14 +113,25 @@ export const GlobalPreference = ({ channels }) => {
             >
               Notify me on {getFormattedLabel(channel)}
             </Typography>
-            <Typography
-              variant='text'
-              sx={{ fontSize: '12px', fontWeight: 400 }}
-              color={theme.palette.text.primary}
-            >
-              By enabling this, you will receive notification via {channel} for
-              all the categories mentioned below
-            </Typography>
+            {globalChannelPreference[channel] ? (
+              <Typography
+                variant='text'
+                sx={{ fontSize: '12px', fontWeight: 400 }}
+                color={theme.palette.text.primary}
+              >
+                By enabling this, you will receive communications as per your
+                preference.
+              </Typography>
+            ) : (
+              <Typography
+                variant='text'
+                sx={{ fontSize: '12px', fontWeight: 400 }}
+                color={theme.palette.text.primary}
+              >
+                By opting out, you won't receive any communications on this
+                channel.
+              </Typography>
+            )}
           </Box>
           <Switch
             checked={!globalChannelPreference[channel]}
