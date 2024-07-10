@@ -16,14 +16,14 @@ export const FynoInappCenter = (props) => {
 
   const defaultBgColor = () => {
     if (mode === 'light') {
-      return '#F4F5FA'
+      return '#FFF'
     } else return '#231F37'
   }
   const theme = createTheme({
     typography: {
       fontFamily:
         themeConfig.font ||
-        ['Roboto', 'Helvetica', 'Arial', 'sans-serif'].join(',')
+        ['Inter', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'].join(',')
     },
     palette: {
       common: {
@@ -75,7 +75,15 @@ export const FynoInappCenter = (props) => {
           mode === 'dark'
             ? themeConfig?.lightBackground || '#FFF'
             : themeConfig?.darkBackground || '#3B345D',
-        default: defaultBgColor()
+        default: defaultBgColor(),
+        configBackground:
+          mode === 'light'
+            ? themeConfig?.lightConfigBackground || '#FFF'
+            : themeConfig?.darkConfigBackground || '#3B345D',
+        configSection:
+          mode === 'light'
+            ? themeConfig?.lightConfigSectionBackground || '#F4F5FA'
+            : themeConfig?.darkConfigSectionBackground || '#231F37'
       },
       inverted: {
         paper:
