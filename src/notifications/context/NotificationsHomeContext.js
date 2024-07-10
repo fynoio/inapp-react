@@ -28,7 +28,6 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     onMessageClicked,
     overrideInappUrl
   } = props
-  const theme = useTheme()
   const [isSeen, setIsSeen] = useState(true)
   const [userPreference, setUserPreference] = useState({})
   const {
@@ -89,7 +88,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   const [anchorDeleteEl, setAnchorDeleteEl] = useState(false)
 
   const openDeleteDialog = Boolean(anchorDeleteEl)
-
+  const theme = useTheme()
   const handleChangeStatus = (status) => {
     if (status.status === 'DELETED') {
       setList((prev) => prev.filter((msg) => msg._id !== status.messageId))
@@ -191,7 +190,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
               return data.messages.messages
             }
           })
-      setUnreadCount(data.messages.unread)
+      setUnreadCount(data.messages.unreadCount)
       setCount(data.messages.total)
       setPage(data.page)
       setShowLoader(100)

@@ -153,8 +153,8 @@ import {FynoInappCenter} from '@fyno/inapp-react'
 class Example extends Component {
   const config = {
     mode: 'THEME_MODE',//<light|dark>
-    userId: 'USER_ID',
-    workspaceId: 'WSID',
+    user: 'USER_ID',
+    workspace: 'WSID',
     integration: 'INTRGRATION_ID',
     signature: 'signature'
     themeConfig: {
@@ -167,6 +167,7 @@ class Example extends Component {
       position: 'left|right', //By default the notification center will be opened as a menu dropdown, if you have right or left navigation where the notification icon is located then you can set the notification position to open the notification with full height to the side
       offset: '0', //Only used if the notification center position is left or right, This specifies the width of your side navigation pane
       preference_mode: 'none|embed|modal', //Default is none if sepcified `embed` the user preferences panel will be shown within the notification center or if specified `modal` the preference panel will be shown in a modal window
+      font: 'CUSTOM_FONT / FONT_FAMILY', //Default font for inapp notification center is Roboto
     }, //optional
     notificationSettings: {
       sound: 'LINK_TO_NOTIFICATION_SOUND',

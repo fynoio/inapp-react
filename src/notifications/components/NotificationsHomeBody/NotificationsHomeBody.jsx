@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import {
   Close,
@@ -14,7 +14,9 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
-  Tooltip
+  Tooltip,
+  Chip,
+  Checkbox
 } from '@mui/material'
 import { useNotificationsHomeContext } from '../../context'
 import ConfigPanel from '../ConfigPanel'
@@ -155,6 +157,7 @@ const PanelHeader = () => {
           </Box>
         </Tooltip>
         <CloseButton />
+        <ConfigButton />
       </Box>
     )
   } else return null
@@ -164,12 +167,7 @@ const PanelBody = () => {
   const {
     data: { showConfig }
   } = useNotificationsHomeContext()
-
-  if (!showConfig) {
-    return <NotificationsTabs />
-  } else if (showConfig) {
-    return <ConfigPanel />
-  }
+  return <NotificationsTabs />
 }
 
 const PanelFooter = () => {
@@ -179,6 +177,7 @@ const PanelFooter = () => {
   return (
     <Box data-testid='noti-center-footer'>
       <Box
+        date-testid='noti-center-footer'
         sx={{
           display: 'flex',
           alignItems: 'center',
@@ -186,7 +185,7 @@ const PanelFooter = () => {
           // py: 0.7,
           gap: 0.5,
           height: '2.25vh',
-          position: 'absolute',
+          position: 'relative',
           bottom: 0,
           left: 0,
           right: 0,
@@ -244,11 +243,11 @@ export const NotificationsHomeBody = () => {
     data: {
       anchorEl,
       showLoader,
+      showConfig,
       notificationCenterPosition,
       notificationCenterOffset,
       preferenceMode,
       showBranding,
-      showConfig,
       notificationCenterConfig
     },
     handlers: { handleClosePanel }
@@ -258,6 +257,7 @@ export const NotificationsHomeBody = () => {
 
   return (
     <Menu
+      className='inapp-container'
       anchorEl={anchorEl}
       disableScrollLock={false}
       open={Boolean(anchorEl)}
