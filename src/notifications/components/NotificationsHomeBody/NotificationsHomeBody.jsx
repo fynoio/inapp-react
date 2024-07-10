@@ -1,6 +1,12 @@
 import React, { useState } from 'react'
 
-import { Close, LinkOffOutlined, Settings, WifiOff } from '@mui/icons-material'
+import {
+  Close,
+  LinkOffOutlined,
+  Settings,
+  SettingsOutlined,
+  WifiOff
+} from '@mui/icons-material'
 import {
   Box,
   IconButton,
@@ -59,14 +65,14 @@ const ConfigButton = () => {
       onClick={handleOpenConfig}
       size='small'
     >
-      <Settings fontSize='small' />
+      <SettingsOutlined fontSize='small' color='secondary' />
     </IconButton>
   )
 }
 
 const PanelHeader = () => {
   const {
-    data: { errMsg, header }
+    data: { errMsg, header, preferenceMode }
   } = useNotificationsHomeContext()
 
   const theme = useTheme()
@@ -82,14 +88,14 @@ const PanelHeader = () => {
           width: 'auto',
           pb: 1,
           pl: 3,
-          pr: 2,
+          pr: 3,
           pt: 3,
           gap: 2
         }}
         data-testid='noti-center-header'
-        className='noti-center-header'
+        className='notification-center-header'
       >
-        <Typography variant='h5'>
+        <Typography variant='h5' className='header-text'>
           {header === true || header === '' || (!header && !xsUp)
             ? 'Notifications'
             : header}
@@ -109,9 +115,9 @@ const PanelHeader = () => {
           ) : (
             <Box />
           )}
-          <CloseButton />
+          <CloseButton color='secondary' />
         </Box>
-        <ConfigButton />
+        {preferenceMode !== 'none' && <ConfigButton color='secondary' />}
       </Box>
     )
   }
@@ -240,11 +246,12 @@ export const NotificationsHomeBody = () => {
       showConfig,
       notificationCenterPosition,
       notificationCenterOffset,
-      preferenceMode
+      preferenceMode,
+      showBranding,
+      notificationCenterConfig
     },
     handlers: { handleClosePanel }
   } = useNotificationsHomeContext()
-
   const xs = useMediaQuery(theme.breakpoints.up('sm'))
   const md = useMediaQuery(theme.breakpoints.up('md'))
 
@@ -254,9 +261,21 @@ export const NotificationsHomeBody = () => {
       anchorEl={anchorEl}
       disableScrollLock={false}
       open={Boolean(anchorEl)}
-      sx={{ left: { sm: -50 } }}
+      sx={{
+        // left: { sm: -50 },
+        visibility:
+          showConfig && preferenceMode === 'modal' ? 'hidden' : 'visible'
+      }}
       onClose={handleClosePanel}
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      anchorOrigin={{
+        vertical: notificationCenterConfig?.anchorOrigin?.vertical || 'bottom',
+        horizontal: notificationCenterConfig?.anchorOrigin?.horizontal || 'left'
+      }}
+      transformOrigin={{
+        vertical: notificationCenterConfig?.transformOrigin?.vertical || 'top',
+        horizontal:
+          notificationCenterConfig?.transformOrigin?.horizontal || 'left'
+      }}
       MenuListProps={{
         sx: {
           overflowY: 'hidden',
@@ -266,6 +285,7 @@ export const NotificationsHomeBody = () => {
       PaperProps={{
         sx: {
           p: 0,
+          borderRadius: '0.75rem',
           // minWidth: 0,
           // width: 0,
           // zIndex: -9999,
@@ -280,9 +300,10 @@ export const NotificationsHomeBody = () => {
           data-testid='Hello'
           className='notification-panel'
           sx={{
+            boxSizing: 'content-box',
             boxShadow:
               '0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)',
-            minWidth: xs ? '25pc' : '80%',
+            minWidth: xs ? '28pc' : '80%',
             width: md ? '24vw' : xs ? '64vw' : '90vw',
             height: xs
               ? notificationCenterPosition === 'left' ||
@@ -318,7 +339,7 @@ export const NotificationsHomeBody = () => {
         )} */}
           <PanelBody />
 
-          <PanelFooter />
+          {showBranding === true ? <PanelFooter /> : null}
         </Box>
       ) : preferenceMode === 'embed' ? (
         <ConfigPanel />

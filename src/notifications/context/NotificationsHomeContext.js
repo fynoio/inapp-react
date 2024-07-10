@@ -6,9 +6,10 @@ import { toast } from 'react-hot-toast'
 import socketIO from 'socket.io-client'
 
 import { ToastStructure } from '../components/NotificationsTabs'
-import { debounce, useTheme } from '@mui/material'
+import { debounce, useTheme, Typography } from '@mui/material'
 import useSound from 'use-sound'
-
+import isEqual from 'lodash/isEqual'
+import cloneDeep from 'lodash/cloneDeep'
 export const NotificationsHomeContext = React.createContext()
 
 export const useNotificationsHomeContext = () =>
@@ -21,15 +22,24 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     integration,
     signature,
     themeConfig,
+    globalChannels,
     notificationSettings,
     onMessageRecieved,
     onMessageClicked,
     overrideInappUrl
   } = props
+  const [isSeen, setIsSeen] = useState(true)
   const [userPreference, setUserPreference] = useState({})
-  const { logo, header, position, offset, preference_mode } = themeConfig
+  const {
+    logo,
+    header,
+    position,
+    offset,
+    preference_mode,
+    notification_center
+  } = themeConfig
   const [resetPreference, setResetPreference] = useState({})
-
+  const [showBranding, setShowBranding] = useState(true)
   const [close, setClose] = useState(false)
   const [errMsg, setErrMsg] = useState('')
   const [list, setList] = useState([])
@@ -45,8 +55,24 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   const [toastData, setToastData] = useState({})
   const [notificationCenterPosition] = useState(position || 'default')
   const [notificationCenterOffset] = useState(offset || 0)
-  const [preferenceMode] = useState(preference_mode || 'modal')
+  const [preferenceMode] = useState(preference_mode || 'none')
+  const [notificationCenterConfig] = useState(
+    notification_center || {
+      anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
+      transformOrigin: { vertical: 'top', horizontal: 'left' }
+    }
+  )
+
   const [openConfigUnsaved, setOpenConfigUnsaved] = useState(false)
+  const [globalChannelPreference, setGlobalChannelPreference] = useState(
+    globalChannels.reduce((acc, curr) => {
+      acc[curr] = false
+      return acc
+    }, {}) || {}
+  )
+  const [resetGlobalChannelPreference, setResetGlobalChannelPreference] =
+    useState({ ...globalChannelPreference })
+  const [updatedPreference, setUpdatedPreference] = useState({})
   const brandLogo = logo
   var soundEnabled = null
   if (notificationSettings && notificationSettings.sound) {
@@ -116,7 +142,8 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       auth: {
         user_id: user,
         WS_ID: workspace,
-        Integration_ID: integration
+        Integration_ID: integration,
+        'x-fyno-signature': signature
       },
       extraHeaders: {
         'x-fyno-signature': signature,
@@ -129,6 +156,11 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     })
     socket.on('connectionSuccess', (data) => {
       resetState()
+      if (data?.config?.branding === false) {
+        setShowBranding(data?.config?.branding)
+      } else {
+        setShowBranding(true)
+      }
       setSocketInstance(socket)
       socket.emit('get:messages', { filter: 'all', page: 1 })
     })
@@ -167,9 +199,8 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
     socket.on('statusUpdated', (status) => {
       handleChangeStatus(status)
     })
-    socket.on('lastSeenUpdated', (time) => {
-      // eslint-disable-next-line no-undef
-      localStorage.setItem('fynoinapp_ls', time)
+    socket.on('lastSeenUpdated', (data) => {
+      setIsSeen(data)
     })
     socket.on('tag:updated', (id) => {
       var id_done = ''
@@ -193,17 +224,47 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
 
     socket.on('preferences:state', (preference) => {
       setUserPreference(preference)
-      setShowConfig(!showConfig)
+      let newPref
+      setGlobalChannelPreference((prev) => {
+        if (!preference.result) return prev
+        else {
+          newPref = Object.entries(preference.result).reduce((acc, curr) => {
+            curr[1].map((value) => {
+              if (!value.is_global_opted_out) return acc
+              else {
+                acc = { ...acc, ...value.is_global_opted_out }
+              }
+            })
+            return acc
+          }, prev)
+          setResetGlobalChannelPreference(cloneDeep(newPref))
+          return newPref
+        }
+      })
+      setResetPreference(cloneDeep(preference))
+      setUpdatedPreference({})
+      setShowConfig((val) => {
+        return !val
+      })
+      setOpenConfigUnsaved(false)
     })
 
     socket.on('preference:update', () => {
-      toast.success('Channel preference updated', {
-        position: 'top-right',
-        duration: 2000,
-        style: {
-          color: theme.palette.text
+      toast.success(
+        () => (
+          <Typography sx={{ color: theme.palette.text.primary }}>
+            Channel preference updated
+          </Typography>
+        ),
+        {
+          position: 'top-center',
+          duration: 2000,
+          style: {
+            color: theme.palette.toasttext.primary
+          }
         }
-      })
+      )
+      socket.emit('get:preference')
     })
 
     return () => {
@@ -257,6 +318,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
   }
 
   const handleOpenPanel = (event) => {
+    socketInstance.emit('updateLastSeen')
     setAnchorEl(event.currentTarget)
   }
 
@@ -326,7 +388,13 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       userPreference,
       openConfigUnsaved,
       resetPreference,
-      preferenceMode
+      preferenceMode,
+      showBranding,
+      isSeen,
+      globalChannelPreference,
+      updatedPreference,
+      notificationCenterConfig,
+      resetGlobalChannelPreference
     },
     handlers: {
       handleClosePanel,
@@ -345,7 +413,10 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       setUserPreference,
       setShowConfig,
       setOpenConfigUnsaved,
-      setResetPreference
+      setResetPreference,
+      setGlobalChannelPreference,
+      setUpdatedPreference,
+      setResetGlobalChannelPreference
     }
   }
 
