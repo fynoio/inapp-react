@@ -17,6 +17,7 @@ import {
   Paper
 } from '@mui/material'
 import { useNotificationsHomeContext } from '../../context'
+import { LOGO_DARK, LOGO_LIGHT } from '../../helpers/constants'
 export const PanelHeader = () => {
   const theme = useTheme()
 
@@ -428,9 +429,8 @@ export const PanelBody = (props) => {
 }
 
 export const PanelFooter = () => {
-  const {
-    data: { showLoader }
-  } = useNotificationsHomeContext()
+  const theme = useTheme()
+
   return (
     <Box
       data-testid='noti-center-footer'
@@ -454,7 +454,7 @@ export const PanelFooter = () => {
           Powered By
         </Typography>
         <img
-          src='https://uploads-ssl.webflow.com/63735bad18c742035738e107/6399dab9fdfc2105b70def91_Fyno_logo_lettered.png'
+          src={theme.palette.mode === 'light' ? LOGO_LIGHT : LOGO_DARK}
           alt='Fyno'
           width='45px'
           height='auto'
