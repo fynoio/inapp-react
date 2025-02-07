@@ -65,7 +65,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
 
   const [openConfigUnsaved, setOpenConfigUnsaved] = useState(false)
   const [globalChannelPreference, setGlobalChannelPreference] = useState(
-    globalChannels.reduce((acc, curr) => {
+    globalChannels?.reduce((acc, curr) => {
       acc[curr] = false
       return acc
     }, {}) || {}
@@ -228,7 +228,7 @@ export const NotificationsHomeProvider = ({ children, ...props }) => {
       setGlobalChannelPreference((prev) => {
         if (!preference.result) return prev
         else {
-          newPref = Object.entries(preference.result).reduce((acc, curr) => {
+          newPref = Object.entries(preference.result)?.reduce((acc, curr) => {
             curr[1].map((value) => {
               if (!value.is_global_opted_out) return acc
               else {

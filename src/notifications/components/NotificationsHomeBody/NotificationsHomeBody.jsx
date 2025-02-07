@@ -1,12 +1,6 @@
-import React, { useState } from 'react'
+import React from 'react'
 
-import {
-  Close,
-  LinkOffOutlined,
-  Settings,
-  SettingsOutlined,
-  WifiOff
-} from '@mui/icons-material'
+import { Close, SettingsOutlined, WifiOff } from '@mui/icons-material'
 import {
   Box,
   IconButton,
@@ -14,14 +8,13 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
-  Tooltip,
-  Chip,
-  Checkbox
+  Tooltip
 } from '@mui/material'
 import { useNotificationsHomeContext } from '../../context'
 import ConfigPanel from '../ConfigPanel'
 import ConfigPopup from '../ConfigPopup'
 import NotificationsTabs from '../NotificationsTabs'
+import { LOGO_DARK, LOGO_LIGHT } from '../../helpers/constants'
 
 const CloseButton = () => {
   const theme = useTheme()
@@ -163,17 +156,10 @@ const PanelHeader = () => {
   } else return null
 }
 
-const PanelBody = () => {
-  const {
-    data: { showConfig }
-  } = useNotificationsHomeContext()
-  return <NotificationsTabs />
-}
+const PanelBody = () => <NotificationsTabs />
 
 const PanelFooter = () => {
-  const {
-    data: { showLoader }
-  } = useNotificationsHomeContext()
+  const theme = useTheme()
   return (
     <Box data-testid='noti-center-footer'>
       <Box
@@ -196,7 +182,7 @@ const PanelFooter = () => {
           Powered By
         </Typography>
         <img
-          src='https://uploads-ssl.webflow.com/63735bad18c742035738e107/6399dab9fdfc2105b70def91_Fyno_logo_lettered.png'
+          src={theme.palette.mode === 'light' ? LOGO_LIGHT : LOGO_DARK}
           alt='Fyno'
           width='45px'
           height='auto'
@@ -207,42 +193,12 @@ const PanelFooter = () => {
   )
 }
 
-const Error = () => {
-  const {
-    data: { errMsg }
-  } = useNotificationsHomeContext()
-  const theme = useTheme()
-  const xs = useMediaQuery(theme.breakpoints.up('sm'))
-
-  return (
-    <Box
-      sx={{
-        height: xs ? '39vh' : '58vh',
-        width: '100%',
-        color: theme.palette.secondary.main,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        pt: '20vh',
-        textAlign: 'center'
-      }}
-    >
-      <LinkOffOutlined fontSize='large' />
-      <Typography color='secondary' sx={{ width: '55%' }}>
-        {errMsg}
-      </Typography>
-    </Box>
-  )
-}
-
 export const NotificationsHomeBody = () => {
   const theme = useTheme()
 
   const {
     data: {
       anchorEl,
-      showLoader,
       showConfig,
       notificationCenterPosition,
       notificationCenterOffset,
