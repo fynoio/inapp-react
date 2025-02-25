@@ -97,3 +97,5 @@ dist
 
 #package-lock
 package-lock.json
+.vercel
+*.bkp

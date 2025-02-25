@@ -1,12 +1,6 @@
-import React, { useState } from 'react'
+import React from 'react'
 
-import {
-  Close,
-  LinkOffOutlined,
-  Settings,
-  SettingsOutlined,
-  WifiOff
-} from '@mui/icons-material'
+import { Close, SettingsOutlined, WifiOff } from '@mui/icons-material'
 import {
   Box,
   IconButton,
@@ -14,23 +8,24 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
-  Tooltip,
-  Chip,
-  Checkbox
+  Tooltip
 } from '@mui/material'
 import { useNotificationsHomeContext } from '../../context'
 import ConfigPanel from '../ConfigPanel'
 import ConfigPopup from '../ConfigPopup'
 import NotificationsTabs from '../NotificationsTabs'
+import CustomTooltip from '../CustomTooltip'
+import { LOGO_DARK, LOGO_LIGHT } from '../../helpers/constants'
 
 const CloseButton = () => {
   const theme = useTheme()
-
   const {
     data: { errMsg },
     handlers: { handleClosePanel }
   } = useNotificationsHomeContext()
+
   const xs = useMediaQuery(theme.breakpoints.up('sm'))
+
   if (!xs) {
     return (
       <IconButton
@@ -45,28 +40,23 @@ const CloseButton = () => {
         <Close fontSize='small' />
       </IconButton>
     )
-  } else return null
+  }
+  return null
 }
 
 const ConfigButton = () => {
   const theme = useTheme()
-
   const {
     data: { errMsg },
     handlers: { handleOpenConfig }
   } = useNotificationsHomeContext()
+
   return (
-    <IconButton
-      sx={{
-        color: errMsg
-          ? theme.palette.secondary.main
-          : theme.palette.text.primary
-      }}
-      onClick={handleOpenConfig}
-      size='small'
-    >
-      <SettingsOutlined fontSize='small' color='secondary' />
-    </IconButton>
+    <CustomTooltip title='Notification Preferences'>
+      <IconButton onClick={(e) => handleOpenConfig()}>
+        <SettingsOutlined fontSize='small' />
+      </IconButton>
+    </CustomTooltip>
   )
 }
 
@@ -74,9 +64,7 @@ const PanelHeader = () => {
   const {
     data: { errMsg, header, preferenceMode }
   } = useNotificationsHomeContext()
-
   const theme = useTheme()
-
   const xsUp = useMediaQuery(theme.breakpoints.up('sm'))
 
   if (header !== undefined || !xsUp) {
@@ -86,16 +74,16 @@ const PanelHeader = () => {
           display: 'flex',
           alignItems: 'center',
           width: 'auto',
-          pb: 1,
+          pb: !xsUp ? 1 : 0,
           pl: 3,
           pr: 3,
-          pt: 3,
+          pt: !xsUp ? 3 : 0,
           gap: 2
         }}
         data-testid='noti-center-header'
         className='notification-center-header'
       >
-        <Typography variant='h5' className='header-text'>
+        <Typography variant='h6' className='header-text'>
           {header === true || header === '' || (!header && !xsUp)
             ? 'Notifications'
             : header}
@@ -109,15 +97,17 @@ const PanelHeader = () => {
           }}
         >
           {errMsg === 'xhr poll error' ? (
-            <Tooltip title='You are offline now, please check your internet'>
+            <CustomTooltip title='You are offline now, please check your internet'>
               <WifiOff color='secondary' />
-            </Tooltip>
+            </CustomTooltip>
           ) : (
             <Box />
           )}
           <CloseButton color='secondary' />
         </Box>
-        {preferenceMode !== 'none' && <ConfigButton color='secondary' />}
+        {preferenceMode !== 'none' && header && xsUp && (
+          <ConfigButton color='secondary' />
+        )}
       </Box>
     )
   }
@@ -136,7 +126,7 @@ const PanelHeader = () => {
           background: 'rgba(0,0,0,0.2)'
         }}
       >
-        <Tooltip title='You are offline now, please check your internet'>
+        <CustomTooltip title='You are offline now, please check your internet'>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <WifiOff
               sx={{
@@ -155,48 +145,40 @@ const PanelHeader = () => {
               Offline
             </Typography>
           </Box>
-        </Tooltip>
+        </CustomTooltip>
         <CloseButton />
-        <ConfigButton />
       </Box>
     )
   } else return null
 }
 
-const PanelBody = () => {
-  const {
-    data: { showConfig }
-  } = useNotificationsHomeContext()
-  return <NotificationsTabs />
-}
+const PanelBody = () => <NotificationsTabs />
 
 const PanelFooter = () => {
-  const {
-    data: { showLoader }
-  } = useNotificationsHomeContext()
+  const theme = useTheme()
   return (
-    <Box data-testid='noti-center-footer'>
+    <Box
+      data-testid='noti-center-footer'
+      sx={{ width: '100%', height: 30, position: 'absolute', bottom: '0' }}
+    >
       <Box
-        date-testid='noti-center-footer'
+        date-testid='noti-center-footer-inner'
         sx={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          // py: 0.7,
           gap: 0.5,
-          height: '2.25vh',
-          position: 'relative',
-          bottom: 0,
+          height: '100%',
           left: 0,
           right: 0,
-          background: (theme) => theme.palette.background.paper
+          background: (theme) => theme.palette.background.configBackground
         }}
       >
         <Typography sx={{ fontSize: '0.7rem', filter: 'opacity(.5)' }}>
           Powered By
         </Typography>
         <img
-          src='https://uploads-ssl.webflow.com/63735bad18c742035738e107/6399dab9fdfc2105b70def91_Fyno_logo_lettered.png'
+          src={theme.palette.mode === 'light' ? LOGO_LIGHT : LOGO_DARK}
           alt='Fyno'
           width='45px'
           height='auto'
@@ -207,42 +189,11 @@ const PanelFooter = () => {
   )
 }
 
-const Error = () => {
-  const {
-    data: { errMsg }
-  } = useNotificationsHomeContext()
-  const theme = useTheme()
-  const xs = useMediaQuery(theme.breakpoints.up('sm'))
-
-  return (
-    <Box
-      sx={{
-        height: xs ? '39vh' : '58vh',
-        width: '100%',
-        color: theme.palette.secondary.main,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        pt: '20vh',
-        textAlign: 'center'
-      }}
-    >
-      <LinkOffOutlined fontSize='large' />
-      <Typography color='secondary' sx={{ width: '55%' }}>
-        {errMsg}
-      </Typography>
-    </Box>
-  )
-}
-
 export const NotificationsHomeBody = () => {
   const theme = useTheme()
-
   const {
     data: {
       anchorEl,
-      showLoader,
       showConfig,
       notificationCenterPosition,
       notificationCenterOffset,
@@ -299,7 +250,11 @@ export const NotificationsHomeBody = () => {
         <Box
           data-testid='Hello'
           className='notification-panel'
+          justifyContent={'center'}
           sx={{
+            display: 'flex',
+            alignContent: 'start',
+            flexDirection: 'column',
             boxSizing: 'content-box',
             boxShadow:
               '0px 5px 5px -3px rgba(0,0,0,0.2), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)',
@@ -309,7 +264,7 @@ export const NotificationsHomeBody = () => {
               ? notificationCenterPosition === 'left' ||
                 notificationCenterPosition === 'right'
                 ? '100%'
-                : '70vh'
+                : '68vh'
               : '100%',
             background: theme.palette.background.paper,
             position:

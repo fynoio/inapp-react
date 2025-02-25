@@ -108,7 +108,11 @@ export const GlobalPreference = ({ channels }) => {
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
             <Typography
               variant='text'
-              sx={{ fontSize: '14px', fontWeight: 600 }}
+              sx={{
+                fontSize: '14px',
+                fontWeight: 600,
+                fontFamily: theme.typography.fontFamily
+              }}
               color={theme.palette.text.primary}
             >
               Notify me on {getFormattedLabel(channel)}
@@ -116,7 +120,11 @@ export const GlobalPreference = ({ channels }) => {
             {globalChannelPreference[channel] ? (
               <Typography
                 variant='text'
-                sx={{ fontSize: '12px', fontWeight: 400 }}
+                sx={{
+                  fontSize: '12px',
+                  fontWeight: 300,
+                  fontFamily: theme.typography.fontFamily
+                }}
                 color={theme.palette.text.primary}
               >
                 By enabling this, you will receive communications as per your
@@ -125,7 +133,11 @@ export const GlobalPreference = ({ channels }) => {
             ) : (
               <Typography
                 variant='text'
-                sx={{ fontSize: '12px', fontWeight: 400 }}
+                sx={{
+                  fontSize: '12px',
+                  fontWeight: 300,
+                  fontFamily: theme.typography.fontFamily
+                }}
                 color={theme.palette.text.primary}
               >
                 By opting out, you won't receive any communications on this
