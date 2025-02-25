@@ -1,6 +1,6 @@
 {
   "name": "@fyno/inapp-react",
-  "version": "1.1.2",
+  "version": "1.2.5",
   "description": "React SDK for invoking Fyno inapp notifications center",
   "author": "Fyno",
   "license": "MIT",
@@ -66,6 +66,7 @@
     "@mui/material": "^5.11.14",
     "@mui/styled-engine": "^5.11.11",
     "@mui/system": "^5.15.15",
+    "bufferutil": "^4.0.8",
     "html-react-parser": "^3.0.15",
     "moment": "^2.29.4",
     "react-hot-toast": "^2.4.0",

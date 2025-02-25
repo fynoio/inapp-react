@@ -5,7 +5,6 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
-  Tooltip,
   Link,
   Icon,
   Chip,
@@ -34,6 +33,7 @@ import {
   PanelBody,
   PreferenceSaveButton
 } from '../ConfigComponents'
+import CustomTooltip from '../CustomTooltip'
 //INFO: Not using this
 // function getDifferentPreferences(newConfig, oldConfig) {
 //   const differentPreferences = {}
@@ -117,7 +117,7 @@ import {
 //   }
 //   const getHeight = () => {
 //     if (!xs) {
-//       return '70vh'
+//       return '69vh'
 //     }
 //     let height = 62
 //     return `${height}vh`
@@ -474,7 +474,7 @@ export const ConfigPopup = () => {
           fontSize: '16px'
         }}
       >
-        Notification Settings
+        Notification Preferences
       </DialogTitle>
       <IconButton
         aria-label='close'
@@ -505,7 +505,7 @@ export const ConfigPopup = () => {
         !isEqual(globalChannelPreference, resetGlobalChannelPreference) ? (
           <PreferenceSaveButton varient='contained' />
         ) : (
-          <Tooltip title='No changes to save' placement='right'>
+          <CustomTooltip title='No changes to save' placement='right'>
             <Box sx={{ m: 1, position: 'relative', flexGrow: '1' }}>
               <Button
                 disableElevation
@@ -524,7 +524,7 @@ export const ConfigPopup = () => {
                 Save
               </Button>
             </Box>
-          </Tooltip>
+          </CustomTooltip>
         )}
       </DialogActions>
     </Dialog>

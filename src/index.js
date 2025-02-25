@@ -1,14 +1,15 @@
-import { Toaster } from 'react-hot-toast'
+import toast, { Toaster, useToasterStore } from 'react-hot-toast'
 import NotificationHomeWrapper from './notifications/components/NotificationsHomeWrapper'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
-import React from 'react'
+import React, { useEffect } from 'react'
 import './styles.module.css'
+import { hexToRGBA } from './notifications/helpers/hextoRGBA'
 
 export const FynoInappCenter = (props) => {
   const { mode, themeConfig, notificationSettings } = props
 
-  const lightColor = '58, 53, 65'
-  const darkColor = '231, 227, 252'
+  const lightColor = '53,65,63'
+  const darkColor = '227, 252, 251'
   const mainColor =
     mode === 'light'
       ? themeConfig?.lightColor || lightColor
@@ -16,14 +17,26 @@ export const FynoInappCenter = (props) => {
 
   const defaultBgColor = () => {
     if (mode === 'light') {
-      return '#FFF'
-    } else return '#231F37'
+      return '#F2F2F2'
+    } else return '#0D0D0D'
   }
+
+  const teal = {
+    50: '#e6f2f2',
+    100: '#b0d8d8',
+    200: '#8ac5c5',
+    300: '#54aaaa',
+    400: '#339999',
+    500: '#008080',
+    600: '#007474',
+    700: '#005b5b',
+    800: '#004646',
+    900: '#003636'
+  }
+
   const theme = createTheme({
     typography: {
-      fontFamily:
-        themeConfig.font ||
-        ['Inter', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'].join(',')
+      fontFamily: themeConfig?.font || ['Inter'].join(',')
     },
     palette: {
       common: {
@@ -32,64 +45,66 @@ export const FynoInappCenter = (props) => {
       },
       mode: mode,
       primary: {
-        main: themeConfig?.primary || '#9155FD',
+        main:
+          themeConfig?.primary || mode === 'light' ? teal['500'] : '#18A5A5',
         contrastText: '#FFF'
       },
       secondary: {
-        main: themeConfig?.secondary || '#AAA6BF',
+        main:
+          themeConfig?.secondary || mode === 'light' ? '#5B5B5B' : '#B2B2B2',
         contrastText: '#FFF'
       },
       text: {
-        primary: mode === 'light' ? '#474550' : '#E8E4FC',
-        secondary: mode === 'light' ? '#5A5761' : '#AAA6BF',
-        disabled: mode === 'light' ? '#ADACB4' : '#84818F',
-        border: mode === 'light' ? '#C8C7CA' : '#8782A0'
+        primary: mode === 'light' ? '#1A1A1A' : '#F2F2F2',
+        secondary: mode === 'light' ? '#595959' : '#B2B2B2',
+        disabled: mode === 'light' ? '#A6A6A6' : '#737373',
+        border: mode === 'light' ? '#00000033' : '#FFFFFF4D'
       },
       toasttext: {
         primary:
           mode === 'light'
             ? notificationSettings?.invertTheme
-              ? '#E8E4FC'
-              : '#474550'
+              ? '#F2F2F2'
+              : '#1A1A1A'
             : notificationSettings?.invertTheme
-            ? '#474550'
-            : '#E8E4FC',
+            ? '#1A1A1A'
+            : '#F2F2F2',
         secondary:
           mode === 'light'
             ? notificationSettings?.invertTheme
-              ? '#AAA6BF'
-              : '#5A5761'
+              ? '#B2B2B2'
+              : '#595959'
             : notificationSettings?.invertTheme
-            ? '#5A5761'
-            : '#AAA6BF',
-        disabled: mode === 'light' ? '#ADACB4' : '#84818F',
-        border: mode === 'light' ? '#C8C7CA' : '#8782A0'
+            ? '#595959'
+            : '#B2B2B2',
+        disabled: mode === 'light' ? '#A6A6A6' : '#737373',
+        border: mode === 'light' ? '#00000033' : '#FFFFFF4D'
       },
       divider: `rgba(${mainColor}, 0.12)`,
       background: {
         paper:
           mode === 'light'
-            ? themeConfig?.lightBackground || '#FFF'
-            : themeConfig?.darkBackground || '#3B345D',
+            ? themeConfig?.lightBackground || '#FCFCFC'
+            : themeConfig?.darkBackground || '#1a1a1a',
         inverted:
           mode === 'dark'
-            ? themeConfig?.lightBackground || '#FFF'
-            : themeConfig?.darkBackground || '#3B345D',
+            ? themeConfig?.lightBackground || '#FCFCFC'
+            : themeConfig?.darkBackground || '#1a1a1a',
         default: defaultBgColor(),
         configBackground:
           mode === 'light'
-            ? themeConfig?.lightConfigBackground || '#FFF'
-            : themeConfig?.darkConfigBackground || '#3B345D',
+            ? themeConfig?.lightConfigBackground || '#FCFCFC'
+            : themeConfig?.darkConfigBackground || '#1a1a1a',
         configSection:
           mode === 'light'
-            ? themeConfig?.lightConfigSectionBackground || '#F4F5FA'
-            : themeConfig?.darkConfigSectionBackground || '#231F37'
+            ? themeConfig?.lightConfigSectionBackground || '#FCFCFC'
+            : themeConfig?.darkConfigSectionBackground || '#0D0D0D'
       },
       inverted: {
         paper:
           mode === 'dark'
-            ? themeConfig?.lightBackground || '#FFF'
-            : themeConfig?.darkBackground || '#3B345D',
+            ? themeConfig?.lightBackground || '#FCFCFC'
+            : themeConfig?.darkBackground || '#1a1a1a',
         default: defaultBgColor()
       },
       action: {
@@ -101,15 +116,24 @@ export const FynoInappCenter = (props) => {
       },
       chip: {
         background: themeConfig?.primary
-          ? `${themeConfig?.primary}2F`
-          : '#9155FD2F'
+          ? `${hexToRGBA(themeConfig?.primary, 0.8)}`
+          : hexToRGBA(mode === 'light' ? teal['500'] : '#18A5A5', 0.8)
       }
     }
   })
+  const { toasts } = useToasterStore()
+
+  useEffect(() => {
+    toasts
+      .filter((t) => t.visible)
+      .filter((_, i) => i >= (notificationSettings?.maxToastCount || 3))
+      .forEach((t) => toast.dismiss(t.id))
+  }, [toasts])
   return (
     <ThemeProvider theme={theme}>
       <NotificationHomeWrapper {...props} />
       <Toaster
+        containerClassName='react-hot-toast'
         position={notificationSettings?.toastPosition || 'top-right'}
         toastOptions={{
           duration: notificationSettings?.duration || 5000,
@@ -127,6 +151,15 @@ export const FynoInappCenter = (props) => {
   )
 }
 
-export const FynoToast = (config) => (
-  <Toaster {...config} reverseOrder={false} />
-)
+export const FynoToast = (config) => {
+  const { toasts } = useToasterStore()
+
+  useEffect(() => {
+    toasts
+      .filter((t) => t.visible)
+      .filter((_, i) => i >= (notificationSettings?.maxToastCount || 3))
+      .forEach((t) => toast.dismiss(t.id))
+  }, [toasts])
+
+  return <Toaster {...config} reverseOrder={false} />
+}

@@ -236,22 +236,26 @@ const MainBody = ({ body, title }) => {
       }}
     >
       <Box>
-        <Typography
-          fontSize='0.85rem'
-          fontWeight={600}
-          color={theme.palette.text.primary}
-          className='notification-title'
-        >
-          {title}
-        </Typography>
-        <Typography
-          fontSize='0.8rem'
-          fontWeight={200}
-          color={theme.palette.text.primary}
-          className='notification-body'
-        >
-          {parse(renderBody)}
-        </Typography>
+        {title && (
+          <Typography
+            fontSize='14px'
+            fontWeight={600}
+            color={theme.palette.text.primary}
+            className='notification-title'
+          >
+            {title}
+          </Typography>
+        )}
+        {body && (
+          <Typography
+            fontSize='12px'
+            fontWeight={300}
+            color={theme.palette.text.primary}
+            className='notification-body'
+          >
+            {parse(renderBody)}
+          </Typography>
+        )}
       </Box>
     </Box>
   )
@@ -337,11 +341,15 @@ const NotificationFooter = ({ createdAt, msg }) => {
                 setOpenMenu(false)
               }}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <DoneAll fontSize='0.6rem' /> Mark as read
+              <Box
+                sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 0 }}
+              >
+                <DoneAll fontSize='0.6rem' />{' '}
+                <Typography variant='small' fontSize='0.8rem'>
+                  Mark as Read
+                </Typography>
               </Box>
             </MenuItem>
-            <Divider />
           </Box>
         )}
         <MenuItem
@@ -357,11 +365,14 @@ const NotificationFooter = ({ createdAt, msg }) => {
               display: 'flex',
               alignItems: 'center',
               gap: 2,
-              py: 1,
+              py: 0,
               color: theme?.palette?.error?.main
             }}
           >
-            <DeleteOutline color='error' fontSize='0.6rem' /> Delete
+            <DeleteOutline color='error' fontSize='0.6rem' />
+            <Typography variant='small' fontSize='0.8rem'>
+              Delete
+            </Typography>
           </Box>
         </MenuItem>
       </Menu>
@@ -443,14 +454,15 @@ const ActionsComponent = ({ item }) => {
     handlers: { handleMarkAsRead }
   } = useNotificationsHomeContext()
   const buttons = item?.notification_content?.buttons
-
+  const message = item
   if (buttons?.length > 0) {
     return (
       <Grid
         container
         flexDirection='row-reverse'
         justifyContent='flex-end'
-        sx={{ gap: 1, mt: 1 }}
+        gap={1}
+        sx={{ mt: 1 }}
         className='buttons-section'
       >
         {buttons.map((item, index) => {
@@ -464,7 +476,7 @@ const ActionsComponent = ({ item }) => {
                 style={{ textDecoration: 'none' }}
                 onClick={(e) => {
                   e.stopPropagation()
-                  handleMarkAsRead(item)
+                  handleMarkAsRead(message)
                 }}
                 rel='noreferrer'
               >
@@ -488,7 +500,7 @@ const ActionsComponent = ({ item }) => {
                 style={{ textDecoration: 'none' }}
                 onClick={(e) => {
                   e.stopPropagation()
-                  handleMarkAsRead(item)
+                  handleMarkAsRead(message)
                 }}
                 rel='noreferrer'
               >
@@ -583,27 +595,39 @@ const NotificationItem = ({ item }) => {
           className='notification-icon'
         />
       </Grid>
-      <Grid item xs={7.7} className='notification-content'>
+      <Grid
+        item
+        xs={attachmentsObject ? 8 : 9.8}
+        className='notification-content'
+      >
         <MainBody title={title} body={body} />
         <ActionsComponent item={item} />
       </Grid>
-      <Grid item xs={2}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-end',
-            justifyContent: 'space-between'
-          }}
-        >
-          <LinkWrapper item={item} link={attachmentLink} hover sameTab='false'>
-            <AttachmentComponent
-              type={type}
-              attachmentsObject={attachmentsObject}
-            />
-          </LinkWrapper>
-        </Box>
-      </Grid>
+      {attachmentsObject && (
+        <Grid item xs={2}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              justifyContent: 'space-between'
+            }}
+          >
+            <LinkWrapper
+              item={item}
+              link={attachmentLink}
+              hover
+              sameTab='false'
+            >
+              <AttachmentComponent
+                type={type}
+                attachmentsObject={attachmentsObject}
+              />
+            </LinkWrapper>
+          </Box>
+        </Grid>
+      )}
+
       <Grid item xs={12}>
         <NotificationFooter createdAt={createdAt} msg={item} />
       </Grid>
@@ -638,7 +662,7 @@ const EmptyList = () => {
 
   const getHeight = () => {
     if (!xs) {
-      return '70vh'
+      return '69vh'
     }
     let height = 62
     if (xs) {
@@ -784,7 +808,7 @@ export const NotificationsList = ({ filter }) => {
   // eslint-disable-next-line no-unused-vars
   const getHeight = () => {
     if (!xs) {
-      return '70vh'
+      return '69vh'
     }
     let height = 62
     if (xs) {
@@ -807,7 +831,7 @@ export const NotificationsList = ({ filter }) => {
               : showBranding
               ? '62.75vh'
               : '64.75vh'
-            : '70vh',
+            : '69vh',
           position: 'relative',
           overflowY: 'auto',
           scrollBehavior: 'auto'

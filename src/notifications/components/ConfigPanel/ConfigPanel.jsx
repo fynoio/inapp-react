@@ -1,19 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import {
-  Box,
-  IconButton,
-  Typography,
-  useMediaQuery,
-  useTheme,
-  Tooltip,
-  Icon,
-  Chip,
-  Button,
-  Collapse,
-  CircularProgress,
-  Paper,
-  Switch
-} from '@mui/material'
+import { Box, useMediaQuery, useTheme } from '@mui/material'
 import { useNotificationsHomeContext } from '../../context'
 
 import { PanelHeader, PanelBody, PanelFooter } from '../ConfigComponents'
@@ -45,7 +31,7 @@ export const ConfigPanel = () => {
           ? notificationCenterPosition === 'left' ||
             notificationCenterPosition === 'right'
             ? '100%'
-            : '70vh'
+            : '69vh'
           : '100%',
         background: theme.palette.background.configBackground,
         position:

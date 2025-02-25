@@ -29,6 +29,7 @@ import { useNotificationsHomeContext } from '../../context'
 
 import NotificationsList from '../NotificationsList'
 import { hexToRGBA } from '../../helpers/hextoRGBA'
+import CustomTooltip from '../CustomTooltip'
 
 const DocumentComponent = ({ docType = 'txt' }) => {
   const theme = useTheme()
@@ -429,25 +430,25 @@ const Actions = () => {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
       {list?.length > 0 && unreadList?.length > 0 && (
-        <Tooltip title='Mark all as read'>
+        <CustomTooltip title='Mark all as read'>
           <IconButton onClick={(e) => handleMarkAllAsRead(e)}>
             <DoneAll />
           </IconButton>
-        </Tooltip>
+        </CustomTooltip>
       )}
       {list?.length > 0 && (
-        <Tooltip title='Delete all'>
+        <CustomTooltip title='Delete all'>
           <IconButton onClick={(e) => handleClickDelete(e)}>
             <DeleteSweepOutlined />
           </IconButton>
-        </Tooltip>
+        </CustomTooltip>
       )}
-      {!header && xsUp && preferenceMode !== 'none' && (
-        <Tooltip title='Channel preference'>
+      {((!header && !header !== '') || !xsUp) && preferenceMode != 'none' && (
+        <CustomTooltip title='Notification Preferences'>
           <IconButton onClick={(e) => handleOpenConfig()}>
-            <SettingsOutlined fontSize='small' color='secondary' />
+            <SettingsOutlined fontSize='small' />
           </IconButton>
-        </Tooltip>
+        </CustomTooltip>
       )}
     </Box>
   )
@@ -498,10 +499,10 @@ export const NotificationsTabs = () => {
         <Actions />
       </Box>
       <Divider sx={{ mt: 0, mb: 0 }} />
-      <TabPanel value='all' sx={{ p: 0 }}>
+      <TabPanel value='all' sx={{ p: 0, minWidth: 'inherit' }}>
         <NotificationsList filter={false} />
       </TabPanel>
-      <TabPanel value='unread' sx={{ p: 0 }}>
+      <TabPanel value='unread' sx={{ p: 0, minWidth: 'inherit' }}>
         <NotificationsList filter />
       </TabPanel>
     </TabContext>
