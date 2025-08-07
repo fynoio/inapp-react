@@ -2,22 +2,19 @@
 import React, { useEffect, useRef, useState } from 'react'
 import parse from 'html-react-parser'
 import { useInView } from 'react-intersection-observer'
-import {
-  Check,
-  Close,
-  DeleteOutline,
-  DoneAll,
-  HourglassEmpty,
-  LibraryBooks,
-  MoreHoriz
-} from '@mui/icons-material'
-import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import MemoClose from '../Icons/Close'
+import MemoCheck from '../Icons/Check'
+import MemoDeleteOutline from '../Icons/DeleteOutline'
+import MemoDoneAll from '../Icons/DoneAll'
+import MemoHourglassEmpty from '../Icons/HourglassEmpty'
+import MemoLibraryBooks from '../Icons/LibraryBooks'
+import MemoMoreHoriz from '../Icons/MoreHoriz'
+import MemoOpenInNewIcon from '../Icons/OpenInNew'
 import {
   Box,
   Button,
   ClickAwayListener,
   Collapse,
-  Divider,
   Grid,
   IconButton,
   Menu,
@@ -29,6 +26,7 @@ import {
 } from '@mui/material'
 import { useNotificationsHomeContext } from '../../context'
 import moment from 'moment'
+import ReadMoreTypography from '../ReadMoreTypography'
 const DocumentComponent = ({ docType = 'txt' }) => {
   const theme = useTheme()
   const isDarkMode = theme.palette.mode === 'dark'
@@ -96,7 +94,7 @@ const DocumentComponent = ({ docType = 'txt' }) => {
 
   return (
     <Box sx={{ ...boxStyles }} className={`notification-attachment ${docType}`}>
-      <LibraryBooks fontSize='small' />
+      <MemoLibraryBooks fontSize='small' />
       <Typography sx={{ fontSize: '0.6rem' }} className='attachemnt-name'>
         {temp[docType]?.title || docType.toUpperCase()}
       </Typography>
@@ -140,16 +138,73 @@ const AttachmentComponent = ({ type, attachmentsObject, showBlur }) => {
   }
 }
 
+const sanitizeHtml = (html) => {
+  const safeTags = [
+    'p',
+    'br',
+    'b',
+    'i',
+    's',
+    'u',
+    'strong',
+    'em',
+    'a',
+    'tt',
+    'span',
+    'div',
+    'code',
+    'pre',
+    'ul',
+    'ol',
+    'li',
+    'blockquote',
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6'
+  ]
+
+  const safeProtocols = ['http:', 'https:', 'mailto:', 'tel:']
+
+  return html.replace(
+    /<\/?([a-z0-9]+)(\s[^>]*)?>/gi,
+    (match, tagName, attrs) => {
+      tagName = tagName.toLowerCase()
+
+      if (safeTags.includes(tagName)) {
+        return match
+      }
+
+      if (tagName === 'a') {
+        const hrefMatch = /href\s*=\s*["']([^"']+)["']/i.exec(attrs || '')
+        const href = hrefMatch?.[1]
+        try {
+          const url = new URL(href, 'https://dummy.com')
+          if (safeProtocols.includes(url.protocol)) {
+            return `<a href="${url.href}">`
+          }
+        } catch (_) {
+          return '&lt;a&gt;'
+        }
+      }
+
+      // Not a safe tag — escape it
+      return match.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    }
+  )
+}
 const preview = (value, list) => {
   if (value) {
     var preview_val = value
     for (const key in list) {
-      const regex = new RegExp(key, list[key].scope)
+      const regex = new RegExp(key, list[key]?.scope)
       preview_val =
         typeof preview_val === 'string'
-          ? preview_val?.replace(regex, list[key].with)
+          ? preview_val?.replace(regex, list[key]?.with)
           : preview_val?.map((item) => {
-              return item?.replace(regex, list[key].with)
+              return item?.replace(regex, list[key]?.with)
             })
     }
 
@@ -179,7 +234,7 @@ const preview = (value, list) => {
     for (let i = 0; i < replace?.length; i++) {
       preview_val = preview_val.replace(replace[i], replace_with[i])
     }
-    return preview_val
+    return sanitizeHtml(preview_val)
   } else {
     return ''
   }
@@ -191,14 +246,6 @@ const MainBody = ({ body, title }) => {
     '&': {
       scope: 'g',
       with: '&amp;'
-    },
-    '<': {
-      scope: 'g',
-      with: '&lt;'
-    },
-    '>': {
-      scope: 'g',
-      with: '&gt;'
     },
     '"': {
       scope: 'g',
@@ -236,22 +283,27 @@ const MainBody = ({ body, title }) => {
       }}
     >
       <Box>
-        <Typography
-          fontSize='0.85rem'
-          fontWeight={600}
-          color={theme.palette.text.primary}
-          className='notification-title'
-        >
-          {title}
-        </Typography>
-        <Typography
-          fontSize='0.8rem'
-          fontWeight={200}
-          color={theme.palette.text.primary}
-          className='notification-body'
-        >
-          {parse(renderBody)}
-        </Typography>
+        {title && (
+          <Typography
+            fontSize='14px'
+            fontWeight={600}
+            color={theme.palette.text.primary}
+            className='notification-title'
+          >
+            {parse(preview(title, list))}
+          </Typography>
+        )}
+        {body && (
+          // <Typography
+          //   fontSize='12px'
+          //   fontWeight={300}
+          //   color={theme.palette.text.primary}
+          //   className='notification-body'
+          // >
+          //   {parse(renderBody)}
+          // </Typography>
+          <ReadMoreTypography renderBody={renderBody} />
+        )}
       </Box>
     </Box>
   )
@@ -289,7 +341,7 @@ const NotificationFooter = ({ createdAt, msg }) => {
       >
         {moment.parseZone(createdAt).fromNow()}
       </Typography>
-      <MoreHoriz
+      <MemoMoreHoriz
         color='secondary'
         ref={buttonRef}
         onClick={(e) => {
@@ -337,11 +389,15 @@ const NotificationFooter = ({ createdAt, msg }) => {
                 setOpenMenu(false)
               }}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <DoneAll fontSize='0.6rem' /> Mark as read
+              <Box
+                sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 0 }}
+              >
+                <MemoDoneAll fontSize='0.6rem' />{' '}
+                <Typography variant='small' fontSize={'0.8rem'}>
+                  Mark as read
+                </Typography>
               </Box>
             </MenuItem>
-            <Divider />
           </Box>
         )}
         <MenuItem
@@ -357,11 +413,14 @@ const NotificationFooter = ({ createdAt, msg }) => {
               display: 'flex',
               alignItems: 'center',
               gap: 2,
-              py: 1,
+              py: 0,
               color: theme?.palette?.error?.main
             }}
           >
-            <DeleteOutline color='error' fontSize='0.6rem' /> Delete
+            <MemoDeleteOutline color='error' fontSize='0.6rem' />
+            <Typography variant='small' fontSize='0.8rem'>
+              Delete
+            </Typography>
           </Box>
         </MenuItem>
       </Menu>
@@ -406,6 +465,13 @@ export const LinkWrapper = ({
     <Box
       onClick={(e) => {
         handleMarkAsRead(item)
+        if (sameTab === 'true') {
+          window.open(link, '_self')
+        } else {
+          window.open(link, '_blank')
+        }
+        e.stopPropagation()
+        e.preventDefault()
       }}
       sx={{ position: 'relative' }}
     >
@@ -419,7 +485,7 @@ export const LinkWrapper = ({
             setShowBlur(false)
           }}
         >
-          <OpenInNewIcon fontSize='small' />
+          <MemoOpenInNewIcon fontSize='small' />
         </Box>
       )}
       <Box
@@ -443,14 +509,15 @@ const ActionsComponent = ({ item }) => {
     handlers: { handleMarkAsRead }
   } = useNotificationsHomeContext()
   const buttons = item?.notification_content?.buttons
-
+  const message = item
   if (buttons?.length > 0) {
     return (
       <Grid
         container
         flexDirection='row-reverse'
         justifyContent='flex-end'
-        sx={{ gap: 1, mt: 1 }}
+        gap={1}
+        sx={{ mt: 1 }}
         className='buttons-section'
       >
         {buttons.map((item, index) => {
@@ -464,7 +531,7 @@ const ActionsComponent = ({ item }) => {
                 style={{ textDecoration: 'none' }}
                 onClick={(e) => {
                   e.stopPropagation()
-                  handleMarkAsRead(item)
+                  handleMarkAsRead(message)
                 }}
                 rel='noreferrer'
               >
@@ -488,7 +555,7 @@ const ActionsComponent = ({ item }) => {
                 style={{ textDecoration: 'none' }}
                 onClick={(e) => {
                   e.stopPropagation()
-                  handleMarkAsRead(item)
+                  handleMarkAsRead(message)
                 }}
                 rel='noreferrer'
               >
@@ -583,27 +650,38 @@ const NotificationItem = ({ item }) => {
           className='notification-icon'
         />
       </Grid>
-      <Grid item xs={7.7} className='notification-content'>
+      <Grid
+        item
+        xs={attachmentsObject ? 8 : 9.8}
+        className='notification-content'
+      >
         <MainBody title={title} body={body} />
         <ActionsComponent item={item} />
       </Grid>
-      <Grid item xs={2}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-end',
-            justifyContent: 'space-between'
-          }}
-        >
-          <LinkWrapper item={item} link={attachmentLink} hover sameTab='false'>
-            <AttachmentComponent
-              type={type}
-              attachmentsObject={attachmentsObject}
-            />
-          </LinkWrapper>
-        </Box>
-      </Grid>
+      {attachmentsObject && (
+        <Grid item xs={2}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              justifyContent: 'space-between'
+            }}
+          >
+            <LinkWrapper
+              item={item}
+              link={attachmentLink}
+              hover
+              sameTab='false'
+            >
+              <AttachmentComponent
+                type={type}
+                attachmentsObject={attachmentsObject}
+              />
+            </LinkWrapper>
+          </Box>
+        </Grid>
+      )}
       <Grid item xs={12}>
         <NotificationFooter createdAt={createdAt} msg={item} />
       </Grid>
@@ -638,7 +716,7 @@ const EmptyList = () => {
 
   const getHeight = () => {
     if (!xs) {
-      return '70vh'
+      return '69vh'
     }
     let height = 62
     if (xs) {
@@ -703,16 +781,16 @@ const EmptyList = () => {
                 size='small'
                 onClick={(e) => deleteAllMessages(e)}
               >
-                <Check />
+                <MemoCheck />
               </IconButton>
               <IconButton size='small' onClick={(e) => handleClickDelete(e)}>
-                <Close />
+                <MemoClose />
               </IconButton>
             </Box>
           </Paper>
         </ClickAwayWrapper>
       </Collapse>
-      <HourglassEmpty fontSize='large' />
+      <MemoHourglassEmpty fontSize='large' />
       <Typography
         color='secondary'
         sx={{ width: '50%', mb: tabIsUnread ? 0 : 3.1 }}
@@ -740,8 +818,17 @@ export const NotificationsList = ({ filter }) => {
       notificationCenterPosition,
       showBranding
     },
-    handlers: { loadMoreNotifications, deleteAllMessages, handleClickDelete }
+    handlers: {
+      loadMoreNotifications,
+      deleteAllMessages,
+      handleClickDelete,
+      setAnchorDeleteEl
+    }
   } = useNotificationsHomeContext()
+
+  useEffect(() => {
+    setAnchorDeleteEl(false)
+  }, [tabPanelValue])
 
   const mapperList = filter ? unreadList : list
 
@@ -784,7 +871,7 @@ export const NotificationsList = ({ filter }) => {
   // eslint-disable-next-line no-unused-vars
   const getHeight = () => {
     if (!xs) {
-      return '70vh'
+      return '69vh'
     }
     let height = 62
     if (xs) {
@@ -807,7 +894,7 @@ export const NotificationsList = ({ filter }) => {
               : showBranding
               ? '62.75vh'
               : '64.75vh'
-            : '70vh',
+            : '69vh',
           position: 'relative',
           overflowY: 'auto',
           scrollBehavior: 'auto'
@@ -851,10 +938,10 @@ export const NotificationsList = ({ filter }) => {
                   size='small'
                   onClick={(e) => deleteAllMessages(e)}
                 >
-                  <Check />
+                  <MemoCheck />
                 </IconButton>
                 <IconButton size='small' onClick={(e) => handleClickDelete(e)}>
-                  <Close />
+                  <MemoClose />
                 </IconButton>
               </Box>
             </Paper>

@@ -1,7 +1,10 @@
 import React from 'react'
 import { Box, Typography, useTheme, Tooltip, Icon, Chip } from '@mui/material'
-import { Lock, CheckCircle } from '@mui/icons-material'
+import MemoLock from '../Icons/Lock'
+import MemoCheckCircle from '../Icons/CheckCircle'
 import { useNotificationsHomeContext } from '../../context'
+import CustomTooltip from '../CustomTooltip'
+import { hexToRGBA } from '../../helpers/hextoRGBA'
 
 export const PreferenceButton = (props) => {
   const getFormattedLabel = (label) => {
@@ -32,7 +35,6 @@ export const PreferenceButton = (props) => {
     data: { globalChannelPreference },
     handlers: { setUserPreference, setUpdatedPreference }
   } = useNotificationsHomeContext()
-  // console.log('Preference button type ', props.type)
   const chipClicked = (section, topic, type, label) => {
     if (type === 'required' || globalChannelPreference[label] === true) return
     setUserPreference((prev) => {
@@ -58,14 +60,8 @@ export const PreferenceButton = (props) => {
   const { section, topic, type, label, tooltip } = props
   let formattedLabel = getFormattedLabel(label)
 
-  // console.log(
-  //   'Cursor allowed',
-  //   type,
-  //   globalChannelPreference[label],
-  //   type !== 'required' && !globalChannelPreference[label]
-  // )
   return tooltip ? (
-    <Tooltip
+    <CustomTooltip
       title={
         type !== 'required' && globalChannelPreference[label]
           ? `${formattedLabel} is globally opted-out`
@@ -84,7 +80,7 @@ export const PreferenceButton = (props) => {
                 alignItems: 'center',
                 padding: 0
               }}
-              color={theme.palette.mode === 'dark' ? '#fff' : 'primary'}
+              color={theme.palette.text.primary}
               padding={0}
             >
               {formattedLabel}
@@ -96,21 +92,21 @@ export const PreferenceButton = (props) => {
                 }}
               >
                 {type === 'required' ? (
-                  <Lock
+                  <MemoLock
                     sx={{
                       width: '.8em',
                       height: '.8em'
                     }}
-                    color={theme.palette.mode === 'dark' ? '#fff' : 'primary'}
+                    color={'primary'}
                     className='required-icon'
                   />
                 ) : type === 'opted-in' ? (
-                  <CheckCircle
+                  <MemoCheckCircle
                     sx={{
                       width: '.8em',
                       height: '.8em'
                     }}
-                    color={theme.palette.mode === 'dark' ? '#fff' : 'primary'}
+                    color={'primary'}
                     className='opt-in-icon'
                   />
                 ) : null}
@@ -128,12 +124,12 @@ export const PreferenceButton = (props) => {
             borderRadius: '5px',
             backgroundColor:
               type === 'opted-out'
-                ? ''
-                : theme.palette.mode === 'dark'
-                ? '#9155FD80'
-                : '#9155FD14',
+                ? hexToRGBA(theme.palette.primary.main, 0.12)
+                : hexToRGBA(theme.palette.primary.main, 0.32),
             color: theme.palette.primary.main,
-            ...(type !== 'opted-out' ? { borderColor: '#9155FD80' } : {}),
+            ...(type !== 'opted-out'
+              ? { borderColor: hexToRGBA(theme.palette.primary.main, 0.32) }
+              : {}),
             ...(type !== 'required' && !globalChannelPreference[label]
               ? { cursor: 'pointer' }
               : { cursor: 'not-allowed' })
@@ -145,7 +141,7 @@ export const PreferenceButton = (props) => {
           onClick={() => chipClicked(section, topic, type, label)}
         />
       </Box>
-    </Tooltip>
+    </CustomTooltip>
   ) : (
     <Chip
       key={label}
@@ -158,7 +154,7 @@ export const PreferenceButton = (props) => {
             alignItems: 'center',
             padding: 0
           }}
-          color={theme.palette.mode === 'dark' ? '#fff' : 'primary'}
+          color={theme.palette.text.primary}
           padding={0}
         >
           {formattedLabel}
@@ -170,20 +166,21 @@ export const PreferenceButton = (props) => {
             }}
           >
             {type === 'required' ? (
-              <Lock
+              <MemoLock
                 sx={{
                   width: '.8em',
                   height: '.8em'
                 }}
-                color={theme.palette.mode === 'dark' ? '#fff' : 'primary'}
+                color={'primary'}
               />
             ) : type === 'opted-in' ? (
-              <CheckCircle
+              <MemoCheckCircle
                 sx={{
+                  transition: 'transform 40ms ease 0ms',
                   width: '.8em',
                   height: '.8em'
                 }}
-                color={theme.palette.mode === 'dark' ? '#fff' : 'primary'}
+                color={'primary'}
               />
             ) : null}
           </Icon>
@@ -200,12 +197,12 @@ export const PreferenceButton = (props) => {
         borderRadius: '5px',
         backgroundColor:
           type === 'opted-out'
-            ? ''
-            : theme.palette.mode === 'dark'
-            ? '#9155FD80'
-            : '#9155FD14',
+            ? hexToRGBA(theme.palette.primary.main, 0.12)
+            : hexToRGBA(theme.palette.primary.main, 0.32),
         color: theme.palette.primary.main,
-        ...(type !== 'opted-out' ? { borderColor: '#9155FD80' } : {}),
+        ...(type !== 'opted-out'
+          ? { borderColor: hexToRGBA(theme.palette.primary.main, 0.32) }
+          : { borderColor: theme.palette.text.chip }),
         ...(type !== 'required' || !globalChannelPreference[label]
           ? { cursor: 'pointer' }
           : { cursor: 'not-allowed' })

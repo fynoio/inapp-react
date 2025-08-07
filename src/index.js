@@ -1,7 +1,7 @@
-import { Toaster } from 'react-hot-toast'
+import toast, { Toaster, useToasterStore } from 'react-hot-toast'
 import NotificationHomeWrapper from './notifications/components/NotificationsHomeWrapper'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
-import React from 'react'
+import React, { useEffect } from 'react'
 import './styles.module.css'
 import { hexToRGBA } from './notifications/helpers/hextoRGBA'
 
@@ -33,12 +33,9 @@ export const FynoInappCenter = (props) => {
     800: '#004646',
     900: '#003636'
   }
-
-  const theme = createTheme({
+  const muiThemeConfig = {
     typography: {
-      fontFamily:
-        themeConfig.font ||
-        ['Inter', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'].join(',')
+      fontFamily: themeConfig?.font ?? ['Inter'].join(',')
     },
     palette: {
       common: {
@@ -48,12 +45,12 @@ export const FynoInappCenter = (props) => {
       mode: mode,
       primary: {
         main:
-          themeConfig?.primary || mode === 'light' ? teal['500'] : '#18A5A5',
+          themeConfig?.primary ?? (mode === 'light' ? teal['500'] : '#18A5A5'),
         contrastText: '#FFF'
       },
       secondary: {
         main:
-          themeConfig?.secondary || mode === 'light' ? '#5B5B5B' : '#B2B2B2',
+          themeConfig?.secondary ?? (mode === 'light' ? '#5B5B5B' : '#B2B2B2'),
         contrastText: '#FFF'
       },
       text: {
@@ -122,11 +119,21 @@ export const FynoInappCenter = (props) => {
           : hexToRGBA(mode === 'light' ? teal['500'] : '#18A5A5', 0.8)
       }
     }
-  })
+  }
+  const theme = createTheme(muiThemeConfig)
+  const { toasts } = useToasterStore()
+
+  useEffect(() => {
+    toasts
+      .filter((t) => t.visible)
+      .filter((_, i) => i >= (notificationSettings?.maxToastCount || 3))
+      .forEach((t) => toast.dismiss(t.id))
+  }, [toasts])
   return (
     <ThemeProvider theme={theme}>
       <NotificationHomeWrapper {...props} />
       <Toaster
+        containerClassName='react-hot-toast'
         position={notificationSettings?.toastPosition || 'top-right'}
         toastOptions={{
           duration: notificationSettings?.duration || 5000,
@@ -144,6 +151,15 @@ export const FynoInappCenter = (props) => {
   )
 }
 
-export const FynoToast = (config) => (
-  <Toaster {...config} reverseOrder={false} />
-)
+export const FynoToast = (config) => {
+  const { toasts } = useToasterStore()
+
+  useEffect(() => {
+    toasts
+      .filter((t) => t.visible)
+      .filter((_, i) => i >= (notificationSettings?.maxToastCount || 3))
+      .forEach((t) => toast.dismiss(t.id))
+  }, [toasts])
+
+  return <Toaster {...config} reverseOrder={false} />
+}
