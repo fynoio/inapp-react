@@ -3,14 +3,11 @@ import React from 'react'
 import toast from 'react-hot-toast'
 import parse from 'html-react-parser'
 
-import {
-  LibraryBooks,
-  DoneAll,
-  DeleteSweepOutlined,
-  Close,
-  Settings,
-  SettingsOutlined
-} from '@mui/icons-material'
+import MemoLibraryBooks from '../Icons/LibraryBooks'
+import MemoDoneAll from '../Icons/DoneAll'
+import MemoDeleteSweepOutlined from '../Icons/DeleteSweepOutlined'
+import MemoClose from '../Icons/Close'
+import MemoSettingsOutlined from '../Icons/SettingsOutlined'
 import { TabContext, TabList, TabPanel } from '@mui/lab'
 import {
   Box,
@@ -29,6 +26,7 @@ import { useNotificationsHomeContext } from '../../context'
 
 import NotificationsList from '../NotificationsList'
 import { hexToRGBA } from '../../helpers/hextoRGBA'
+import CustomTooltip from '../CustomTooltip'
 
 const DocumentComponent = ({ docType = 'txt' }) => {
   const theme = useTheme()
@@ -87,8 +85,8 @@ const DocumentComponent = ({ docType = 'txt' }) => {
     width: '50px',
     height: '50px',
     borderRadius: 1,
-    background: temp[docType]?.background || theme.palette.action.selected,
-    color: temp[docType]?.iconColor || theme.palette.action.active,
+    background: temp[docType]?.background || theme.palette?.action?.selected,
+    color: temp[docType]?.iconColor || theme.palette?.action?.active,
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
@@ -97,7 +95,7 @@ const DocumentComponent = ({ docType = 'txt' }) => {
 
   return (
     <Box sx={{ ...boxStyles }}>
-      <LibraryBooks fontSize='small' />
+      <MemoLibraryBooks fontSize='small' />
       <Typography sx={{ fontSize: '0.6rem' }}>
         {temp[docType]?.title || docType.toUpperCase()}
       </Typography>
@@ -126,7 +124,7 @@ const ActionsComponent = ({ item, t, socketInstance }) => {
                 onClick={(e) => {
                   e.stopPropagation()
                   toast.dismiss(t.id)
-                  socketInstance.emit('message:read', data)
+                  socketInstance?.emit('message:read', data)
                 }}
                 target={sameTab === 'false' ? '_self' : '_blank'}
                 href={`${item?.action}`}
@@ -204,6 +202,63 @@ const AttachmentComponent = ({ type, attachmentsObject, showBlur }) => {
       return null
   }
 }
+const sanitizeHtml = (html) => {
+  const safeTags = [
+    'p',
+    'br',
+    'b',
+    'i',
+    's',
+    'u',
+    'strong',
+    'em',
+    'a',
+    'tt',
+    'span',
+    'div',
+    'code',
+    'pre',
+    'ul',
+    'ol',
+    'li',
+    'blockquote',
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6'
+  ]
+
+  const safeProtocols = ['http:', 'https:', 'mailto:', 'tel:']
+
+  return html.replace(
+    /<\/?([a-z0-9]+)(\s[^>]*)?>/gi,
+    (match, tagName, attrs) => {
+      tagName = tagName.toLowerCase()
+
+      if (safeTags.includes(tagName)) {
+        return match
+      }
+
+      if (tagName === 'a') {
+        const hrefMatch = /href\s*=\s*["']([^"']+)["']/i.exec(attrs || '')
+        const href = hrefMatch?.[1]
+        try {
+          const url = new URL(href, 'https://dummy.com')
+          if (safeProtocols.includes(url.protocol)) {
+            return `<a href="${url.href}">`
+          }
+        } catch (_) {
+          return '&lt;a&gt;'
+        }
+      }
+
+      // Not a safe tag — escape it
+      return match.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    }
+  )
+}
 const preview = (value, list) => {
   if (value) {
     var preview_val = value
@@ -243,7 +298,7 @@ const preview = (value, list) => {
     for (let i = 0; i < replace?.length; i++) {
       preview_val = preview_val.replace(replace[i], replace_with[i])
     }
-    return preview_val
+    return sanitizeHtml(preview_val)
   } else {
     return ''
   }
@@ -254,14 +309,6 @@ const MainBody = ({ body, title }) => {
     '&': {
       scope: 'g',
       with: '&amp;'
-    },
-    '<': {
-      scope: 'g',
-      with: '&lt;'
-    },
-    '>': {
-      scope: 'g',
-      with: '&gt;'
     },
     '"': {
       scope: 'g',
@@ -291,32 +338,34 @@ const MainBody = ({ body, title }) => {
   const theme = useTheme()
   const renderBody = preview(body, list)
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 2,
-        textAlign: 'left',
-        wordWrap: 'break-word'
-      }}
-    >
-      <Box>
-        <Typography
-          fontSize='0.85rem'
-          fontWeight={600}
-          color={theme.palette.toasttext.primary}
-        >
-          {title}
-        </Typography>
-        <Typography
-          fontSize='0.7rem'
-          fontWeight={200}
-          color={theme.palette.toasttext.primary}
-        >
-          {parse(renderBody)}
-        </Typography>
+    renderBody && (
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+          textAlign: 'left',
+          wordWrap: 'break-word'
+        }}
+      >
+        <Box>
+          <Typography
+            fontSize='0.85rem'
+            fontWeight={600}
+            color={theme.palette?.toasttext?.primary}
+          >
+            {title}
+          </Typography>
+          <Typography
+            fontSize='0.7rem'
+            fontWeight={200}
+            color={theme.palette?.toasttext?.primary}
+          >
+            {parse(renderBody)}
+          </Typography>
+        </Box>
       </Box>
-    </Box>
+    )
   )
 }
 
@@ -352,9 +401,10 @@ export const ToastStructure = ({ msg, t, socketInstance, logo, close }) => {
       onClick={(e) => {
         e.stopPropagation()
         toast.dismiss(t.id)
-        socketInstance.emit('message:read', msg)
+        socketInstance?.emit('message:read', msg)
         if (link) window.open(link, sameTab === 'true' ? '_self' : '_blank')
       }}
+      className='fyno-toast'
       style={{ textDecoration: 'none', width: '100%' }}
     >
       <Grid container spacing={0} alignItems='center'>
@@ -408,7 +458,7 @@ export const ToastStructure = ({ msg, t, socketInstance, logo, close }) => {
             }}
             size='small'
           >
-            <Close fontSize='small' />
+            <MemoClose fontSize='small' />
           </IconButton>
         ) : (
           ''
@@ -429,25 +479,25 @@ const Actions = () => {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
       {list?.length > 0 && unreadList?.length > 0 && (
-        <Tooltip title='Mark all as read'>
+        <CustomTooltip title='Mark all as read'>
           <IconButton onClick={(e) => handleMarkAllAsRead(e)}>
-            <DoneAll />
+            <MemoDoneAll />
           </IconButton>
-        </Tooltip>
+        </CustomTooltip>
       )}
       {list?.length > 0 && (
-        <Tooltip title='Delete all'>
+        <CustomTooltip title='Delete all'>
           <IconButton onClick={(e) => handleClickDelete(e)}>
-            <DeleteSweepOutlined />
+            <MemoDeleteSweepOutlined />
           </IconButton>
-        </Tooltip>
+        </CustomTooltip>
       )}
-      {!header && xsUp && preferenceMode !== 'none' && (
-        <Tooltip title='Channel preference'>
+      {((!header && !header !== '') || !xsUp) && preferenceMode != 'none' && (
+        <CustomTooltip title='Notification Preferences'>
           <IconButton onClick={(e) => handleOpenConfig()}>
-            <SettingsOutlined fontSize='small' color='secondary' />
+            <MemoSettingsOutlined fontSize='small' />
           </IconButton>
-        </Tooltip>
+        </CustomTooltip>
       )}
     </Box>
   )
@@ -460,7 +510,6 @@ export const NotificationsTabs = () => {
   } = useNotificationsHomeContext()
 
   const theme = useTheme()
-
   return (
     <TabContext value={tabPanelValue}>
       <Box
@@ -498,10 +547,10 @@ export const NotificationsTabs = () => {
         <Actions />
       </Box>
       <Divider sx={{ mt: 0, mb: 0 }} />
-      <TabPanel value='all' sx={{ p: 0 }}>
+      <TabPanel value='all' sx={{ p: 0, minWidth: 'inherit' }}>
         <NotificationsList filter={false} />
       </TabPanel>
-      <TabPanel value='unread' sx={{ p: 0 }}>
+      <TabPanel value='unread' sx={{ p: 0, minWidth: 'inherit' }}>
         <NotificationsList filter />
       </TabPanel>
     </TabContext>
